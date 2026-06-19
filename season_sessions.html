@@ -1,0 +1,1240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Season Training Sessions — PLD Soccer 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --red:#ce0e2d;--red-mid:#e8324f;--red-pale:#f5c0c8;
+  --dark:#0e0e0e;--dark2:#1a1a1a;--dark3:#252525;--dark4:#2e2e2e;
+  --white:#fff;--gray:#888;--border:rgba(255,255,255,0.08);
+}
+html{scroll-behavior:smooth;}
+body{font-family:'DM Sans',sans-serif;background:var(--dark);color:var(--white);min-height:100vh;display:flex;flex-direction:column;}
+
+.top-nav{background:var(--dark);border-bottom:3px solid var(--red);padding:14px 20px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100;}
+.back-btn{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.4);text-decoration:none;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);padding:6px 12px;border-radius:6px;flex-shrink:0;transition:all .2s;}
+.back-btn:hover{color:var(--white);background:rgba(255,255,255,0.1);}
+.nav-title{flex:1;}
+.nav-eyebrow{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--red-mid);font-weight:600;}
+.nav-heading{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:var(--white);line-height:1;}
+.nav-heading span{color:var(--red);}
+.session-indicator{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;color:var(--white);line-height:1;flex-shrink:0;text-align:right;}
+.session-indicator span{color:var(--red);}
+.session-indicator small{display:block;font-size:10px;font-family:'DM Sans',sans-serif;letter-spacing:1px;color:rgba(255,255,255,0.3);font-weight:600;text-transform:uppercase;}
+
+.theme-bar{background:var(--dark2);border-bottom:1px solid var(--border);padding:10px 16px 0;overflow-x:auto;scrollbar-width:none;}
+.theme-bar::-webkit-scrollbar{display:none;}
+.theme-groups{display:flex;gap:0;min-width:max-content;}
+.theme-group{display:flex;flex-direction:column;gap:4px;padding:0 12px 10px;border-right:1px solid var(--border);}
+.theme-group:first-child{padding-left:0;}
+.theme-group:last-child{border-right:none;}
+.theme-label{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.25);font-weight:700;margin-bottom:2px;}
+.theme-pips{display:flex;gap:5px;}
+.day-pip{min-width:44px;height:32px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;cursor:pointer;border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.35);background:transparent;flex-shrink:0;transition:all .15s;letter-spacing:0.5px;padding:0 8px;white-space:nowrap;}
+.day-pip:hover{border-color:rgba(206,14,45,0.4);color:var(--white);}
+.day-pip.active{background:var(--red);border-color:var(--red);color:var(--white);}
+
+.main{flex:1;max-width:780px;width:100%;margin:0 auto;padding:0 0 80px;}
+.day-panel{display:none;padding:20px 20px 0;}
+.day-panel.active{display:block;}
+
+.day-header{background:var(--dark2);border-radius:10px;padding:18px 20px;margin-bottom:16px;border-left:4px solid var(--red);}
+.day-header-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+.day-phase-badge{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--red-mid);font-weight:700;margin-bottom:4px;}
+.day-title{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:2px;color:var(--white);line-height:1.1;}
+.day-meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
+.day-tag{font-size:10px;font-weight:600;letter-spacing:1px;padding:3px 9px;border-radius:4px;background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.5);}
+.day-tag.red{background:rgba(206,14,45,0.15);color:var(--red-mid);}
+.day-duration{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:2px;color:var(--white);flex-shrink:0;line-height:1;}
+.day-duration span{font-size:14px;font-weight:400;color:rgba(255,255,255,0.35);letter-spacing:0;font-family:'DM Sans',sans-serif;margin-left:2px;}
+
+.block{background:var(--dark2);border-radius:10px;margin-bottom:12px;overflow:hidden;}
+.block-head{padding:10px 16px;display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none;}
+.block-head:hover{background:var(--dark3);}
+.block-time{font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:1px;color:rgba(255,255,255,0.35);flex-shrink:0;min-width:80px;}
+.block-label{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--white);flex:1;}
+.block-pg{font-size:10px;font-weight:600;letter-spacing:1px;color:rgba(255,255,255,0.28);margin-left:4px;flex-shrink:0;text-decoration:none;border-bottom:1px dotted rgba(255,255,255,0.2);padding-bottom:1px;cursor:pointer;}
+.block-pg:hover{color:var(--red-mid);border-bottom-color:var(--red-mid);}
+.block-type{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:3px 8px;border-radius:4px;flex-shrink:0;}
+.block-type.setup{background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.4);}
+.block-type.activation{background:rgba(255,165,0,0.12);color:#ffaa33;}
+.block-type.one-v-one{background:rgba(0,150,255,0.12);color:#66aaff;}
+.block-type.unit{background:rgba(100,200,100,0.12);color:#88dd88;}
+.block-type.ssg{background:rgba(180,100,255,0.12);color:#cc88ff;}
+.block-type.debrief{background:rgba(206,14,45,0.15);color:var(--red-mid);}
+.block-chevron{color:rgba(255,255,255,0.25);font-size:12px;transition:transform .2s;}
+.block.open .block-chevron{transform:rotate(180deg);}
+.block-body{display:none;padding:0 16px 14px;}
+.block.open .block-body{display:block;}
+.block-desc{font-size:13px;color:rgba(255,255,255,0.65);line-height:1.65;}
+.block-desc strong{color:var(--red-pale);font-weight:600;}
+
+.ten-min-grid{display:flex;flex-direction:column;gap:8px;margin-top:4px;}
+.pos-row{background:rgba(255,255,255,0.04);border-radius:7px;padding:10px 12px;border-left:3px solid;}
+.pos-row.gk{border-left-color:#ffcc33;}
+.pos-row.cb{border-left-color:#66aaff;}
+.pos-row.fb{border-left-color:#88dd88;}
+.pos-row.cm{border-left-color:#cc88ff;}
+.pos-row.fwd{border-left-color:#ff8866;}
+.pos-row.all{border-left-color:var(--red-mid);}
+.pos-label{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;}
+.pos-row.gk .pos-label{color:#ffcc33;}
+.pos-row.cb .pos-label{color:#66aaff;}
+.pos-row.fb .pos-label{color:#88dd88;}
+.pos-row.cm .pos-label{color:#cc88ff;}
+.pos-row.fwd .pos-label{color:#ff8866;}
+.pos-row.all .pos-label{color:var(--red-mid);}
+.pos-text{font-size:12px;color:rgba(255,255,255,0.65);line-height:1.5;}
+
+.cues-box{background:rgba(206,14,45,0.08);border:1px solid rgba(206,14,45,0.2);border-radius:10px;padding:14px 16px;margin-bottom:12px;}
+.cues-head{font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:3px;color:var(--red-mid);margin-bottom:10px;}
+.cue-item{display:flex;gap:8px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:13px;color:rgba(255,255,255,0.7);line-height:1.45;}
+.cue-item:last-child{border-bottom:none;}
+.cue-item::before{content:'▸';color:var(--red);flex-shrink:0;margin-top:1px;}
+
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--dark2);border-top:1px solid var(--border);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;z-index:100;}
+.nav-btn{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;padding:10px 20px;border-radius:8px;border:none;cursor:pointer;transition:all .15s;letter-spacing:0.5px;font-family:'DM Sans',sans-serif;}
+.nav-btn.prev{background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.6);}
+.nav-btn.prev:hover{background:rgba(255,255,255,0.12);color:var(--white);}
+.nav-btn.next{background:var(--red);color:var(--white);}
+.nav-btn.next:hover{background:var(--red-mid);}
+.nav-btn:disabled{opacity:0.2;cursor:default;}
+.bottom-center{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:rgba(255,255,255,0.3);}
+
+@media(max-width:520px){
+  .top-nav{padding:10px 14px;}
+  .day-panel{padding:14px 14px 0;}
+  .block-time{min-width:68px;font-size:12px;}
+  .day-pip{min-width:38px;font-size:10px;}
+}
+</style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <a href="coaching.html" class="back-btn">← Back</a>
+  <div class="nav-title">
+    <div class="nav-eyebrow">PLD · 2026 Regular Season</div>
+    <div class="nav-heading">TRAINING <span>SESSIONS</span></div>
+  </div>
+  <div class="session-indicator"><small>Session</small><span id="nav-s-num">1</span></div>
+</nav>
+
+<div class="theme-bar">
+  <div class="theme-groups">
+    <div class="theme-group">
+      <div class="theme-label">Possession</div>
+      <div class="theme-pips">
+        <button class="day-pip active" onclick="goTo(1)">Switching</button>
+        <button class="day-pip" onclick="goTo(2)">Build-Out</button>
+        <button class="day-pip" onclick="goTo(3)">Midfield</button>
+      </div>
+    </div>
+    <div class="theme-group">
+      <div class="theme-label">Wide &amp; Final Third</div>
+      <div class="theme-pips">
+        <button class="day-pip" onclick="goTo(4)">Wide Play</button>
+        <button class="day-pip" onclick="goTo(5)">Finishing</button>
+      </div>
+    </div>
+    <div class="theme-group">
+      <div class="theme-label">Transitions</div>
+      <div class="theme-pips">
+        <button class="day-pip" onclick="goTo(6)">4 Moments</button>
+        <button class="day-pip" onclick="goTo(7)">Counter</button>
+        <button class="day-pip" onclick="goTo(8)">vs Back 4</button>
+      </div>
+    </div>
+    <div class="theme-group">
+      <div class="theme-label">Game Model</div>
+      <div class="theme-pips">
+        <button class="day-pip" onclick="goTo(9)">Defence</button>
+        <button class="day-pip" onclick="goTo(10)">Shape</button>
+        <button class="day-pip" onclick="goTo(11)">Mgmt</button>
+        <button class="day-pip" onclick="goTo(12)">Trigger</button>
+      </div>
+    </div>
+    <div class="theme-group">
+      <div class="theme-label">Review</div>
+      <div class="theme-pips">
+        <button class="day-pip" onclick="goTo(13)">Full Review</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<main class="main">
+
+<!-- S1 -->
+<div class="day-panel active" id="day-1">
+  <div class="day-header">
+    <div class="day-header-top">
+      <div>
+        <div class="day-phase-badge">Possession · Session 1</div>
+        <div class="day-title">Switching Play &amp; Five Receiving Lines</div>
+        <div class="day-meta"><span class="day-tag red">Reinforce the Foundation</span><span class="day-tag">Wide Pitch · Six Goals</span></div>
+      </div>
+      <div class="day-duration">120<span>min</span></div>
+    </div>
+  </div>
+  <div class="block open">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">0:00–0:10</span>
+      <span class="block-label">10-Minute Rule</span>
+      <span class="block-type setup">Individual</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="ten-min-grid">
+      <div class="pos-row gk"><div class="pos-label">GK</div><div class="pos-text">Distribution under a pressing forward — receive back pass, play through or over the press.</div></div>
+      <div class="pos-row cb"><div class="pos-label">CBs</div><div class="pos-text">Driving pass to switch — receive from GK, hit the far FB on the half-volley. 10 reps each foot.</div></div>
+      <div class="pos-row fb"><div class="pos-label">FBs</div><div class="pos-text">Step into L3 receiving position — time the movement to arrive as the ball leaves the CB.</div></div>
+      <div class="pos-row cm"><div class="pos-label">CMs</div><div class="pos-text">Half-turn receive — check away, open body before ball arrives, first touch forward.</div></div>
+      <div class="pos-row fwd"><div class="pos-label">Forwards</div><div class="pos-text">Receiving back to goal at L5 — single touch lay-off under shoulder pressure, 10 reps.</div></div>
+    </div></div>
+  </div>
+  <div class="block">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">0:10–0:22</span>
+      <span class="block-label">Activation — Recognition of Pressure <a class="block-pg" href="Developing-an-elite-philosophy-in-possession-itzwoc.pdf#page=30" target="_blank" onclick="event.stopPropagation()">p.30 ↗</a></span>
+      <span class="block-type activation">Activation</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="block-desc">Poles and cones scattered randomly creating gates (1 pt) and goals (2 pts). Teams score by dribbling through gates or shooting into goals. No set pattern — players read pressure areas continuously. Pure game-reality warm-up. <strong>Prompt players to name the pressure side before receiving.</strong></div></div>
+  </div>
+  <div class="block">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">0:25–0:45</span>
+      <span class="block-label">1v1 — Dominate Receiving Pressure Behind <a class="block-pg" href="Developing-an-elite-philosophy-in-possession-itzwoc.pdf#page=50" target="_blank" onclick="event.stopPropagation()">p.50 ↗</a></span>
+      <span class="block-type one-v-one">1v1</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="block-desc">10×15 area, mannequin centrally, two gates beyond. Defender starts behind (the most common match situation). Attacker protects, dominates, plays through a gate or reaches the end line. 6 reps. <strong>Progress:</strong> replace mannequin with live defender.</div></div>
+  </div>
+  <div class="block">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">0:45–1:13</span>
+      <span class="block-label">Unit — Switching Play &amp; Circulation <a class="block-pg" href="Developing-an-elite-philosophy-in-possession-itzwoc.pdf#page=27" target="_blank" onclick="event.stopPropagation()">p.27 ↗</a></span>
+      <span class="block-type unit">Unit</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="block-desc">Wide pitch, 6 goals (one central, two wide each end). Teams score in any goal. <strong>Switching play earns a bonus point.</strong> No more than 3 consecutive passes in the same zone. Forces identification of the pressure side and switch to find freedom. Ask players to call "switch" before the pass is made.</div></div>
+  </div>
+  <div class="block">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">1:16–1:50</span>
+      <span class="block-label">SSG — Technicians Game <a class="block-pg" href="Developing-an-elite-philosophy-in-possession-itzwoc.pdf#page=46" target="_blank" onclick="event.stopPropagation()">p.46 ↗</a></span>
+      <span class="block-type ssg">SSG</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="block-desc">Small area, 4 small goals, no GKs. <strong>Seven 4-minute bouts:</strong> (1) Vertical goals only, (2) Horizontal only, (3) 20 passes = goal, (4) Any goal, (5) Volleys only, (6) Aerial set volley, (7) Chest volley. Each bout rewards a different technical quality under competitive pressure.</div></div>
+  </div>
+  <div class="block">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">1:50–2:00</span>
+      <span class="block-label">Debrief</span>
+      <span class="block-type debrief">Debrief</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="block-desc">Name the Five Receiving Lines. Which line was hardest to find today? Connect one switch in the unit to a moment where pressure was read early. Ask: is the 10-minute rule habit carrying into the season?</div></div>
+  </div>
+  <div class="cues-box">
+    <div class="cues-head">Coaching Cues — Session 1</div>
+    <div class="cue-item">The pressure area is read before the ball arrives — not after.</div>
+    <div class="cue-item">Five Receiving Lines: GK (L1) → CBs/FBs (L2) → Pivot/FBs (L3) → No.10 (L4) → Forwards (L5).</div>
+    <div class="cue-item">A switch that arrives late is a switch that doesn't work. Call it early.</div>
+    <div class="cue-item">Ball possession without purpose is wasted. Every circulation must shift defenders.</div>
+  </div>
+</div>
+
+<!-- S2 -->
+<div class="day-panel" id="day-2">
+  <div class="day-header">
+    <div class="day-header-top">
+      <div>
+        <div class="day-phase-badge">Possession · Session 2</div>
+        <div class="day-title">Building From the Back — Patience &amp; Underload</div>
+        <div class="day-meta"><span class="day-tag red">Horseshoe · 3v4 Underload</span><span class="day-tag">Half Pitch</span></div>
+      </div>
+      <div class="day-duration">120<span>min</span></div>
+    </div>
+  </div>
+  <div class="block open">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">0:00–0:10</span>
+      <span class="block-label">10-Minute Rule</span>
+      <span class="block-type setup">Individual</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="ten-min-grid">
+      <div class="pos-row gk"><div class="pos-label">GK</div><div class="pos-text">Horseshoe distribution — short to CB, CB feeds back, GK switches to far FB. Pace and timing.</div></div>
+      <div class="pos-row cb"><div class="pos-label">CBs</div><div class="pos-text">Playing through a press — receive under a closing striker, body shape to play around or through.</div></div>
+      <div class="pos-row fb"><div class="pos-label">FBs</div><div class="pos-text">Underlap timing — check inside at the exact moment the winger takes the defender wide.</div></div>
+      <div class="pos-row cm"><div class="pos-label">CMs</div><div class="pos-text">Retention under tight press — 1v1 keep-ball, protect without backing into the defender.</div></div>
+      <div class="pos-row fwd"><div class="pos-label">Strikers</div><div class="pos-text">Hold-up strength — back to goal, two hands out, resist 3 seconds, then turn. 10 reps.</div></div>
+    </div></div>
+  </div>
+  <div class="block">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">0:10–0:22</span>
+      <span class="block-label">Activation — Horseshoe Retention &amp; CM Angles <a class="block-pg" href="Developing-an-elite-philosophy-in-possession-itzwoc.pdf#page=48" target="_blank" onclick="event.stopPropagation()">p.48 ↗</a></span>
+      <span class="block-type activation">Activation</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="block-desc">Two 18-yard areas back to back, GK in each. Two back fours outside each box. 3 CMs vs 3 CMs centrally. Back fours retain in horseshoe and feed their CM trio. Builds the critical link between defensive line and CM. <strong>Focus on the CB's first look being long before recycling.</strong></div></div>
+  </div>
+  <div class="block">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">0:25–0:45</span>
+      <span class="block-label">1v1 — Foundation of 2v2 and 3v3 <a class="block-pg" href="Developing-an-elite-philosophy-in-possession-itzwoc.pdf#page=59" target="_blank" onclick="event.stopPropagation()">p.59 ↗</a></span>
+      <span class="block-type one-v-one">1v1</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="block-desc">3 areas side by side: (1) 10×15 — 1v1, (2) 12×12 — 2v2, (3) 15×15 — 3v3. Groups rotate every 3 minutes. Win the 1v1 → create the 2v1; two players dominating → the 3v2 overload. Individual skill IS the foundation of every team possession moment.</div></div>
+  </div>
+  <div class="block">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">0:45–1:13</span>
+      <span class="block-label">Unit — Circulation, Switching &amp; Patience in Possession <a class="block-pg" href="Developing-an-elite-philosophy-in-possession-itzwoc.pdf#page=28" target="_blank" onclick="event.stopPropagation()">p.28 ↗</a></span>
+      <span class="block-type unit">Unit</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="block-desc">3 zones. End zones: 2v1 (CBs + GK vs CF) — easy possession. Central zone: <strong>3v4 deliberate underload.</strong> Floaters on outside as relief. Ball flows end zone → central 3v4 → opposite end zone. The underload forces faster decisions and genuine patience — use the floater, reset, attack again.</div></div>
+  </div>
+  <div class="block">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">1:16–1:50</span>
+      <span class="block-label">SSG — Playing Out of Pressure Zones <a class="block-pg" href="Developing-an-elite-philosophy-in-possession-itzwoc.pdf#page=36" target="_blank" onclick="event.stopPropagation()">p.36 ↗</a></span>
+      <span class="block-type ssg">SSG</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="block-desc">3 zones: 2v1 each end, 3v3 central. Floating extra defender creates overload pressure. Teams alternate — one builds out through all three zones, the other establishes a press. When pressing team wins centrally → <strong>counter to goal within 8 seconds.</strong></div></div>
+  </div>
+  <div class="block">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">1:50–2:00</span>
+      <span class="block-label">Debrief</span>
+      <span class="block-type debrief">Debrief</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="block-desc">CB hierarchy check: long first, CM angle second, switch third. Did any CB skip straight to the switch? Connect the underload patience to a moment where the floater unlocked the next phase.</div></div>
+  </div>
+  <div class="cues-box">
+    <div class="cues-head">Coaching Cues — Session 2</div>
+    <div class="cue-item">The CB's first look is long, second is the CM angle, third is the switch. Build the hierarchy until automatic.</div>
+    <div class="cue-item">The underload is vital — don't force it alone, use the floater, then attack again.</div>
+    <div class="cue-item">Individual skill is the foundation of every possession moment.</div>
+  </div>
+</div>
+
+<!-- S3 -->
+<div class="day-panel" id="day-3">
+  <div class="day-header">
+    <div class="day-header-top">
+      <div>
+        <div class="day-phase-badge">Possession · Session 3</div>
+        <div class="day-title">Midfield Domination — Rotation, Overload &amp; Press</div>
+        <div class="day-meta"><span class="day-tag red">CM Rotation · 4 Boxes</span><span class="day-tag">Tight Area</span></div>
+      </div>
+      <div class="day-duration">120<span>min</span></div>
+    </div>
+  </div>
+  <div class="block open">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">0:00–0:10</span>
+      <span class="block-label">10-Minute Rule</span>
+      <span class="block-type setup">Individual</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="ten-min-grid">
+      <div class="pos-row gk"><div class="pos-label">GK</div><div class="pos-text">Distribution under press — read the press shape and choose: play short, long, or switch.</div></div>
+      <div class="pos-row cb"><div class="pos-label">CBs</div><div class="pos-text">Diagonal driven pass to switch — 10 reps, alternate feet, no standing passes.</div></div>
+      <div class="pos-row cm"><div class="pos-label">CMs</div><div class="pos-text">Receive on the half-turn and play forward first time — the core CM habit, done until unconscious.</div></div>
+      <div class="pos-row fwd"><div class="pos-label">No. 10</div><div class="pos-text">Receiving between lines, disguising the turn — 10 reps against a shadow marker.</div></div>
+      <div class="pos-row fwd"><div class="pos-label">Forwards</div><div class="pos-text">Dropping to L4, laying off for the arriving CM run. Timing the drop.</div></div>
+    </div></div>
+  </div>
+  <div class="block">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">0:10–0:22</span>
+      <span class="block-label">Activation — 1v1 To Play Forward &amp; Domination Without Ball <a class="block-pg" href="Developing-an-elite-philosophy-in-possession-itzwoc.pdf#page=62" target="_blank" onclick="event.stopPropagation()">p.62 ↗</a></span>
+      <span class="block-type activation">Activation</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="block-desc">Whites outside with balls. Yellows vs reds 1v1 inside. White serves to yellow. Yellow dominates the 1v1 and plays immediately to the opposite white target. <strong>Movement before the ball arrives; first action after winning = play forward.</strong></div></div>
+  </div>
+  <div class="block">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">0:25–0:45</span>
+      <span class="block-label">1v1 — Domination Without Ball &amp; Playing Forward <a class="block-pg" href="Developing-an-elite-philosophy-in-possession-itzwoc.pdf#page=53" target="_blank" onclick="event.stopPropagation()">p.53 ↗</a></span>
+      <span class="block-type one-v-one">1v1</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="block-desc">Area split into 4 equal boxes (12×12). 1v1 in each simultaneously. One red CM centrally. Yellow dominates and plays to the CM or into another box. Player who concedes becomes the next CM. The attacker's work begins before the ball arrives.</div></div>
+  </div>
+  <div class="block">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">0:45–1:13</span>
+      <span class="block-label">Unit — Central Midfield Rotation Principles <a class="block-pg" href="Developing-an-elite-philosophy-in-possession-itzwoc.pdf#page=40" target="_blank" onclick="event.stopPropagation()">p.40 ↗</a></span>
+      <span class="block-type unit">Unit</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="block-desc">Two white targets top and bottom. 3v3 centrally. CMs rotate: one drops, one holds, one makes a line-breaking run. <strong>Variation 1:</strong> receive and recycle. <strong>Variation 2:</strong> receive, turn, penetrate immediately. Rotation triggered by where the ball goes — three CMs shift as a unit, never static.</div></div>
+  </div>
+  <div class="block">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">1:16–1:50</span>
+      <span class="block-label">SSG — Midfield Rotation vs Press &amp; Counter <a class="block-pg" href="Developing-an-elite-philosophy-in-possession-itzwoc.pdf#page=31" target="_blank" onclick="event.stopPropagation()">p.31 ↗</a></span>
+      <span class="block-type ssg">SSG</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="block-desc">Tight area. 4 yellows press and counter. Whites: 2 outside (CBs/FBs) + 3 inside (midfield trio). Yellows press in a coordinated block of 4. When yellows win → immediate counter to goal (8-second rule). <strong>Progress:</strong> add white No.10, then yellow forwards.</div></div>
+  </div>
+  <div class="block">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">1:50–2:00</span>
+      <span class="block-label">Debrief</span>
+      <span class="block-type debrief">Debrief</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="block-desc">The CM not receiving must always be moving — did that happen? One moment where rotation beat the press. Connect the half-turn habit from the 10-min rule to one pass in the SSG.</div></div>
+  </div>
+  <div class="cues-box">
+    <div class="cues-head">Coaching Cues — Session 3</div>
+    <div class="cue-item">The CM not receiving must always be moving — never watching.</div>
+    <div class="cue-item">The first yard is won before the pass is made.</div>
+    <div class="cue-item">Rotation is triggered by where the ball goes — all three CMs shift as a unit.</div>
+  </div>
+</div>
+
+<!-- S4 -->
+<div class="day-panel" id="day-4">
+  <div class="day-header">
+    <div class="day-header-top">
+      <div>
+        <div class="day-phase-badge">Wide &amp; Final Third · Session 4</div>
+        <div class="day-title">Wide Play — Full Back / Winger Combinations</div>
+        <div class="day-meta"><span class="day-tag red">Bielsa Delivery · 8-Yard Channels</span><span class="day-tag">Wide Pitch</span></div>
+      </div>
+      <div class="day-duration">120<span>min</span></div>
+    </div>
+  </div>
+  <div class="block open">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">0:00–0:10</span>
+      <span class="block-label">10-Minute Rule</span>
+      <span class="block-type setup">Individual</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="ten-min-grid">
+      <div class="pos-row gk"><div class="pos-label">GK</div><div class="pos-text">Post-save distribution — save, reset feet, distribute quickly under pressure.</div></div>
+      <div class="pos-row cb"><div class="pos-label">CBs</div><div class="pos-text">Marking in transition — opponent goes long, CB must get side-on before the ball lands.</div></div>
+      <div class="pos-row fb"><div class="pos-label">FBs</div><div class="pos-text">Their specific preferred delivery — whipped in-swinger, driven low, or cut-back. 10 reps from a moving approach.</div></div>
+      <div class="pos-row fwd"><div class="pos-label">Wide Players</div><div class="pos-text">1v1 vs a retreating FB — attacker must use pace or disguise to find the cross angle.</div></div>
+      <div class="pos-row fwd"><div class="pos-label">Strikers</div><div class="pos-text">Near-post run timing — check away, then attack the near post as ball reaches the wide player.</div></div>
+    </div></div>
+  </div>
+  <div class="block">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">0:10–0:22</span>
+      <span class="block-label">Activation — Finding A Way To Deliver (Bielsa) <a class="block-pg" href="Developing-an-elite-philosophy-in-possession-itzwoc.pdf#page=58" target="_blank" onclick="event.stopPropagation()">p.58 ↗</a></span>
+      <span class="block-type activation">Activation</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="block-desc">Isolated to one side on edge of the box. Mannequins as a "second six-yard box." Wide player receives from CM, moves around the mannequin block, delivers. <strong>All cross types:</strong> early whipped, driven low, cut-back, lofted clip. Forwards attack near, far, penalty spot.</div></div>
+  </div>
+  <div class="block">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">0:25–0:45</span>
+      <span class="block-label">1v1 — Defender In Front <a class="block-pg" href="Developing-an-elite-philosophy-in-possession-itzwoc.pdf#page=55" target="_blank" onclick="event.stopPropagation()">p.55 ↗</a></span>
+      <span class="block-type one-v-one">1v1</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="block-desc">Two small goals 3 yards in from each corner. Attacker receives with defender already facing them. Must use feint, step-over, change of pace, or disguise to score in either corner goal. <strong>Defender In Front requires maximum disguise, not maximum speed.</strong></div></div>
+  </div>
+  <div class="block">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">0:45–1:13</span>
+      <span class="block-label">Unit — FB/Wide Player Relationship <a class="block-pg" href="Developing-an-elite-philosophy-in-possession-itzwoc.pdf#page=42" target="_blank" onclick="event.stopPropagation()">p.42 ↗</a></span>
+      <span class="block-type unit">Unit</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="block-desc">Wide pitch, 2 zones. Two 8-yard free channels down each side — <strong>defenders cannot enter unless ball is there.</strong> GKs both goals. Wide channels: FB + winger combine to beat the press and deliver. Options: overlap, underlap, double-pass, or direct 1v1. Central zones overloaded — teaches the team to exploit width as primary outlet.</div></div>
+  </div>
+  <div class="block">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">1:16–1:50</span>
+      <span class="block-label">SSG — Three Zone Shape Game <a class="block-pg" href="Developing-an-elite-philosophy-in-possession-itzwoc.pdf#page=38" target="_blank" onclick="event.stopPropagation()">p.38 ↗</a></span>
+      <span class="block-type ssg">SSG</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="block-desc">3 zones, 2 goals with GKs. 8v8 to 11v11. Minimum player counts in each zone enforce structural discipline. Teams play through to the next zone before switching. All four phases expressed: back four build, midfield link, wide combination, and finish.</div></div>
+  </div>
+  <div class="block">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">1:50–2:00</span>
+      <span class="block-label">Debrief</span>
+      <span class="block-type debrief">Debrief</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="block-desc">FB/winger: did one push forward and one hold depth — always? Read the run before deciding the cross — did the delivery match the runner's angle? Name one combination that worked from the channel session.</div></div>
+  </div>
+  <div class="cues-box">
+    <div class="cues-head">Coaching Cues — Session 4</div>
+    <div class="cue-item">Read the run before deciding the cross. The runner's angle tells you the delivery.</div>
+    <div class="cue-item">FB/winger: one pushes forward, one holds depth — never both forward simultaneously.</div>
+    <div class="cue-item">One player dominating their 1v1 creates the team's next 2v1.</div>
+  </div>
+</div>
+
+<!-- S5 -->
+<div class="day-panel" id="day-5">
+  <div class="day-header">
+    <div class="day-header-top">
+      <div>
+        <div class="day-phase-badge">Wide &amp; Final Third · Session 5</div>
+        <div class="day-title">Final Third — Finishing, Combinations &amp; Counter Patterns</div>
+        <div class="day-meta"><span class="day-tag red">Playing Off 9 · Front Three · 4-2-3-1</span></div>
+      </div>
+      <div class="day-duration">120<span>min</span></div>
+    </div>
+  </div>
+  <div class="block open">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">0:00–0:10</span>
+      <span class="block-label">10-Minute Rule</span>
+      <span class="block-type setup">Individual</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="ten-min-grid">
+      <div class="pos-row gk"><div class="pos-label">GK</div><div class="pos-text">Shot-stopping from close range — coach fires low driven shots 8–10 yards. Reaction saves.</div></div>
+      <div class="pos-row cb"><div class="pos-label">CBs</div><div class="pos-text">Heading delivery — lofted balls in from wide, CB wins it and redirects. Technique and timing.</div></div>
+      <div class="pos-row fb"><div class="pos-label">FBs</div><div class="pos-text">Late run into the box — time the run from deep, arrive at the far post as the cross is delivered.</div></div>
+      <div class="pos-row cm"><div class="pos-label">CMs</div><div class="pos-text">Late arriving run into the box to finish — the CM run from possession now finishes with a shot.</div></div>
+      <div class="pos-row fwd"><div class="pos-label">Wide / No.10 / Fwds</div><div class="pos-text">Bounce pass precision — weight, angle, and pace of the lay-off that sets up the shot. 10 reps.</div></div>
+    </div></div>
+  </div>
+  <div class="block">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">0:10–0:22</span>
+      <span class="block-label">Activation — Playing Off The Number 9 <a class="block-pg" href="Developing-an-elite-philosophy-in-possession-itzwoc.pdf#page=37" target="_blank" onclick="event.stopPropagation()">p.37 ↗</a></span>
+      <span class="block-type activation">Activation</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="block-desc">3 zones. Narrow end zones with small outside goals. 5v5 centrally. <strong>Must bounce off the striker before scoring.</strong> Teaches: midfield → striker → midfield runner. The striker's first touch sets up the lay-off; the arriving CM times the run.</div></div>
+  </div>
+  <div class="block">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">0:25–0:45</span>
+      <span class="block-label">1v1 — Receiving To Play Forward <a class="block-pg" href="Developing-an-elite-philosophy-in-possession-itzwoc.pdf#page=57" target="_blank" onclick="event.stopPropagation()">p.57 ↗</a></span>
+      <span class="block-type one-v-one">1v1</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="block-desc">10×15. Red targets at one height higher, one deeper. 1v1 centrally. Receive under pressure, play to one target. Heights force the decision: can I play forward (preferred) or must I bounce (safety)? <strong>Receive-and-play-forward is always the primary outcome.</strong></div></div>
+  </div>
+  <div class="block">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">0:45–1:13</span>
+      <span class="block-label">Unit — Close Finishing + Front Three Combinations <a class="block-pg" href="Developing-an-elite-philosophy-in-possession-itzwoc.pdf#page=44" target="_blank" onclick="event.stopPropagation()">pp.44–45 ↗</a></span>
+      <span class="block-type unit">Unit</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="block-desc"><strong>Part A — Close Finishing (14 min):</strong> 2 goals with GKs, 3 defenders each half, 2 strikers opposite. 4 outside players 1-touch only. Every finish in tight traffic — rewards composure and correct shot angle.<br><br><strong>Part B — Front Three Combinations (14 min):</strong> One goal + GK, 18-yard area. Front three vs back four. No.10 supports outside. Runs: near-post, far-post, diagonal, overlap, underlap. First-time finish wherever possible.</div></div>
+  </div>
+  <div class="block">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">1:16–1:50</span>
+      <span class="block-label">SSG — Counter Patterns in a 4-2-3-1 <a class="block-pg" href="Developing-an-elite-philosophy-in-possession-itzwoc.pdf#page=72" target="_blank" onclick="event.stopPropagation()">p.72 ↗</a></span>
+      <span class="block-type ssg">SSG</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="block-desc">Half pitch. GK + 2 defenders + 1 screener. Front unit: striker + 2 wingers + No.10 + 2 screeners. <strong>8-second rule is law.</strong> Three patterns: (1) screener → 10 → winger → striker → 10; (2) screener → striker → reverse winger; (3) screener → wide → cut inside. Three full rotations of the white unit.</div></div>
+  </div>
+  <div class="block">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">1:50–2:00</span>
+      <span class="block-label">Debrief</span>
+      <span class="block-type debrief">Debrief</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="block-desc">Without prompts, can the front unit walk through all three 4-2-3-1 counter patterns? Ask: did the bounce pass precision from the 10-minute rule change any finish today?</div></div>
+  </div>
+  <div class="cues-box">
+    <div class="cues-head">Coaching Cues — Session 5</div>
+    <div class="cue-item">The bounce pass is the assist — pace, weight, and angle must all be right.</div>
+    <div class="cue-item">First option in tight areas: take it. Hesitation closes the window.</div>
+    <div class="cue-item">Players must name the pattern they're in, not just execute it.</div>
+  </div>
+</div>
+
+<!-- S6 -->
+<div class="day-panel" id="day-6">
+  <div class="day-header">
+    <div class="day-header-top">
+      <div>
+        <div class="day-phase-badge">Transitions · Session 6</div>
+        <div class="day-title">Four Moments — Three Team &amp; Guardiola</div>
+        <div class="day-meta"><span class="day-tag red">Press Trigger · Tight Area</span></div>
+      </div>
+      <div class="day-duration">120<span>min</span></div>
+    </div>
+  </div>
+  <div class="block open">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">0:00–0:10</span>
+      <span class="block-label">10-Minute Rule</span>
+      <span class="block-type setup">Individual</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="ten-min-grid">
+      <div class="pos-row gk"><div class="pos-label">GK</div><div class="pos-text">Receive back pass under press — footwork and positioning, distribute under a closing forward.</div></div>
+      <div class="pos-row cb"><div class="pos-label">CBs</div><div class="pos-text">Step to intercept — read the striker's run into the channel, time the step, don't get caught flat.</div></div>
+      <div class="pos-row fb"><div class="pos-label">FBs</div><div class="pos-text">Recovery run — sprint at full pace from an advanced position back to goal side. Timed.</div></div>
+      <div class="pos-row cm"><div class="pos-label">CMs</div><div class="pos-text">Immediate press trigger — the moment the ball is lost, three steps toward the ball. 10 reps simulating loss of possession.</div></div>
+      <div class="pos-row fwd"><div class="pos-label">Forwards</div><div class="pos-text">Press trigger technique — drop the shoulder, show opponent one way, cut off the pass. Defensive skill.</div></div>
+    </div></div>
+  </div>
+  <div class="block">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">0:10–0:22</span>
+      <span class="block-label">Activation — Different Types of Pressure <a class="block-pg" href="Developing-an-elite-philosophy-in-possession-itzwoc.pdf#page=52" target="_blank" onclick="event.stopPropagation()">p.52 ↗</a></span>
+      <span class="block-type activation">Activation</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="block-desc">Two identical pitches, 15-yard gap. 5v5 on each. Coach calls a number — that player sprints across for a 1v1. Rest continue 4v4. All five 1v1 scenarios can arise. 2×6 min rounds. Replicates match transitions under fatigue.</div></div>
+  </div>
+  <div class="block">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">0:25–0:45</span>
+      <span class="block-label">1v1 — One v One To Finish <a class="block-pg" href="Developing-an-elite-philosophy-in-possession-itzwoc.pdf#page=64" target="_blank" onclick="event.stopPropagation()">p.64 ↗</a></span>
+      <span class="block-type one-v-one">1v1</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="block-desc">18-yard box. GK in each goal. Coaches and players outside continuously feed aerial and ground balls — no waiting between reps. Continuous 60-second bouts. <strong>Relentless delivery replicates match speed.</strong> Forces finishing decisions under fatigue and close-quarters pressure.</div></div>
+  </div>
+  <div class="block">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">0:45–1:13</span>
+      <span class="block-label">Unit — Three Team Transition <a class="block-pg" href="Developing-an-elite-philosophy-in-possession-itzwoc.pdf#page=65" target="_blank" onclick="event.stopPropagation()">p.65 ↗</a></span>
+      <span class="block-type unit">Unit</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="block-desc">3 equal boxes. 3 teams of 3. Team A in middle. Team B one end box. Team C one player each in the other two boxes. A achieves 5 passes then switches to C. When ball moves to C's side, B transitions — one sprints to press the middle. <strong>Every team is simultaneously in a different moment.</strong></div></div>
+  </div>
+  <div class="block">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">1:16–1:50</span>
+      <span class="block-label">SSG — Guardiola Transition Game <a class="block-pg" href="Developing-an-elite-philosophy-in-possession-itzwoc.pdf#page=66" target="_blank" onclick="event.stopPropagation()">p.66 ↗</a></span>
+      <span class="block-type ssg">SSG</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="block-desc">Tight area. 4 whites at corners. 4 reds + 3 yellows centrally. 7v4 in possession. When whites win → expand to corners immediately, the 7 press all four corners. <strong>The essence of positional play:</strong> overload centrally; press immediately on loss. 3×6 min rounds.</div></div>
+  </div>
+  <div class="block">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">1:50–2:00</span>
+      <span class="block-label">Four Moments Check</span>
+      <span class="block-type debrief">Debrief</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="block-desc">Ask players to identify one moment each of: In Possession, Out of Possession, Counter Attack, Counter Defend. Did the press trigger from the 10-minute rule appear in live play?</div></div>
+  </div>
+  <div class="cues-box">
+    <div class="cues-head">Coaching Cues — Session 6</div>
+    <div class="cue-item">The step after losing the ball is the most important step of the session.</div>
+    <div class="cue-item">Every player is always in one of the four moments. Know which one before the ball arrives.</div>
+    <div class="cue-item">Guardiola corners are the reset — get there fast; the press must be coordinated, not chaotic.</div>
+  </div>
+</div>
+
+<!-- S7 -->
+<div class="day-panel" id="day-7">
+  <div class="day-header">
+    <div class="day-header-top">
+      <div>
+        <div class="day-phase-badge">Transitions · Session 7</div>
+        <div class="day-title">Counter Attack — Break the Lines &amp; 8-Second Rule</div>
+        <div class="day-meta"><span class="day-tag red">Five Channels · 8 Seconds</span></div>
+      </div>
+      <div class="day-duration">120<span>min</span></div>
+    </div>
+  </div>
+  <div class="block open">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">0:00–0:10</span>
+      <span class="block-label">10-Minute Rule</span>
+      <span class="block-type setup">Individual</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="ten-min-grid">
+      <div class="pos-row gk"><div class="pos-label">GK</div><div class="pos-text">Long distribution accuracy — target a CB or CM moving into specific channel zones. Timed.</div></div>
+      <div class="pos-row cb"><div class="pos-label">CBs / DM</div><div class="pos-text">First touch forward in transition — receive, first touch must go 5 yards forward in under 0.5 sec.</div></div>
+      <div class="pos-row fb"><div class="pos-label">FBs / Wide</div><div class="pos-text">Counter run into channel 1 or 5 — explosive first 10 yards from standing, curved run to stay onside.</div></div>
+      <div class="pos-row cm"><div class="pos-label">CMs</div><div class="pos-text">Recognise the open channel before the ball is played — coach points to a mannequin line, player calls the open channel out loud first, then runs it.</div></div>
+      <div class="pos-row fwd"><div class="pos-label">Forwards</div><div class="pos-text">Bent run behind the defensive line, stay onside, reach the ball at pace. 10 timed reps.</div></div>
+    </div></div>
+  </div>
+  <div class="block">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">0:10–0:22</span>
+      <span class="block-label">Activation — Break The Five Channels <a class="block-pg" href="Developing-an-elite-philosophy-in-possession-itzwoc.pdf#page=34" target="_blank" onclick="event.stopPropagation()">p.34 ↗</a></span>
+      <span class="block-type activation">Activation</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="block-desc">Central possession box. Mannequins outside in 5 vertical channels. GKs both ends. Teams retain (min 5 passes) then trigger a runner to break one channel. <strong>Runners identify the open channel before making the run — the decision comes first.</strong></div></div>
+  </div>
+  <div class="block">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">0:25–0:45</span>
+      <span class="block-label">1v1 — Domination To Get Shots At Goal <a class="block-pg" href="Developing-an-elite-philosophy-in-possession-itzwoc.pdf#page=61" target="_blank" onclick="event.stopPropagation()">p.61 ↗</a></span>
+      <span class="block-type one-v-one">1v1</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="block-desc">Edge of box in 3 zones. 1v1 in each simultaneously. One red CM outside all three zones. GK in goal. Attacker dominates and gets a shot. CM gives one combination option — attacker decides: combine or go direct. Simulates the final 1v1 before goal in a real match.</div></div>
+  </div>
+  <div class="block">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">0:45–1:13</span>
+      <span class="block-label">Unit — Counter Attacking Principles <a class="block-pg" href="Developing-an-elite-philosophy-in-possession-itzwoc.pdf#page=67" target="_blank" onclick="event.stopPropagation()">p.67 ↗</a></span>
+      <span class="block-type unit">Unit</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="block-desc">2 zones, both width of the penalty box. GK in top goal. 2 defenders top, 1 midfielder bottom. 3 rows of 3 attackers at halfway. Coach plays to first group of 3. Penetrate bottom zone (vs 1 mid) then finish top (vs 2 def + GK). <strong>8-second rule enforced from first touch.</strong> Groups rotate continuously.</div></div>
+  </div>
+  <div class="block">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">1:16–1:50</span>
+      <span class="block-label">SSG — Recognise Where the Overload Is <a class="block-pg" href="Developing-an-elite-philosophy-in-possession-itzwoc.pdf#page=68" target="_blank" onclick="event.stopPropagation()">p.68 ↗</a></span>
+      <span class="block-type ssg">SSG</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="block-desc">Normal game (4v4–6v6). Player who loses the ball sprints around a designated object before re-joining. Creates temporary overload. <strong>Coach counts "1–2–3–4–5" — overload must be attacked by 5.</strong> No instruction. Players self-organise. Breeds urgency naturally.</div></div>
+  </div>
+  <div class="block">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">1:50–2:00</span>
+      <span class="block-label">8-Second Audit</span>
+      <span class="block-type debrief">Debrief</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="block-desc">How many counters reached a shot within 8 seconds? What slowed teams down — first touch, pass, or run? Did channel recognition from the 10-minute rule make a visible difference?</div></div>
+  </div>
+  <div class="cues-box">
+    <div class="cues-head">Coaching Cues — Session 7</div>
+    <div class="cue-item">Identify the open channel before you receive — look through the line, not at the ball.</div>
+    <div class="cue-item">A sideways first touch kills the counter.</div>
+    <div class="cue-item">8 seconds is a law, not a guideline. Name it every time it's missed.</div>
+  </div>
+</div>
+
+<!-- S8 -->
+<div class="day-panel" id="day-8">
+  <div class="day-header">
+    <div class="day-header-top">
+      <div>
+        <div class="day-phase-badge">Transitions · Session 8</div>
+        <div class="day-title">Counter Attack Progressions — Against a Back Four</div>
+        <div class="day-meta"><span class="day-tag red">Aerial → 2v2 · Trigger Shape</span></div>
+      </div>
+      <div class="day-duration">120<span>min</span></div>
+    </div>
+  </div>
+  <div class="block open">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">0:00–0:10</span>
+      <span class="block-label">10-Minute Rule</span>
+      <span class="block-type setup">Individual</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="ten-min-grid">
+      <div class="pos-row gk"><div class="pos-label">GK</div><div class="pos-text">Claim the aerial ball — coach lofts balls in, GK commands, calls, and claims cleanly. 10 reps.</div></div>
+      <div class="pos-row cb"><div class="pos-label">CBs</div><div class="pos-text">Aerial contest + immediate ground transition — head the ball, land, accelerate into counter shape.</div></div>
+      <div class="pos-row fb"><div class="pos-label">FBs</div><div class="pos-text">Tucking in from wide — sprint from wide to cover central channel as the counter is countered.</div></div>
+      <div class="pos-row cm"><div class="pos-label">CMs</div><div class="pos-text">Getting between the lines — check, receive in the strip, face forward, play. 10 reps with shadow marker.</div></div>
+      <div class="pos-row fwd"><div class="pos-label">Forwards / Wide</div><div class="pos-text">Bent counter run — stay onside off the CB's shoulder, attack the half-space, first touch toward goal. Non-aerial player starts their run the moment the ball is served.</div></div>
+    </div></div>
+  </div>
+  <div class="block">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">0:10–0:22</span>
+      <span class="block-label">Activation — Getting In Between The Lines <a class="block-pg" href="Developing-an-elite-philosophy-in-possession-itzwoc.pdf#page=43" target="_blank" onclick="event.stopPropagation()">p.43 ↗</a></span>
+      <span class="block-type activation">Activation</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="block-desc">Normal pitch, GKs both goals. <strong>Horizontal strips (≈3 yards wide) marked across full width.</strong> Rule: receive in a strip = no press for 2 seconds. Teaches players to check into gaps between defensive lines. The reward is time on the ball — players discover it organically.</div></div>
+  </div>
+  <div class="block">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">0:25–0:45</span>
+      <span class="block-label">1v1 — Aerial into 2v2 <a class="block-pg" href="Developing-an-elite-philosophy-in-possession-itzwoc.pdf#page=56" target="_blank" onclick="event.stopPropagation()">p.56 ↗</a></span>
+      <span class="block-type one-v-one">1v1</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="block-desc">Coach serves aerial ball into area. Two players contest the header — one wins. Immediately becomes 2v2 to small goals. The aerial loser must recover; the winner's partner makes an immediate run. Trains aerial domination + instant ground transition.</div></div>
+  </div>
+  <div class="block">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">0:45–1:13</span>
+      <span class="block-label">Unit — Counter Principles + Counter vs Two CBs <a class="block-pg" href="Developing-an-elite-philosophy-in-possession-itzwoc.pdf#page=69" target="_blank" onclick="event.stopPropagation()">pp.69–70 ↗</a></span>
+      <span class="block-type unit">Unit</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="block-desc"><strong>Part A (14 min):</strong> 3 zones. 3v3 centrally. After 3 passes, 2 break into end zone: 3v1. Score within 8 seconds.<br><br><strong>Part B (14 min):</strong> Half pitch. GK + 2 CBs + red striker. 5v5 in possession box. After 5 passes, 3 break vs 2 CBs + GK. Attack the side of the recovering CB. Striker occupies the set CB to free space for the arriving runner.</div></div>
+  </div>
+  <div class="block">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">1:16–1:50</span>
+      <span class="block-label">SSG — Counter From Triggers — Specific Shape <a class="block-pg" href="Developing-an-elite-philosophy-in-possession-itzwoc.pdf#page=73" target="_blank" onclick="event.stopPropagation()">p.73 ↗</a></span>
+      <span class="block-type ssg">SSG</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="block-desc">¾ pitch, width of penalty box. GK + 1–2 yellow defenders. Middle strip: 3 yellows vs 1 white No.10. Bottom: whites in two banks of four. Yellows circulate under underload. <strong>Trigger occurs → white two banks counter the ¾ pitch.</strong> Full sequence: sit in shape → recognise trigger → execute counter within 8 seconds.</div></div>
+  </div>
+  <div class="block">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">1:50–2:00</span>
+      <span class="block-label">Debrief</span>
+      <span class="block-type debrief">Debrief</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="block-desc">Attack the recovering CB, not the set one — did that happen? Did the non-aerial player start their run at the right moment? All 11 players must recognise the trigger simultaneously.</div></div>
+  </div>
+  <div class="cues-box">
+    <div class="cues-head">Coaching Cues — Session 8</div>
+    <div class="cue-item">Find the gap, face forward.</div>
+    <div class="cue-item">Attack the recovering CB — the FB takes longest to tuck in, that's always the first look.</div>
+    <div class="cue-item">The non-aerial player starts their run the moment the ball is served.</div>
+  </div>
+</div>
+
+<!-- S9 -->
+<div class="day-panel" id="day-9">
+  <div class="day-header">
+    <div class="day-header-top">
+      <div>
+        <div class="day-phase-badge">Game Model · Session 9</div>
+        <div class="day-title">Defensive Shape, Block Work &amp; Counter Press</div>
+        <div class="day-meta"><span class="day-tag red">Out of Possession · Half Line</span></div>
+      </div>
+      <div class="day-duration">120<span>min</span></div>
+    </div>
+  </div>
+  <div class="block open">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">0:00–0:10</span>
+      <span class="block-label">10-Minute Rule</span>
+      <span class="block-type setup">Individual</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="ten-min-grid">
+      <div class="pos-row gk"><div class="pos-label">GK</div><div class="pos-text">Sweep-keeping reads — when to come for through-balls vs when to stay on the line. 10 decisions.</div></div>
+      <div class="pos-row cb"><div class="pos-label">CBs</div><div class="pos-text">Defensive 1v1 — deny the turn, stay between ball and goal, force outside. No gambles.</div></div>
+      <div class="pos-row fb"><div class="pos-label">FBs</div><div class="pos-text">Tuck in shape — wide position when ball is opposite, tucked central when ball is in our half. 10 transitions.</div></div>
+      <div class="pos-row cm"><div class="pos-label">CMs</div><div class="pos-text">Screening movement — position to block the pass into the striker. Shadow the passing lane, not the player.</div></div>
+      <div class="pos-row fwd"><div class="pos-label">Forwards</div><div class="pos-text">Press trigger — drop the shoulder, show one way, cut off the CB's diagonal. Starting press correctly.</div></div>
+    </div></div>
+  </div>
+  <div class="block">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">0:10–0:22</span>
+      <span class="block-label">Activation — 1v1 To Retain (Defensive Mindset) <a class="block-pg" href="Developing-an-elite-philosophy-in-possession-itzwoc.pdf#page=63" target="_blank" onclick="event.stopPropagation()">p.63 ↗</a></span>
+      <span class="block-type activation">Activation</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="block-desc">Whites 1v1 vs yellows. Two red overloads always available. Whites maintain possession — reds provide the escape. Today's focus: defenders must force whites into the overload by cutting off forward options. <strong>Defends the principle, not just the ball.</strong></div></div>
+  </div>
+  <div class="block">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">0:25–0:45</span>
+      <span class="block-label">1v1 — Defender In Front (Full Pitch Version) <a class="block-pg" href="Developing-an-elite-philosophy-in-possession-itzwoc.pdf#page=60" target="_blank" onclick="event.stopPropagation()">p.60 ↗</a></span>
+      <span class="block-type one-v-one">1v1</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="block-desc">Full-scale. GK in goal. Flat markers down centre. Mannequins on edge of centre circle D. Attacker receives at halfway D, attacks goal with defender already facing them. Markers force the attacker to stay in channel. <strong>Defender's goal: show to one side and funnel toward the touchline or GK.</strong></div></div>
+  </div>
+  <div class="block">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">0:45–1:13</span>
+      <span class="block-label">Unit — Back Four In and Out of Possession <a class="block-pg" href="Developing-an-elite-philosophy-in-possession-itzwoc.pdf#page=39" target="_blank" onclick="event.stopPropagation()">p.39 ↗</a></span>
+      <span class="block-type unit">Unit</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="block-desc">Half pitch, full width. Two back fours face each other. 2 yellow CMs between the lines. Back four builds through the horseshoe. Ball to CM → recycle or turn and play forward. <strong>Opposing back four transitions to press shape immediately on loss.</strong> Focus: compactness, correct distances, no gaps.</div></div>
+  </div>
+  <div class="block">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">1:16–1:50</span>
+      <span class="block-label">SSG — Playing Out of Pressure OR Establishing the Press <a class="block-pg" href="Developing-an-elite-philosophy-in-possession-itzwoc.pdf#page=36" target="_blank" onclick="event.stopPropagation()">p.36 ↗</a></span>
+      <span class="block-type ssg">SSG</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="block-desc">3 zones: 2v1 each end, 3v3 central. Teams alternate: one builds out through all three zones, the other establishes a press. <strong>Decision for the pressing team each time:</strong> show to touchline OR trap centrally? Make the call before the ball moves. When pressing team wins centrally → counter to goal.</div></div>
+  </div>
+  <div class="block">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">1:50–2:00</span>
+      <span class="block-label">Debrief</span>
+      <span class="block-type debrief">Debrief</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="block-desc">Defend the half line, not the goal — did the shape stay compact? Correct distances between units? Name one moment where the press decision (touchline vs central) was made and executed correctly.</div></div>
+  </div>
+  <div class="cues-box">
+    <div class="cues-head">Coaching Cues — Session 9</div>
+    <div class="cue-item">Defend the half line, not the goal — depth before width.</div>
+    <div class="cue-item">Show to touchline OR trap centrally — make the call before the ball moves.</div>
+    <div class="cue-item">Don't be beaten 1v1 — stay in front; a foul is better than being turned.</div>
+    <div class="cue-item">Light switch transition — immediate reaction on loss, 11 players one brain.</div>
+  </div>
+</div>
+
+<!-- S10 -->
+<div class="day-panel" id="day-10">
+  <div class="day-header">
+    <div class="day-header-top">
+      <div>
+        <div class="day-phase-badge">Game Model · Session 10</div>
+        <div class="day-title">Shape &amp; Rotation — Width, Depth &amp; Movement</div>
+        <div class="day-meta"><span class="day-tag red">Rotation as Two · False Nine</span></div>
+      </div>
+      <div class="day-duration">120<span>min</span></div>
+    </div>
+  </div>
+  <div class="block open">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">0:00–0:10</span>
+      <span class="block-label">10-Minute Rule</span>
+      <span class="block-type setup">Individual</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="ten-min-grid">
+      <div class="pos-row gk"><div class="pos-label">GK</div><div class="pos-text">Angle setting — adjust starting position for different ball positions in wide areas.</div></div>
+      <div class="pos-row cb"><div class="pos-label">CBs</div><div class="pos-text">Stepping to intercept vs holding — read the striker's run and choose. 10 decisions at pace.</div></div>
+      <div class="pos-row fb"><div class="pos-label">FBs</div><div class="pos-text">Overlap timing — read the winger's run and burst without being caught offside.</div></div>
+      <div class="pos-row cm"><div class="pos-label">CMs</div><div class="pos-text">Checking away and offering at a new angle — 10 reps, vary the angle each time.</div></div>
+      <div class="pos-row fwd"><div class="pos-label">False 9 / Forwards</div><div class="pos-text">Dropping to L4 creating space, then the arriving CM run. Walk it, then full pace.</div></div>
+    </div></div>
+  </div>
+  <div class="block">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">0:10–0:22</span>
+      <span class="block-label">Activation — Rotation As A Two <a class="block-pg" href="Developing-an-elite-philosophy-in-possession-itzwoc.pdf#page=41" target="_blank" onclick="event.stopPropagation()">p.41 ↗</a></span>
+      <span class="block-type activation">Activation</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="block-desc">Octagonal shape. 2 blue targets opposite each other outside. 2v2 inside. Whites retain using the full shape. <strong>Trigger:</strong> when the inside 2v2 opens, the receiving pair rotate — check away then spin, overlap, or underlap. Foundation of all midfield and forward rotation patterns.</div></div>
+  </div>
+  <div class="block">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">0:25–0:45</span>
+      <span class="block-label">1v1 — Angled Movements, Agility &amp; Change of Direction <a class="block-pg" href="Developing-an-elite-philosophy-in-possession-itzwoc.pdf#page=54" target="_blank" onclick="event.stopPropagation()">p.54 ↗</a></span>
+      <span class="block-type one-v-one">1v1</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="block-desc">Cones 2 yards apart vertically, 6 yards between pairs. Attackers approach from angles — not straight lines. Gates on the side for scoring. Angled approach changes the defender's cover shadow and creates the extra half-yard.</div></div>
+  </div>
+  <div class="block">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">0:45–1:13</span>
+      <span class="block-label">Unit — Rotation of Front Three in Diamond vs 4-3-3 <a class="block-pg" href="Developing-an-elite-philosophy-in-possession-itzwoc.pdf#page=49" target="_blank" onclick="event.stopPropagation()">p.49 ↗</a></span>
+      <span class="block-type unit">Unit</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="block-desc">Two 18-yard boxes back to back. Rotation patterns rehearsed systematically: striker short → No.10 runs in behind; striker wide → No.10 occupies centre; both press high → screener drops to cover. <strong>Not improvised — choreographed understanding rehearsed until automatic.</strong> Then apply it at full pace against a live back four.</div></div>
+  </div>
+  <div class="block">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">1:16–1:50</span>
+      <span class="block-label">SSG — Circulation with Width, Depth &amp; False Nine <a class="block-pg" href="Developing-an-elite-philosophy-in-possession-itzwoc.pdf#page=33" target="_blank" onclick="event.stopPropagation()">p.33 ↗</a></span>
+      <span class="block-type ssg">SSG</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="block-desc">Two main goals with GKs. Four side goals (poles 4 yards from touchline). Teams score 1 pt in main goals, 2 pts in side goals. <strong>Side goals force wide play.</strong> False nine drops creating central overload; forwards check wide to attack side goals. Width and depth working together simultaneously.</div></div>
+  </div>
+  <div class="block">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">1:50–2:00</span>
+      <span class="block-label">Debrief</span>
+      <span class="block-type debrief">Debrief</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="block-desc">Movement before ball arrives = space when it arrives. Could players name what their partner was about to do before they received? The rotation as a two is the building block — does it show in the SSG?</div></div>
+  </div>
+  <div class="cues-box">
+    <div class="cues-head">Coaching Cues — Session 10</div>
+    <div class="cue-item">Movement before the ball arrives = space when it arrives.</div>
+    <div class="cue-item">Never in a line — always in a triangle when receiving.</div>
+    <div class="cue-item">The screener's position determines which rotation is available — communicate before the ball moves.</div>
+  </div>
+</div>
+
+<!-- S11 -->
+<div class="day-panel" id="day-11">
+  <div class="day-header">
+    <div class="day-header-top">
+      <div>
+        <div class="day-phase-badge">Game Model · Session 11</div>
+        <div class="day-title">Game Management — Score Scenarios &amp; Decision Making</div>
+        <div class="day-meta"><span class="day-tag red">Winning · Losing · Drawing</span></div>
+      </div>
+      <div class="day-duration">120<span>min</span></div>
+    </div>
+  </div>
+  <div class="block open">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">0:00–0:10</span>
+      <span class="block-label">10-Minute Rule — Player's Own Focus</span>
+      <span class="block-type setup">Individual</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="block-desc" style="background:rgba(206,14,45,0.07);border-radius:7px;padding:12px;border-left:3px solid var(--red);">Each player works on whatever <strong>they</strong> identify as their biggest in-season need. <strong>Coach says nothing.</strong> Ten minutes. Then ask one player: what did you work on and why? The habit of self-directed improvement is the goal.</div></div>
+  </div>
+  <div class="block">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">0:10–0:22</span>
+      <span class="block-label">Activation — Line Breaking Passes &amp; Screening Midfielder <a class="block-pg" href="Developing-an-elite-philosophy-in-possession-itzwoc.pdf#page=35" target="_blank" onclick="event.stopPropagation()">p.35 ↗</a></span>
+      <span class="block-type activation">Activation</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="block-desc">Three concentric boxes. 5v5 central, 2 players each team in second box, 2 in outer. Build in central box → play a line-breaking pass to second box → play to far outer player. Screener wins the 5v5, recycles if blocked, finds the moment to break through lines.</div></div>
+  </div>
+  <div class="block">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">0:25–0:45</span>
+      <span class="block-label">1v1 — Player-Chosen Scenario</span>
+      <span class="block-type one-v-one">1v1</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="block-desc">Each group picks the 1v1 scenario they feel least comfortable with. Coach circulates and observes — no coaching during the reps, only brief individual feedback between rounds. Players self-identify their weakness and get targeted reps.</div></div>
+  </div>
+  <div class="block">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">0:45–1:13</span>
+      <span class="block-label">Unit — Counter Attacking Against a Back Four <a class="block-pg" href="Developing-an-elite-philosophy-in-possession-itzwoc.pdf#page=71" target="_blank" onclick="event.stopPropagation()">p.71 ↗</a></span>
+      <span class="block-type unit">Unit</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="block-desc">Half pitch. Full back four in horseshoe. GK in goal. 4v4 in central possession box. After 5 passes → 3 break vs back four + GK. <strong>FBs start wide — attack the space before they tuck in.</strong> Third attacker takes far-post run. Progress: break after 3 passes, then immediately on any regain.</div></div>
+  </div>
+  <div class="block">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">1:16–1:50</span>
+      <span class="block-label">SSG — Three Game Management Scenarios</span>
+      <span class="block-type ssg">SSG</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="block-desc">Three 10-minute blocks. Players self-organise. <strong>Coach does not call the shape.</strong><br><br>
+      <strong>A — Winning 2–0 (10 min left):</strong> Manage the clock, possession team; opposition presses high.<br><br>
+      <strong>B — Losing 1–0:</strong> Full press, direct counter, 8-second rule absolute.<br><br>
+      <strong>C — 1–1 (5 min left):</strong> Probe possession then commit final 2 min. Name the scenario out loud before starting.</div></div>
+  </div>
+  <div class="block">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">1:50–2:00</span>
+      <span class="block-label">Debrief</span>
+      <span class="block-type debrief">Debrief</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="block-desc">Could players describe their approach before the scenario started? Winning 2–0: was possession genuine or just safe? Losing 1–0: did the counter reach a shot within 8 seconds? Drawing 1–1: when was the commitment point?</div></div>
+  </div>
+  <div class="cues-box">
+    <div class="cues-head">Coaching Cues — Session 11</div>
+    <div class="cue-item">Name the scenario before executing. The approach changes — so does the mindset.</div>
+    <div class="cue-item">Winning 2–0: possession is only valuable when it puts the opponent under pressure, not when it lets them rest.</div>
+    <div class="cue-item">Losing 1–0: 8 seconds is a law. A sideways first touch loses the game.</div>
+  </div>
+</div>
+
+<!-- S12 -->
+<div class="day-panel" id="day-12">
+  <div class="day-header">
+    <div class="day-header-top">
+      <div>
+        <div class="day-phase-badge">Game Model · Session 12</div>
+        <div class="day-title">Full Trigger Line Game — Trust the System</div>
+        <div class="day-meta"><span class="day-tag red">Trigger Line · No Coach Stoppages</span></div>
+      </div>
+      <div class="day-duration">120<span>min</span></div>
+    </div>
+  </div>
+  <div class="block open">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">0:00–0:10</span>
+      <span class="block-label">10-Minute Rule — Player's Own Focus</span>
+      <span class="block-type setup">Individual</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="block-desc" style="background:rgba(206,14,45,0.07);border-radius:7px;padding:12px;border-left:3px solid var(--red);">Player-directed. Coach says nothing. Each player has by now had dozens of sessions with the 10-minute rule — they know what they need. The discipline of starting work without instruction is the point.</div></div>
+  </div>
+  <div class="block">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">0:10–0:22</span>
+      <span class="block-label">Activation — Different Types of Pressure <a class="block-pg" href="Developing-an-elite-philosophy-in-possession-itzwoc.pdf#page=52" target="_blank" onclick="event.stopPropagation()">p.52 ↗</a></span>
+      <span class="block-type activation">Activation</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="block-desc">Two identical pitches, 15-yard gap. 5v5 on each. Coach calls a number — that player sprints across for a 1v1. Rest continue 4v4. All five 1v1 scenarios can arise. High-intensity opener to replicate match transitions.</div></div>
+  </div>
+  <div class="block">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">0:25–0:45</span>
+      <span class="block-label">1v1 — Player-Chosen Scenario</span>
+      <span class="block-type one-v-one">1v1</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="block-desc">Each group votes on one scenario. Coach observes only. The principle: players who can identify their own weakness and address it independently are the ones who improve fastest.</div></div>
+  </div>
+  <div class="block">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">0:45–1:13</span>
+      <span class="block-label">Unit — Counter From Triggers — Specific Shape <a class="block-pg" href="Developing-an-elite-philosophy-in-possession-itzwoc.pdf#page=73" target="_blank" onclick="event.stopPropagation()">p.73 ↗</a></span>
+      <span class="block-type unit">Unit</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="block-desc">¾ pitch, width of penalty box. Full team. Sit in shape → recognise trigger → execute counter within 8 seconds. Run it until the execution is clean: correct shape, correct trigger recognition, shot within 8 seconds. This is the full game model compressed into one unit exercise.</div></div>
+  </div>
+  <div class="block">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">1:16–1:50</span>
+      <span class="block-label">SSG — Full Trigger Line Game <a class="block-pg" href="Developing-an-elite-philosophy-in-possession-itzwoc.pdf#page=74" target="_blank" onclick="event.stopPropagation()">p.74 ↗</a></span>
+      <span class="block-type ssg">SSG</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="block-desc">Long pitch. 10v10 or 11v11. Flat cones form a <strong>trigger line</strong> in opposition's half. Rule: when defending team wins on or beyond the trigger line → counter within 8 seconds. <strong>No coach stoppages for 34 minutes.</strong> Coaches observe only — count counters, time them, note overloads recognised or missed.</div></div>
+  </div>
+  <div class="block">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">1:50–2:00</span>
+      <span class="block-label">Debrief</span>
+      <span class="block-type debrief">Debrief</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="block-desc">The trigger line is the only rule. How many counters were executed? How many reached a shot in 8 seconds? Ask players: are there moments in matches where we are NOT doing this? That is the only conversation worth having.</div></div>
+  </div>
+  <div class="cues-box">
+    <div class="cues-head">Coaching Cues — Session 12</div>
+    <div class="cue-item">The trigger line is the only rule. Trust the preseason.</div>
+    <div class="cue-item">Players self-organise. The work done in preseason built this.</div>
+    <div class="cue-item">No stoppages. Observe, time, count. Debrief at the end.</div>
+  </div>
+</div>
+
+<!-- S13 -->
+<div class="day-panel" id="day-13">
+  <div class="day-header">
+    <div class="day-header-top">
+      <div>
+        <div class="day-phase-badge">Full Review · Session 13</div>
+        <div class="day-title">All Phases Review — Where Are We?</div>
+        <div class="day-meta"><span class="day-tag red">Mid/End Season Audit</span><span class="day-tag">Player-Led</span></div>
+      </div>
+      <div class="day-duration">120<span>min</span></div>
+    </div>
+  </div>
+  <div class="block open">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">0:00–0:10</span>
+      <span class="block-label">10-Minute Rule — Player's Own Focus</span>
+      <span class="block-type setup">Individual</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="block-desc" style="background:rgba(206,14,45,0.07);border-radius:7px;padding:12px;border-left:3px solid var(--red);">Player-directed. No instruction. After a full season of 10-minute rule work, this is the acid test: do players go straight to it without being told? Observe who does and who waits. That tells you more than any coach evaluation.</div></div>
+  </div>
+  <div class="block">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">0:10–0:22</span>
+      <span class="block-label">Activation — Recognition of Pressure <a class="block-pg" href="Developing-an-elite-philosophy-in-possession-itzwoc.pdf#page=30" target="_blank" onclick="event.stopPropagation()">p.30 ↗</a></span>
+      <span class="block-type activation">Activation</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="block-desc">Back to Session 1's activation. Same exercise. <strong>The question is: is it noticeably better?</strong> Speed of recognition, quality of decision, body shape on receive. This is your measure of the season's individual development.</div></div>
+  </div>
+  <div class="block">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">0:25–0:45</span>
+      <span class="block-label">1v1 — Rotation Through All Five Scenarios</span>
+      <span class="block-type one-v-one">1v1</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="block-desc">5 stations, one for each 1v1 scenario. Groups rotate every 3 minutes. <strong>Same exercise used in preseason.</strong> Coach assesses without stopping: (1) Pressure Behind, (2) Pressure on Side, (3) Angled Movements, (4) Defender in Front, (5) 2v2 Situation. Note one strength and one gap per player.</div></div>
+  </div>
+  <div class="block">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">0:45–1:13</span>
+      <span class="block-label">Unit — Three Team Transition <a class="block-pg" href="Developing-an-elite-philosophy-in-possession-itzwoc.pdf#page=65" target="_blank" onclick="event.stopPropagation()">p.65 ↗</a></span>
+      <span class="block-type unit">Unit</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="block-desc">Three team game. All four moments will be visible simultaneously. Coach observes only — no instruction during the exercise. After, ask players: which moment do we handle best? Which do we handle worst? Let the answer drive the debrief.</div></div>
+  </div>
+  <div class="block">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">1:16–1:50</span>
+      <span class="block-label">SSG — Free Game, Coach Observes Only</span>
+      <span class="block-type ssg">SSG</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="block-desc">Full game. No rules beyond offside and fouls. No coach stoppages. <strong>Observe all four moments.</strong> Tally: counters attempted, counters within 8 seconds, switches completed, press triggers executed. This data drives the debrief and determines which session themes to revisit for the remainder of the season.</div></div>
+  </div>
+  <div class="block">
+    <div class="block-head" onclick="toggleBlock(this)">
+      <span class="block-time">1:50–2:00</span>
+      <span class="block-label">Full Season Review Debrief — 10 min</span>
+      <span class="block-type debrief">Debrief</span>
+      <span class="block-chevron">▾</span>
+    </div>
+    <div class="block-body"><div class="block-desc"><strong>Four questions:</strong> (1) Name the Five Receiving Lines. (2) Counter from a deep regain vs a high regain — what is the difference? (3) Which game management scenario is most difficult? (4) What is your 10-minute rule focus for the rest of the season?<br><br>Close with one individual note for every player: one strength visible this season, one area to sharpen. Keep it short and honest.</div></div>
+  </div>
+  <div class="cues-box">
+    <div class="cues-head">Coaching Cues — Session 13</div>
+    <div class="cue-item">Compare to Session 1. The gap between then and now is the measure of the season.</div>
+    <div class="cue-item">Players who self-identify their weakness and address it independently are the ones who improve fastest.</div>
+    <div class="cue-item">After this session: decide which 3 themes need the most work and schedule them for the final weeks.</div>
+  </div>
+</div>
+
+</main>
+
+<div class="bottom-nav">
+  <button class="nav-btn prev" id="btn-prev" onclick="navigate(-1)">← Prev</button>
+  <div class="bottom-center" id="bottom-center">1 / 13</div>
+  <button class="nav-btn next" id="btn-next" onclick="navigate(1)">Next →</button>
+</div>
+
+<script>
+let current = 1;
+const TOTAL = 13;
+const pips = document.querySelectorAll('.day-pip');
+
+function goTo(s) {
+  document.getElementById('day-' + current).classList.remove('active');
+  pips[current - 1].classList.remove('active');
+  current = s;
+  document.getElementById('day-' + current).classList.add('active');
+  pips[current - 1].classList.add('active');
+  document.getElementById('nav-s-num').textContent = current;
+  document.getElementById('bottom-center').textContent = current + ' / ' + TOTAL;
+  document.getElementById('btn-prev').disabled = current === 1;
+  document.getElementById('btn-next').disabled = current === TOTAL;
+  window.scrollTo({top: 0, behavior: 'smooth'});
+  sessionStorage.setItem('pld-season-session', current);
+}
+
+function navigate(dir) {
+  const next = current + dir;
+  if (next >= 1 && next <= TOTAL) goTo(next);
+}
+
+function toggleBlock(head) {
+  head.parentElement.classList.toggle('open');
+}
+
+document.getElementById('btn-prev').disabled = true;
+const saved = sessionStorage.getItem('pld-season-session');
+if (saved && parseInt(saved) !== 1) goTo(parseInt(saved));
+</script>
+</body>
+</html>
