@@ -543,6 +543,219 @@ html, body {
 }
 .video-modal-close:hover { color: var(--white); }
 
+
+/* ── MOBILE ─────────────────────────────────────── */
+@media (max-width: 680px) {
+
+  /* Allow page to scroll; slides stack in normal flow */
+  html, body {
+    overflow-y: auto !important;
+    height: auto !important;
+    min-height: 100vh;
+  }
+
+  .deck {
+    width: 100%;
+    height: auto;
+    overflow: visible;
+    position: relative;
+  }
+
+  /* Slides: normal flow, hidden until active */
+  .slide {
+    position: relative !important;
+    inset: auto;
+    width: 100%;
+    height: auto !important;
+    min-height: 0;
+    padding: 28px 20px 90px !important;
+    opacity: 1 !important;
+    pointer-events: none;
+    display: none !important;
+    transition: none;
+    overflow: visible;
+    justify-content: flex-start;
+    align-items: flex-start;
+  }
+
+  .slide.active {
+    display: flex !important;
+    pointer-events: all;
+  }
+
+  /* ── Principle slides ── */
+  .principle-layout {
+    grid-template-columns: 1fr !important;
+    gap: 20px;
+  }
+
+  .principle-num {
+    font-size: 64px !important;
+    margin-bottom: -8px !important;
+  }
+
+  .principle-title {
+    font-size: clamp(30px, 8vw, 44px) !important;
+  }
+
+  .principle-desc {
+    font-size: 14px !important;
+    margin-bottom: 16px !important;
+  }
+
+  .how-label {
+    font-size: 11px !important;
+    margin-bottom: 10px !important;
+  }
+
+  .points-list li {
+    font-size: 14px !important;
+    padding: 9px 0 !important;
+  }
+
+  .video-btn {
+    width: 100%;
+    margin-top: 4px;
+    justify-content: center;
+  }
+
+  /* ── Overview / stages ── */
+  .overview-header {
+    margin-bottom: 24px !important;
+  }
+
+  .section-title {
+    font-size: clamp(30px, 8vw, 44px) !important;
+  }
+
+  .stages-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+  }
+
+  /* Five receiving lines: single column */
+  .five-lines-grid {
+    display: grid;
+    grid-template-columns: 1fr !important;
+    gap: 10px;
+    width: 100%;
+    margin-top: 8px;
+  }
+
+  .stage-card {
+    padding: 14px 12px !important;
+  }
+
+  .stage-num {
+    font-size: 28px !important;
+    margin-bottom: 4px !important;
+  }
+
+  .stage-name {
+    font-size: 12px !important;
+  }
+
+  .stage-phase {
+    font-size: 10px !important;
+    margin-top: 4px !important;
+  }
+
+  /* ── Title slide ── */
+  .slide-title {
+    text-align: center;
+    align-items: center !important;
+    padding-top: 48px !important;
+  }
+
+  .title-main {
+    font-size: clamp(52px, 14vw, 72px) !important;
+  }
+
+  .title-label { font-size: 10px !important; }
+
+  .bg-circle-1, .bg-circle-2, .bg-ring { display: none !important; }
+
+  /* ── Motto slide ── */
+  .motto-quote {
+    font-size: clamp(20px, 5.5vw, 28px) !important;
+  }
+
+  .motto-quote .highlight {
+    font-size: clamp(30px, 8vw, 42px) !important;
+  }
+
+  /* ── Tactical slide ── */
+  .tactical-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+
+  .tac-card {
+    padding: 14px 14px !important;
+  }
+
+  .tac-card-label {
+    font-size: 13px !important;
+  }
+
+  .tac-points li {
+    font-size: 13px !important;
+  }
+
+  /* ── Closer slide ── */
+  .closer-stat {
+    font-size: clamp(72px, 20vw, 100px) !important;
+  }
+
+  .closer-tagline {
+    font-size: clamp(18px, 4.5vw, 24px) !important;
+  }
+
+  /* ── Nav: fixed bottom bar ── */
+  .nav {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    transform: none !important;
+    width: 100%;
+    background: rgba(14,14,14,0.97);
+    border-top: 1px solid rgba(255,255,255,0.08);
+    padding: 10px 16px !important;
+    border-radius: 0;
+    justify-content: space-between;
+    gap: 12px;
+    backdrop-filter: blur(8px);
+  }
+
+  .nav-btn {
+    width: 40px !important;
+    height: 40px !important;
+    flex-shrink: 0;
+  }
+
+  .nav-dots {
+    flex: 1;
+    justify-content: center;
+    overflow-x: auto;
+    flex-wrap: wrap;
+    gap: 6px !important;
+    scrollbar-width: none;
+  }
+
+  .nav-dots::-webkit-scrollbar { display: none; }
+
+  .dot { width: 6px !important; height: 6px !important; }
+
+  .kbd-hint { display: none !important; }
+
+  /* Inline note text in receiving lines */
+  .five-lines-grid + div {
+    font-size: 13px !important;
+    margin-top: 16px !important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -667,7 +880,7 @@ html, body {
       <div class="section-label">Possession Structure</div>
       <div class="section-title">Five Receiving Lines</div>
     </div>
-    <div style="display:grid; grid-template-columns: repeat(5,1fr); gap:16px; width:100%; margin-top:8px;">
+    <div class="five-lines-grid">
       <div class="stage-card" style="text-align:center;">
         <div class="stage-num">L1</div>
         <div class="stage-name">Goalkeeper</div>
