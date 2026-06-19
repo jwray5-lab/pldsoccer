@@ -608,9 +608,38 @@ html, body {
     margin-bottom: 10px !important;
   }
 
+  .points-list {
+    gap: 10px !important;
+  }
+
   .points-list li {
     font-size: 14px !important;
-    padding: 9px 0 !important;
+    padding-left: 20px !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    line-height: 1.55 !important;
+  }
+
+  .points-list li::before {
+    top: 7px !important;
+    width: 5px !important;
+    height: 5px !important;
+  }
+
+  /* list-layout 2-col → 1-col on mobile */
+  .slide-principle.list-layout .points-list {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+
+  .tac-points li {
+    font-size: 13px !important;
+    padding-left: 18px !important;
+    line-height: 1.5 !important;
+  }
+
+  .tac-points li::before {
+    top: 1px !important;
   }
 
   .video-btn {
