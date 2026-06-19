@@ -192,6 +192,76 @@ body {
   color: var(--white);
 }
 
+/* ── GROUP CARD ── */
+.group-card {
+  background: var(--dark-2);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 10px;
+  overflow: hidden;
+  grid-column: 1 / -1;
+}
+.group-card-accent { height: 3px; background: var(--red); }
+.group-card-header {
+  padding: 16px 22px 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.group-card-type {
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--red-mid);
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.group-card-title {
+  font-weight: 700;
+  font-size: 17px;
+  color: var(--white);
+}
+.group-items { display: flex; flex-direction: column; }
+.group-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 22px;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  transition: background 0.15s;
+}
+.group-item:last-child { border-bottom: none; }
+.group-item:hover { background: var(--dark-3); }
+.group-item-text { flex: 1; }
+.group-item-label {
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--red-mid);
+  font-weight: 600;
+  margin-bottom: 3px;
+}
+.group-item-title {
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--white);
+  margin-bottom: 2px;
+}
+.group-item-desc {
+  font-size: 12px;
+  color: rgba(255,255,255,0.45);
+  line-height: 1.5;
+}
+.group-item-arrow {
+  width: 28px; height: 28px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  color: rgba(255,255,255,0.3);
+  font-size: 14px;
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+.group-item:hover .group-item-arrow { background: var(--red); color: var(--white); }
+
 /* ── PLACEHOLDER ── */
 .placeholder-card {
   background: transparent;
@@ -398,19 +468,6 @@ footer {
       </div>
     </a>
 
-    <a href="PLD_Boys_Soccer_Preseason_Plan.html" class="resource-card">
-      <div class="resource-card-accent"></div>
-      <div class="resource-card-body">
-        <div class="resource-card-type">Season Planning</div>
-        <div class="resource-card-title">Preseason Plan</div>
-        <div class="resource-card-desc">Full preseason training plan including periodisation, session structure, fitness blocks, and team-building activities.</div>
-        <div class="resource-card-footer">
-          <span class="resource-card-tag">Preseason</span>
-          <div class="resource-card-arrow">→</div>
-        </div>
-      </div>
-    </a>
-
     <a href="dunbar_workout.html" class="resource-card">
       <div class="resource-card-accent"></div>
       <div class="resource-card-body">
@@ -424,31 +481,39 @@ footer {
       </div>
     </a>
 
-    <a href="season_sessions.html" class="resource-card">
-      <div class="resource-card-accent"></div>
-      <div class="resource-card-body">
-        <div class="resource-card-type">In-Season Training</div>
-        <div class="resource-card-title">Regular Season Sessions</div>
-        <div class="resource-card-desc">13 theme-based sessions for the regular season — possession, wide play, transitions, counter attack, game management, and a full review. Organized by focus area, not by date.</div>
-        <div class="resource-card-footer">
-          <span class="resource-card-tag">Field Guide</span>
-          <div class="resource-card-arrow">→</div>
-        </div>
+    <div class="group-card">
+      <div class="group-card-accent"></div>
+      <div class="group-card-header">
+        <div class="group-card-type">Session Plans</div>
+        <div class="group-card-title">Training Sessions</div>
       </div>
-    </a>
-
-    <a href="preseason_sessions.html" class="resource-card">
-      <div class="resource-card-accent"></div>
-      <div class="resource-card-body">
-        <div class="resource-card-type">Session Guide</div>
-        <div class="resource-card-title">Daily Preseason Session Detail</div>
-        <div class="resource-card-desc">Day-by-day session plans for all 12 preseason days. Time-coded blocks, position-specific 10-minute rule, key coaching cues, and phase breakdowns.</div>
-        <div class="resource-card-footer">
-          <span class="resource-card-tag">Field Guide</span>
-          <div class="resource-card-arrow">→</div>
-        </div>
+      <div class="group-items">
+        <a href="PLD_Boys_Soccer_Preseason_Plan.html" class="group-item">
+          <div class="group-item-text">
+            <div class="group-item-label">Season Planning</div>
+            <div class="group-item-title">Full Preseason Framework</div>
+            <div class="group-item-desc">Full preseason training plan including periodisation, session structure, fitness blocks, and team-building activities.</div>
+          </div>
+          <div class="group-item-arrow">→</div>
+        </a>
+        <a href="preseason_sessions.html" class="group-item">
+          <div class="group-item-text">
+            <div class="group-item-label">Session Guide</div>
+            <div class="group-item-title">Daily Preseason Session Detail</div>
+            <div class="group-item-desc">Day-by-day session plans for all 12 preseason days. Time-coded blocks, position-specific 10-minute rule, key coaching cues, and phase breakdowns.</div>
+          </div>
+          <div class="group-item-arrow">→</div>
+        </a>
+        <a href="season_sessions.html" class="group-item">
+          <div class="group-item-text">
+            <div class="group-item-label">In-Season Training</div>
+            <div class="group-item-title">Regular Season Sessions</div>
+            <div class="group-item-desc">13 theme-based sessions for the regular season — possession, wide play, transitions, counter attack, game management, and a full review.</div>
+          </div>
+          <div class="group-item-arrow">→</div>
+        </a>
       </div>
-    </a>
+    </div>
 
   </div>
 </main>
