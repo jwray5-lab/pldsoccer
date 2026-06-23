@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JV Master Scores — PLD Soccer Tryouts 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --red: #ce0e2d; --red-mid: #e8324f;
+  --dark: #0e0e0e; --dark-2: #1a1a1a; --dark-3: #252525; --dark-4: #2e2e2e;
+  --white: #ffffff; --gray: #888;
+  --c1: #e879f9; --c2: #38bdf8; --c3: #4ade80; --c4: #fb923c; --c5: #facc15;
+}
+body { font-family: 'DM Sans', sans-serif; background: var(--dark); color: var(--white); min-height: 100vh; }
+
+/* HEADER */
+.page-header {
+  background: var(--dark); border-bottom: 4px solid var(--red);
+  padding: 28px 48px; display: flex; align-items: center; gap: 20px;
+  position: relative; overflow: hidden;
+}
+.page-header::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse 80% 120% at 0% 50%, rgba(206,14,45,0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+.header-crest { width: 64px; height: 64px; flex-shrink: 0; }
+.header-crest img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 2px 10px rgba(206,14,45,0.4)); }
+.back-link {
+  display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600;
+  letter-spacing: 1px; text-transform: uppercase; color: rgba(255,255,255,0.4);
+  text-decoration: none; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+  padding: 7px 14px; border-radius: 6px; flex-shrink: 0; transition: all 0.2s; position: relative;
+}
+.back-link:hover { color: var(--white); background: rgba(255,255,255,0.1); }
+.header-text { position: relative; flex: 1; }
+.header-eyebrow { font-size: 10px; letter-spacing: 4px; text-transform: uppercase; color: var(--red-mid); font-weight: 600; margin-bottom: 3px; }
+.header-title { font-family: 'Bebas Neue', sans-serif; font-size: 38px; letter-spacing: 4px; color: var(--white); line-height: 1; }
+.header-title span { color: var(--red); }
+
+/* SYNC BAR */
+.sync-bar {
+  padding: 7px 48px; display: flex; align-items: center; gap: 10px;
+  font-size: 11px; background: #0a1a0a; border-bottom: 1px solid #1a2e1a; transition: background 0.4s;
+}
+.sync-bar.offline { background: #1a0a0a; border-bottom-color: #2e1a1a; }
+.sync-bar.syncing { background: #0a0f1a; border-bottom-color: #1a1f2e; }
+.sync-dot { width: 8px; height: 8px; border-radius: 50%; background: #22c55e; flex-shrink: 0; transition: background 0.4s; }
+.sync-bar.offline .sync-dot { background: #ef4444; }
+.sync-bar.syncing .sync-dot { background: #eab308; animation: pulse 1s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+.sync-text { color: rgba(255,255,255,0.5); }
+.sync-bar.offline .sync-text { color: #f87171; }
+.sync-bar.syncing .sync-text { color: #fbbf24; }
+.last-update { margin-left: auto; color: rgba(255,255,255,0.3); }
+
+/* MAIN */
+.main { max-width: 1400px; margin: 0 auto; padding: 36px 48px 80px; }
+.section-label { font-size: 10px; letter-spacing: 4px; text-transform: uppercase; color: var(--gray); font-weight: 600; margin-bottom: 14px; }
+
+/* COACH CARDS */
+.coach-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 32px; }
+.coach-card {
+  background: var(--dark-2); border: 1px solid var(--dark-3); border-radius: 10px;
+  padding: 14px 18px; min-width: 160px; position: relative; overflow: hidden;
+}
+.coach-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+}
+.coach-card .cc-name { font-size: 14px; font-weight: 600; color: var(--white); margin-bottom: 4px; }
+.coach-card .cc-day { font-size: 11px; color: var(--gray); }
+.coach-card .cc-count { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: var(--white); line-height: 1; }
+.coach-card .cc-sub { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--gray); }
+.live-dot {
+  display: inline-block; width: 6px; height: 6px; border-radius: 50%;
+  background: #22c55e; margin-right: 5px; animation: pulse 2s infinite;
+}
+
+/* STATS */
+.stats-row {
+  display: flex; gap: 24px; flex-wrap: wrap; margin-bottom: 32px;
+  background: var(--dark-2); border: 1px solid var(--dark-3); border-radius: 10px; padding: 20px 24px;
+}
+.stat .num { font-family: 'Bebas Neue', sans-serif; font-size: 36px; color: var(--white); line-height: 1; }
+.stat .lbl { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--gray); margin-top: 2px; }
+
+/* FILTERS */
+.filter-bar { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
+.filter-input {
+  background: var(--dark-3); border: 1px solid var(--dark-4); border-radius: 8px;
+  padding: 8px 12px; font-family: 'DM Sans', sans-serif; font-size: 13px;
+  color: var(--white); outline: none; transition: border 0.2s;
+}
+.filter-input:focus { border-color: var(--red-mid); }
+.filter-input::placeholder { color: var(--gray); }
+.filter-input option { background: var(--dark-2); }
+.btn { border-radius: 6px; padding: 8px 16px; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; transition: all 0.2s; border: 1px solid transparent; }
+.btn-ghost { background: var(--dark-3); border-color: var(--dark-4); color: rgba(255,255,255,0.7); }
+.btn-ghost:hover { background: var(--dark-4); color: var(--white); }
+.btn-primary { background: var(--red); color: var(--white); border-color: var(--red); }
+.btn-primary:hover { background: var(--red-mid); }
+
+/* TABLE */
+.table-wrap { overflow-x: auto; border-radius: 10px; border: 1px solid var(--dark-3); }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+thead th {
+  background: var(--dark-3); padding: 10px 14px; text-align: left;
+  font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--gray);
+  white-space: nowrap; cursor: pointer; user-select: none; border-bottom: 1px solid var(--dark-4);
+  transition: color 0.15s;
+}
+thead th:hover { color: var(--white); }
+thead th.sorted { color: var(--red-mid); }
+tbody tr { border-bottom: 1px solid rgba(255,255,255,0.04); transition: background 0.15s; }
+tbody tr:hover { background: var(--dark-2); }
+tbody tr:last-child { border-bottom: none; }
+td { padding: 10px 14px; vertical-align: middle; white-space: nowrap; }
+td.rank-cell { font-family: 'Bebas Neue', sans-serif; font-size: 22px; color: var(--gray); width: 36px; }
+td.rank-cell.top { color: var(--red-mid); }
+td.name-cell { font-weight: 600; color: var(--white); white-space: normal; min-width: 150px; }
+
+/* Coach mini score */
+.mini-scores { display: flex; gap: 3px; }
+.mini-cat {
+  display: flex; flex-direction: column; align-items: center;
+  background: var(--dark-3); border-radius: 4px; padding: 3px 5px; min-width: 24px;
+}
+.mini-cat .mv { font-size: 12px; font-weight: 700; line-height: 1; }
+.mini-cat .ml { font-size: 8px; color: var(--gray); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 1px; }
+.no-score { color: var(--dark-4); font-size: 16px; }
+
+/* Average */
+.avg-pill {
+  display: inline-block; padding: 4px 12px; border-radius: 20px;
+  font-size: 13px; font-weight: 700; min-width: 52px; text-align: center;
+}
+.avg-pill.high  { background: rgba(34,197,94,0.15);  color: #4ade80; }
+.avg-pill.mid   { background: rgba(234,179,8,0.15);  color: #fbbf24; }
+.avg-pill.low   { background: rgba(239,68,68,0.15);  color: #f87171; }
+.avg-pill.na    { background: rgba(255,255,255,0.06); color: var(--gray); }
+
+/* Coverage dots */
+.cov-dots { display: flex; gap: 4px; }
+.cov-dot { width: 8px; height: 8px; border-radius: 50%; }
+.cov-dot.empty { background: var(--dark-4); }
+
+/* Config panel */
+.config-panel {
+  background: var(--dark-2); border: 1px solid var(--dark-3); border-radius: 10px;
+  padding: 20px 24px; margin-bottom: 32px;
+}
+.config-title { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 2px; margin-bottom: 12px; }
+.config-title span { color: var(--red); }
+.config-steps { list-style: none; counter-reset: steps; }
+.config-steps li {
+  counter-increment: steps; display: flex; gap: 14px; align-items: flex-start;
+  margin-bottom: 10px; font-size: 13px; color: rgba(255,255,255,0.75); line-height: 1.6;
+}
+.config-steps li::before {
+  content: counter(steps); background: var(--red); color: var(--white);
+  border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center;
+  justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; margin-top: 1px;
+}
+.config-steps a { color: var(--red-mid); }
+code {
+  background: var(--dark-3); border: 1px solid var(--dark-4); border-radius: 4px;
+  padding: 1px 6px; font-family: monospace; font-size: 12px; color: #a3e635;
+}
+
+/* Empty state */
+.empty-state { text-align: center; padding: 80px 20px; }
+.empty-state .icon { font-size: 48px; margin-bottom: 16px; }
+.empty-state p { color: var(--gray); font-size: 14px; line-height: 1.8; }
+
+@media print {
+  .sync-bar, .filter-bar, .config-panel, .action-bar { display: none !important; }
+  body { background: white; color: black; }
+  thead th { background: #eee; color: #333; }
+}
+
+/* ── PASSWORD GATE ── */
+.pw-gate { display:none; position:fixed; inset:0; background:#0e0e0e; z-index:9999; align-items:center; justify-content:center; }
+.pw-gate.visible { display:flex; }
+.pw-box { text-align:center; width:320px; padding:48px 36px; }
+.pw-box-crest { width:80px; height:80px; margin:0 auto 20px; }
+.pw-box-crest img { width:100%; height:100%; object-fit:contain; filter:drop-shadow(0 4px 16px rgba(206,14,45,0.4)); }
+.pw-box-eyebrow { font-size:10px; letter-spacing:4px; text-transform:uppercase; color:#e8324f; font-weight:600; margin-bottom:6px; }
+.pw-box-title { font-family:'Bebas Neue',sans-serif; font-size:28px; letter-spacing:3px; color:#fff; margin-bottom:6px; }
+.pw-box-sub { font-size:13px; color:rgba(255,255,255,0.35); margin-bottom:24px; line-height:1.5; }
+.pw-input { width:100%; background:#1a1a1a; border:1px solid #333; color:#fff; border-radius:8px; padding:11px 14px; font-family:'DM Sans',sans-serif; font-size:15px; outline:none; text-align:center; letter-spacing:3px; margin-bottom:10px; transition:border-color .2s; }
+.pw-input:focus { border-color:var(--red); }
+.pw-input.error { border-color:#e84545; animation:pw-shake .3s; }
+@keyframes pw-shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-8px)} 75%{transform:translateX(8px)} }
+.pw-error { font-size:12px; color:#e84545; min-height:16px; margin-bottom:8px; }
+.pw-submit { width:100%; background:var(--red); color:#fff; border:none; border-radius:8px; padding:12px; font-family:'DM Sans',sans-serif; font-size:14px; font-weight:700; cursor:pointer; transition:background .15s; }
+.pw-submit:hover { background:var(--red-mid); }
+.pw-back { display:inline-block; margin-top:12px; font-size:12px; color:rgba(255,255,255,0.25); text-decoration:none; }
+.pw-back:hover { color:rgba(255,255,255,0.5); }
+</style>
+</head>
+<body>
+
+<div class="pw-gate visible" id="pw-gate">
+  <div class="pw-box">
+    <div class="pw-box-crest"><img src="6 Star Dunbar Crest.png" alt="PLD" onerror="this.style.display='none'"></div>
+    <div class="pw-box-eyebrow">JV Head Coach</div>
+    <div class="pw-box-title">JV Scores</div>
+    <div class="pw-box-sub">Enter your password to continue.</div>
+    <input class="pw-input" type="password" id="pw-input" placeholder="Password"
+      onkeydown="if(event.key==='Enter')submitGate()"
+      oninput="document.getElementById('pw-error').textContent=''">
+    <div class="pw-error" id="pw-error"></div>
+    <button class="pw-submit" onclick="submitGate()">Enter</button>
+    <a class="pw-back" href="tryouts.html">← Back</a>
+  </div>
+</div>
+
+<div class="page-header">
+  <a href="index.html" class="back-link">← Home</a>
+  <div class="header-crest">
+    <img src="6 Star Dunbar Crest.png" alt="PLD Crest" onerror="this.style.display='none'">
+  </div>
+  <div class="header-text">
+    <div class="header-eyebrow">Paul Laurence Dunbar Boys Soccer · 2026 · JV</div>
+    <div class="header-title">Master <span>Scores</span></div>
+  </div>
+</div>
+
+<div class="sync-bar syncing" id="sync-bar">
+  <div class="sync-dot"></div>
+  <span class="sync-text" id="sync-text">Connecting…</span>
+  <span class="last-update" id="last-update"></span>
+</div>
+
+<div class="main">
+
+  <!-- SETUP GUIDE (shown only when not configured) -->
+  <div class="config-panel" id="config-panel" style="display:none">
+    <div class="config-title">One-Time <span>Setup</span></div>
+    <ol class="config-steps">
+      <li>Go to <a href="https://console.firebase.google.com" target="_blank">console.firebase.google.com</a> and create a free project.</li>
+      <li>Inside the project, click <strong>Build → Realtime Database</strong> and create a database (start in <strong>test mode</strong>).</li>
+      <li>Click the gear icon → <strong>Project Settings</strong> → scroll to <strong>Your apps</strong> → click <strong>Add app → Web</strong>. Copy the <code>firebaseConfig</code> object.</li>
+      <li>Open both <code>tryout_evaluation.html</code> and <code>tryout_master.html</code> in a text editor, find <code>FIREBASE_CONFIG</code> near the top of the script, and paste in your values.</li>
+      <li>Share <code>tryout_evaluation.html</code> with your coaches (email the file). They open it in any browser, enter their name, and score away.</li>
+    </ol>
+  </div>
+
+  <!-- COACHES LIVE -->
+  <div id="coaches-section" style="display:none">
+    <div class="section-label">Active Coaches</div>
+    <div class="coach-row" id="coach-row"></div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-row" id="stats-row" style="display:none"></div>
+
+  <!-- FILTERS + ACTIONS -->
+  <div class="filter-bar" id="filter-bar" style="display:none">
+    <input class="filter-input" id="f-search" type="text" placeholder="Search name or tryout #…" oninput="renderTable()">
+    <select class="filter-input" id="f-grade" onchange="renderTable()">
+      <option value="">All Grades</option>
+      <option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option>
+    </select>
+    <select class="filter-input" id="f-day" onchange="renderTable()">
+      <option value="">Both Days</option>
+      <option value="day1">Day 1</option>
+      <option value="day2">Day 2</option>
+    </select>
+    <select class="filter-input" id="f-cov" onchange="renderTable()">
+      <option value="">All Coverage</option>
+      <option value="full">All coaches scored</option>
+      <option value="partial">Partially scored</option>
+    </select>
+    <button class="btn btn-ghost" onclick="window.print()">Print</button>
+    <button class="btn btn-primary" onclick="exportCSV()">Export CSV</button>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="results">
+    <div class="empty-state" id="empty-state">
+      <div class="icon">⏳</div>
+      <p>Waiting for data…<br>Make sure Firebase is configured and coaches have started scoring.</p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ── FIREBASE CONFIG ───────────────────────────────────────────────────────────
+// Paste your Firebase project config here (same values as in tryout_evaluation.html)
+const FIREBASE_CONFIG = {
+  apiKey:            "AIzaSyCSWl0deRXE3ieLMM2TQy1h6rUmzTr0-W4",
+  authDomain:        "pld-soccer-tryout-evaluations.firebaseapp.com",
+  databaseURL:       "https://pld-soccer-tryout-evaluations-default-rtdb.firebaseio.com",
+  projectId:         "pld-soccer-tryout-evaluations",
+  storageBucket:     "pld-soccer-tryout-evaluations.firebasestorage.app",
+  messagingSenderId: "105016963227",
+  appId:             "1:105016963227:web:57e1a927613aaa9f04163e"
+};
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+const CATS = ['technical','tactical','teamfit'];
+const CAT_LABEL = { technical: 'TEC', tactical: 'TAC', teamfit: 'FIT' };
+const COACH_COLORS = ['#e879f9','#38bdf8','#4ade80','#fb923c','#facc15'];
+const MAX_SCORE = CATS.length * 5; // 15
+
+// liveData[day][coachKey][playerId] = { name, grade, pos, num, technical, tactical, teamfit, notes, coach, ts }
+let liveData = {};
+let coachColorMap = {};
+let currentSort = { col: 'avg', dir: -1 };
+
+// ── FIREBASE INIT ─────────────────────────────────────────────────────────────
+function initFirebase() {
+  if (FIREBASE_CONFIG.apiKey === 'PASTE_API_KEY_HERE') {
+    setSyncStatus('offline', 'Firebase not configured — see setup guide below');
+    document.getElementById('config-panel').style.display = '';
+    document.getElementById('empty-state').innerHTML = '<div class="icon">🔧</div><p>Follow the setup steps above to connect to Firebase.</p>';
+    return;
+  }
+
+  try {
+    firebase.initializeApp(FIREBASE_CONFIG);
+    const db = firebase.database();
+
+    db.ref('.info/connected').on('value', snap => {
+      if (snap.val()) setSyncStatus('online', 'Live — scores update in real time');
+      else setSyncStatus('offline', 'Disconnected — reconnecting…');
+    });
+
+    // Listen to all scores in real time
+    db.ref('tryouts2026/jv/scores').on('value', snap => {
+      liveData = snap.val() || {};
+      document.getElementById('last-update').textContent = 'Updated ' + new Date().toLocaleTimeString();
+      refresh();
+    });
+
+  } catch(e) {
+    setSyncStatus('offline', 'Firebase error: ' + e.message);
+    document.getElementById('config-panel').style.display = '';
+  }
+}
+
+function setSyncStatus(state, msg) {
+  const bar = document.getElementById('sync-bar');
+  bar.className = `sync-bar ${state === 'online' ? '' : state === 'syncing' ? 'syncing' : 'offline'}`;
+  document.getElementById('sync-text').textContent = msg;
+}
+
+// ── DATA HELPERS ──────────────────────────────────────────────────────────────
+function getAllCoaches() {
+  const keys = new Set();
+  Object.values(liveData).forEach(dayData => {
+    if (dayData) Object.keys(dayData).forEach(k => keys.add(k));
+  });
+  return [...keys].sort();
+}
+
+function getCoachColor(key) {
+  if (!coachColorMap[key]) {
+    const idx = Object.keys(coachColorMap).length % COACH_COLORS.length;
+    coachColorMap[key] = COACH_COLORS[idx];
+  }
+  return coachColorMap[key];
+}
+
+function getCoachName(key, dayData) {
+  // Try to get display name from any player record
+  for (const day of Object.keys(liveData)) {
+    const coachDay = liveData[day]?.[key];
+    if (coachDay) {
+      const first = Object.values(coachDay)[0];
+      if (first?.coach) return first.coach;
+    }
+  }
+  return key.replace(/_/g,' ').replace(/\b\w/g, c => c.toUpperCase());
+}
+
+function buildPlayerMap(dayFilter) {
+  // Merge all days/coaches into { playerKey: { name, grade, pos, num, coachScores: {coachKey: {cat: val}} } }
+  const map = {};
+  Object.entries(liveData).forEach(([day, dayData]) => {
+    if (dayFilter && day !== dayFilter) return;
+    if (!dayData) return;
+    Object.entries(dayData).forEach(([coachKey, players]) => {
+      if (!players) return;
+      Object.entries(players).forEach(([pid, p]) => {
+        if (!p?.name) return;
+        const key = p.name.trim().toLowerCase() + (dayFilter ? '' : '::' + day);
+        if (!map[key]) map[key] = { name: p.name, grade: p.grade||'', pos: p.pos||'', num: p.num||'', coachScores: {} };
+        if (!map[key].coachScores[coachKey]) map[key].coachScores[coachKey] = {};
+        CATS.forEach(cat => {
+          if (p[cat] !== undefined && p[cat] !== 0) {
+            map[key].coachScores[coachKey][cat] = p[cat];
+          }
+        });
+        // fill metadata
+        if (!map[key].pos && p.pos) map[key].pos = p.pos;
+        if (!map[key].grade && p.grade) map[key].grade = p.grade;
+        if (!map[key].num && p.num) map[key].num = p.num;
+      });
+    });
+  });
+  return map;
+}
+
+function playerAvg(coachScores) {
+  const scored = Object.values(coachScores).filter(s => Object.keys(s).length > 0);
+  if (!scored.length) return null;
+  const totals = scored.map(s => CATS.reduce((sum, c) => sum + (s[c] || 0), 0));
+  return totals.reduce((a, b) => a + b, 0) / totals.length;
+}
+
+// ── RENDER ────────────────────────────────────────────────────────────────────
+function refresh() {
+  const coaches = getAllCoaches();
+  const hasData = coaches.length > 0;
+
+  document.getElementById('coaches-section').style.display = hasData ? '' : 'none';
+  document.getElementById('stats-row').style.display       = hasData ? '' : 'none';
+  document.getElementById('filter-bar').style.display      = hasData ? '' : 'none';
+
+  if (hasData) {
+    renderCoachCards(coaches);
+    renderStats(coaches);
+    renderTable();
+  }
+}
+
+function renderCoachCards(coaches) {
+  const el = document.getElementById('coach-row');
+  el.innerHTML = coaches.map(key => {
+    const color = getCoachColor(key);
+    const name  = getCoachName(key);
+    // count scored players across both days
+    let d1 = 0, d2 = 0;
+    if (liveData.day1?.[key]) d1 = Object.keys(liveData.day1[key]).length;
+    if (liveData.day2?.[key]) d2 = Object.keys(liveData.day2[key]).length;
+    return `
+      <div class="coach-card" style="border-top-color:${color}">
+        <div class="cc-name"><span class="live-dot"></span>${escHtml(name)}</div>
+        <div class="cc-count">${d1 + d2}</div>
+        <div class="cc-sub">players scored</div>
+        <div class="cc-day" style="margin-top:4px">Day 1: ${d1} &nbsp;·&nbsp; Day 2: ${d2}</div>
+      </div>`;
+  }).join('');
+}
+
+function renderStats(coaches) {
+  const dayFilter = document.getElementById('f-day')?.value || '';
+  const map = buildPlayerMap(dayFilter);
+  const players = Object.values(map);
+  const avgs = players.map(p => playerAvg(p.coachScores)).filter(v => v !== null);
+  const topCount = avgs.filter(v => v / MAX_SCORE >= 0.7).length;
+  const mean = avgs.length ? (avgs.reduce((a,b)=>a+b,0)/avgs.length).toFixed(1) : '—';
+  const fullyCovered = players.filter(p => Object.keys(p.coachScores).length >= coaches.length).length;
+
+  document.getElementById('stats-row').innerHTML = `
+    <div class="stat"><div class="num">${coaches.length}</div><div class="lbl">Coaches</div></div>
+    <div class="stat"><div class="num">${players.length}</div><div class="lbl">Players Scored</div></div>
+    <div class="stat"><div class="num">${fullyCovered}</div><div class="lbl">All Coaches Scored</div></div>
+    <div class="stat"><div class="num">${topCount}</div><div class="lbl">Top Rated ≥70%</div></div>
+    <div class="stat"><div class="num">${mean}<span style="font-size:18px;color:var(--gray)">/${MAX_SCORE}</span></div><div class="lbl">Avg Score</div></div>
+  `;
+}
+
+function renderTable() {
+  const coaches = getAllCoaches();
+  if (!coaches.length) return;
+
+  const dayFilter = document.getElementById('f-day')?.value || '';
+  const q     = (document.getElementById('f-search')?.value || '').toLowerCase();
+  const grade = document.getElementById('f-grade')?.value || '';
+  const cov   = document.getElementById('f-cov')?.value   || '';
+
+  const map = buildPlayerMap(dayFilter);
+  let players = Object.values(map).filter(p => {
+    if (q     && !p.name.toLowerCase().includes(q) && !(p.num||'').includes(q)) return false;
+    if (grade && p.grade !== grade)                  return false;
+    if (cov === 'full'    && Object.keys(p.coachScores).length < coaches.length) return false;
+    if (cov === 'partial' && Object.keys(p.coachScores).length >= coaches.length) return false;
+    return true;
+  });
+
+  // Sort
+  players.sort((a, b) => {
+    let va, vb;
+    const col = currentSort.col;
+    if      (col === 'avg')   { va = playerAvg(a.coachScores) ?? -1; vb = playerAvg(b.coachScores) ?? -1; }
+    else if (col === 'name')  { va = a.name.toLowerCase(); vb = b.name.toLowerCase(); }
+    else if (col === 'grade') { va = parseInt(a.grade)||99; vb = parseInt(b.grade)||99; }
+    else { va = 0; vb = 0; }
+    return va < vb ? currentSort.dir : va > vb ? -currentSort.dir : 0;
+  });
+
+  if (!players.length) {
+    document.getElementById('results').innerHTML = '<div class="empty-state"><div class="icon">🔍</div><p>No players match the current filters.</p></div>';
+    return;
+  }
+
+  const coachHeaders = coaches.map(key => {
+    const color = getCoachColor(key);
+    const name  = getCoachName(key);
+    return `<th><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${color};margin-right:5px"></span>${escHtml(name)}</th>`;
+  }).join('');
+
+  const rows = players.map((p, i) => {
+    const avg = playerAvg(p.coachScores);
+    const pct = avg !== null ? avg / MAX_SCORE : null;
+    const pillCls = pct === null ? 'na' : pct >= 0.8 ? 'high' : pct >= 0.55 ? 'mid' : 'low';
+
+    const coachCells = coaches.map(key => {
+      const cs = p.coachScores[key];
+      const hasAny = cs && Object.keys(cs).length > 0;
+      if (!hasAny) return `<td><div class="no-score">·</div></td>`;
+      const color = getCoachColor(key);
+      return `<td>
+        <div class="mini-scores">
+          ${CATS.map(cat => `
+            <div class="mini-cat" style="border-top:2px solid ${color}">
+              <span class="mv">${cs[cat] !== undefined ? cs[cat] : '·'}</span>
+              <span class="ml">${CAT_LABEL[cat]}</span>
+            </div>`).join('')}
+        </div>
+      </td>`;
+    }).join('');
+
+    const covDots = coaches.map(key =>
+      `<div class="cov-dot ${p.coachScores[key] ? '' : 'empty'}"
+            style="background:${p.coachScores[key] ? getCoachColor(key) : ''}"
+            title="${getCoachName(key)}"></div>`
+    ).join('');
+
+    return `<tr>
+      <td class="rank-cell ${i < 3 ? 'top' : ''}">${i+1}</td>
+      <td class="name-cell">${escHtml(p.name)}${p.num ? ` <span style="color:var(--gray);font-size:11px">T-${p.num}</span>` : ''}</td>
+      <td style="color:var(--gray);font-size:12px">${p.grade||'—'}</td>
+      ${coachCells}
+      <td><span class="avg-pill ${pillCls}">${avg !== null ? avg.toFixed(1) : '—'}</span></td>
+      <td><div class="cov-dots">${covDots}</div></td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('results').innerHTML = `
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th onclick="setSort('rank')" style="width:36px">#</th>
+            <th onclick="setSort('name')" class="${currentSort.col==='name'?'sorted':''}">Player ${currentSort.col==='name'?(currentSort.dir===-1?'↓':'↑'):'↕'}</th>
+            <th onclick="setSort('grade')" class="${currentSort.col==='grade'?'sorted':''}">Gr ${currentSort.col==='grade'?(currentSort.dir===-1?'↓':'↑'):'↕'}</th>
+            ${coachHeaders}
+            <th onclick="setSort('avg')" class="${currentSort.col==='avg'?'sorted':''}">Avg ${currentSort.col==='avg'?(currentSort.dir===-1?'↓':'↑'):'↕'}</th>
+            <th>Coverage</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+}
+
+function setSort(col) {
+  if (currentSort.col === col) currentSort.dir *= -1;
+  else { currentSort.col = col; currentSort.dir = -1; }
+  renderTable();
+}
+
+// ── EXPORT ────────────────────────────────────────────────────────────────────
+function exportCSV() {
+  const coaches = getAllCoaches();
+  const dayFilter = document.getElementById('f-day')?.value || '';
+  const map = buildPlayerMap(dayFilter);
+  const players = Object.values(map).sort((a,b) => (playerAvg(b.coachScores)??-1) - (playerAvg(a.coachScores)??-1));
+
+  const catLabels = ['Technical','Tactical','Team Fit'];
+  const coachHeaders = coaches.flatMap(k => catLabels.map(c => `${getCoachName(k)} - ${c}`));
+  const header = ['Rank','Name','Tryout #','Grade', ...coachHeaders, 'Avg Score','Coverage'];
+  const rows = [header];
+
+  players.forEach((p, i) => {
+    const coachVals = coaches.flatMap(k => {
+      const cs = p.coachScores[k] || {};
+      return CATS.map(cat => cs[cat] !== undefined ? cs[cat] : '');
+    });
+    const avg = playerAvg(p.coachScores);
+    rows.push([i+1, p.name, p.num||'', p.grade||'', ...coachVals,
+               avg !== null ? avg.toFixed(2) : '',
+               `${Object.keys(p.coachScores).length}/${coaches.length}`]);
+  });
+
+  const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = 'PLD_Tryouts_2026_Master.csv'; a.click();
+  URL.revokeObjectURL(url);
+}
+
+function escHtml(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── Password Gate ─────────────────────────────────────────────────────────────
+const PW_HASH_MS = '2ebda397567291e64bea0575d54715ea4ba8cec2606bf8b2da95df58df67ca8e';
+async function sha256(s) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+if (sessionStorage.getItem('pld-master-jv-auth') === 'true') {
+  document.getElementById('pw-gate').classList.remove('visible');
+}
+async function submitGate() {
+  const val = document.getElementById('pw-input').value;
+  if (await sha256(val) === PW_HASH_MS) {
+    sessionStorage.setItem('pld-master-jv-auth', 'true');
+    document.getElementById('pw-gate').classList.remove('visible');
+  } else {
+    const inp = document.getElementById('pw-input');
+    inp.classList.add('error');
+    document.getElementById('pw-error').textContent = 'Incorrect password.';
+    setTimeout(() => inp.classList.remove('error'), 400);
+    inp.value = ''; inp.focus();
+  }
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+initFirebase();
+</script>
+</body>
+</html>
