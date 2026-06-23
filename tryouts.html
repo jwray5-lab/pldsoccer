@@ -330,24 +330,6 @@ footer {
 </head>
 <body>
 
-<!-- PASSWORD GATE -->
-<div class="pw-gate visible" id="pw-gate">
-  <div class="pw-box">
-    <div class="pw-box-crest">
-      <img src="6 Star Dunbar Crest.png" alt="PLD" onerror="this.style.display='none'">
-    </div>
-    <div class="pw-box-eyebrow">Staff Only</div>
-    <div class="pw-box-title">Tryouts 2026</div>
-    <div class="pw-box-sub">Enter your password to access tryout tools.</div>
-    <input class="pw-input" type="password" id="pw-input" placeholder="Password"
-      onkeydown="if(event.key==='Enter')submitGate()"
-      oninput="document.getElementById('pw-error').textContent=''">
-    <div class="pw-error" id="pw-error"></div>
-    <button class="pw-submit" onclick="submitGate()">Enter</button>
-    <a class="pw-back" href="index.html">← Back to home</a>
-  </div>
-</div>
-
 <header class="page-header">
   <a href="index.html" class="back-link">← Home</a>
   <div class="header-crest">
@@ -434,33 +416,6 @@ footer {
   <div class="footer-text">Paul Laurence Dunbar</div>
 </footer>
 
-<script>
-const PW_HASH = 'e4467318120754dacee06c4f97e285b187f4188f0dda8fb2972c4c74fee3413d';
-
-async function sha256(str) {
-  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
-  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
-}
-
-if (sessionStorage.getItem('pld-tryouts-auth') === 'true') {
-  document.getElementById('pw-gate').classList.remove('visible');
-}
-
-async function submitGate() {
-  const val = document.getElementById('pw-input').value;
-  const hash = await sha256(val);
-  if (hash === PW_HASH) {
-    sessionStorage.setItem('pld-tryouts-auth', 'true');
-    document.getElementById('pw-gate').classList.remove('visible');
-  } else {
-    const inp = document.getElementById('pw-input');
-    inp.classList.add('error');
-    document.getElementById('pw-error').textContent = 'Incorrect password.';
-    setTimeout(() => inp.classList.remove('error'), 400);
-    inp.value = '';
-    inp.focus();
-  }
-}
-</script>
+<script></script>
 </body>
 </html>
