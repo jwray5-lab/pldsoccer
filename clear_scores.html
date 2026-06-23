@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Clear Scores</title>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  <style>
+    body { background: #0f0f0f; color: #f0f0f0; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; gap: 16px; }
+    button { background: #ce0e2d; border: none; border-radius: 8px; padding: 14px 32px; color: white; font-size: 16px; font-weight: 600; cursor: pointer; }
+    button:hover { background: #a80b24; }
+    button:disabled { background: #444; cursor: default; }
+    #status { color: #888; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <h2>Clear All Tryout Scores</h2>
+  <p style="color:#888;font-size:14px;text-align:center">This removes all coach scores from Firebase.<br>Player names, grades, and tryout numbers are not affected.</p>
+  <button id="btn" onclick="clearScores()">Clear All Scores</button>
+  <div id="status">Connecting…</div>
+<script>
+  firebase.initializeApp({
+    apiKey: "AIzaSyCSWl0deRXE3ieLMM2TQy1h6rUmzTr0-W4",
+    authDomain: "pld-soccer-tryout-evaluations.firebaseapp.com",
+    databaseURL: "https://pld-soccer-tryout-evaluations-default-rtdb.firebaseio.com",
+    projectId: "pld-soccer-tryout-evaluations",
+    storageBucket: "pld-soccer-tryout-evaluations.firebasestorage.app",
+    messagingSenderId: "105016963227",
+    appId: "1:105016963227:web:57e1a927613aaa9f04163e"
+  });
+  const db = firebase.database();
+  db.ref('.info/connected').on('value', s => {
+    document.getElementById('status').textContent = s.val() ? 'Connected' : 'Offline';
+    document.getElementById('btn').disabled = !s.val();
+  });
+
+  function clearScores() {
+    if (!confirm('Delete all coach scores? This cannot be undone.')) return;
+    document.getElementById('btn').disabled = true;
+    document.getElementById('status').textContent = 'Clearing…';
+    db.ref('tryouts2026/scores').remove().then(() => {
+      document.getElementById('status').textContent = '✓ All scores cleared.';
+    }).catch(e => {
+      document.getElementById('status').textContent = 'Error: ' + e.message;
+      document.getElementById('btn').disabled = false;
+    });
+  }
+</script>
+</body>
+</html>

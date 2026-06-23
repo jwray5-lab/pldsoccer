@@ -94,10 +94,10 @@ body {
 /* ── SECTION CARDS ── */
 .sections {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, 1fr);
   gap: 20px;
   width: 100%;
-  max-width: 720px;
+  max-width: 1000px;
   position: relative;
 }
 .section-card {
@@ -185,6 +185,22 @@ body {
 .section-card.players:hover .section-card-cta {
   background: rgba(206,14,45,0.25);
 }
+.section-card.tryouts {
+  background: var(--dark-2);
+  border: 1px solid rgba(206,14,45,0.25);
+}
+.section-card.tryouts:hover {
+  border-color: rgba(206,14,45,0.5);
+}
+.section-card.tryouts .section-card-label { color: var(--red-mid); }
+.section-card.tryouts .section-card-desc { color: rgba(255,255,255,0.45); }
+.section-card.tryouts .section-card-cta {
+  background: rgba(206,14,45,0.15);
+  color: var(--red-mid);
+}
+.section-card.tryouts:hover .section-card-cta {
+  background: rgba(206,14,45,0.25);
+}
 
 /* ── FOOTER ── */
 footer {
@@ -244,6 +260,16 @@ footer {
         <div class="section-card-title">Player Resources</div>
         <div class="section-card-desc">Playing principles, team identity, roster, and everything players need for the season.</div>
         <div class="section-card-cta">View Resources →</div>
+      </div>
+    </a>
+
+    <a href="tryouts.html" class="section-card tryouts">
+      <div class="section-card-body">
+        <span class="section-card-icon">🏅</span>
+        <div class="section-card-label">Staff Only</div>
+        <div class="section-card-title">Tryouts 2026</div>
+        <div class="section-card-desc">Live check-in, coach evaluation forms, and the master scores dashboard — all synced in real time.</div>
+        <div class="section-card-cta">Open Tools →</div>
       </div>
     </a>
   </div>
