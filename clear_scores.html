@@ -5,15 +5,52 @@
   <title>Clear Scores</title>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    body { background: #0f0f0f; color: #f0f0f0; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; gap: 16px; }
-    button { background: #ce0e2d; border: none; border-radius: 8px; padding: 14px 32px; color: white; font-size: 16px; font-weight: 600; cursor: pointer; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #0f0f0f; color: #f0f0f0; font-family: 'DM Sans', sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; gap: 16px; }
+    button { background: #ce0e2d; border: none; border-radius: 8px; padding: 14px 32px; color: white; font-size: 16px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; }
     button:hover { background: #a80b24; }
     button:disabled { background: #444; cursor: default; }
     #status { color: #888; font-size: 14px; }
+
+    /* Password gate */
+    .pw-gate { display: none; position: fixed; inset: 0; background: #0f0f0f; z-index: 9999; align-items: center; justify-content: center; }
+    .pw-gate.visible { display: flex; }
+    .pw-box { text-align: center; width: 320px; padding: 48px 36px; }
+    .pw-box-crest { width: 80px; height: 80px; margin: 0 auto 20px; }
+    .pw-box-crest img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 4px 16px rgba(206,14,45,0.4)); }
+    .pw-box-eyebrow { font-size: 10px; letter-spacing: 4px; text-transform: uppercase; color: #e8324f; font-weight: 600; margin-bottom: 6px; }
+    .pw-box-title { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 3px; color: #fff; margin-bottom: 6px; }
+    .pw-box-sub { font-size: 13px; color: rgba(255,255,255,0.35); margin-bottom: 24px; line-height: 1.5; }
+    .pw-input { width: 100%; background: #1a1a1a; border: 1px solid #333; color: #fff; border-radius: 8px; padding: 11px 14px; font-family: 'DM Sans', sans-serif; font-size: 15px; outline: none; text-align: center; letter-spacing: 3px; margin-bottom: 10px; transition: border-color .2s; }
+    .pw-input:focus { border-color: #ce0e2d; }
+    .pw-input.error { border-color: #e84545; animation: shake .3s; }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-8px)} 75%{transform:translateX(8px)} }
+    .pw-error { font-size: 12px; color: #e84545; min-height: 16px; margin-bottom: 8px; }
+    .pw-submit { width: 100%; background: #ce0e2d; color: #fff; border: none; border-radius: 8px; padding: 12px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; }
+    .pw-submit:hover { background: #a80b24; }
+    .pw-back { display: inline-block; margin-top: 12px; font-size: 12px; color: rgba(255,255,255,0.25); text-decoration: none; }
+    .pw-back:hover { color: rgba(255,255,255,0.5); }
   </style>
 </head>
 <body>
+
+<div class="pw-gate visible" id="pw-gate">
+  <div class="pw-box">
+    <div class="pw-box-crest"><img src="6 Star Dunbar Crest.png" alt="PLD" onerror="this.style.display='none'"></div>
+    <div class="pw-box-eyebrow">Admin</div>
+    <div class="pw-box-title">Clear Scores</div>
+    <div class="pw-box-sub">Enter your password to access this tool.</div>
+    <input class="pw-input" type="password" id="pw-input" placeholder="Password"
+      onkeydown="if(event.key==='Enter')submitGate()"
+      oninput="document.getElementById('pw-error').textContent=''">
+    <div class="pw-error" id="pw-error"></div>
+    <button class="pw-submit" onclick="submitGate()">Enter</button>
+    <a class="pw-back" href="tryouts.html">← Back</a>
+  </div>
+</div>
+
   <h2>Clear All Tryout Scores</h2>
   <p style="color:#888;font-size:14px;text-align:center">This removes all coach scores from Firebase.<br>Player names, grades, and tryout numbers are not affected.</p>
   <button id="btn" onclick="clearScores()">Clear All Scores</button>
@@ -33,6 +70,28 @@
     document.getElementById('status').textContent = s.val() ? 'Connected' : 'Offline';
     document.getElementById('btn').disabled = !s.val();
   });
+
+  const PW_HASH = '2ebda397567291e64bea0575d54715ea4ba8cec2606bf8b2da95df58df67ca8e';
+  async function sha256(s) {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+  }
+  if (sessionStorage.getItem('pld-admin-auth') === 'true') {
+    document.getElementById('pw-gate').classList.remove('visible');
+  }
+  async function submitGate() {
+    const val = document.getElementById('pw-input').value;
+    if (await sha256(val) === PW_HASH) {
+      sessionStorage.setItem('pld-admin-auth', 'true');
+      document.getElementById('pw-gate').classList.remove('visible');
+    } else {
+      const inp = document.getElementById('pw-input');
+      inp.classList.add('error');
+      document.getElementById('pw-error').textContent = 'Incorrect password.';
+      setTimeout(() => inp.classList.remove('error'), 400);
+      inp.value = ''; inp.focus();
+    }
+  }
 
   function clearScores() {
     if (!confirm('Delete all coach scores? This cannot be undone.')) return;
