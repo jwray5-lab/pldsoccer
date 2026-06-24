@@ -145,7 +145,11 @@
     td.p-name   { font-weight: 500; min-width: 160px; }
     td.p-grade  { color: var(--muted); width: 44px; }
     td.p-num    { width: 120px; }
-    td.p-email  { min-width: 220px; }
+    td.p-phys   { min-width: 110px; white-space: nowrap; }
+    td.p-phys.phys-expired .email-display { color: #f87171; font-weight: 600; }
+    td.p-phys.phys-expired .email-display::after { content: ' ⚠'; font-size: 11px; }
+    td.p-email  { min-width: 200px; }
+    td.p-email2 { min-width: 200px; }
     td.p-status { width: 100px; }
 
     .num-input {
@@ -327,7 +331,9 @@
         <th>Name</th>
         <th>Gr</th>
         <th>Tryout #</th>
-        <th>Email</th>
+        <th>Physical Exp.</th>
+        <th>Email 1</th>
+        <th>Email 2</th>
         <th>Status</th>
       </tr>
     </thead>
@@ -347,15 +353,19 @@ const FIREBASE_CONFIG = {
   appId: "1:105016963227:web:57e1a927613aaa9f04163e"
 };
 
-const PLAYERS = [{"id":"fdlfo1wc","name":"Juan Abad","grade":"10"},{"id":"i0tnz8c1","name":"Yaseen Agoub","grade":"10"},{"id":"kdeiyx2i","name":"Anthony Aguilar","grade":"11"},{"id":"hcwbhcnn","name":"Tarek Ahmad","grade":"12"},{"id":"mztub2e5","name":"Grady Alberti","grade":"10"},{"id":"genrd9e0","name":"Abdul Aziz Aljanabi","grade":"9"},{"id":"nldhrzat","name":"Antony Alvarez","grade":"9"},{"id":"nk1u0avh","name":"Fernando Arellano","grade":"11"},{"id":"azb1uosq","name":"Samuel Armstrong","grade":"10"},{"id":"daao81rr","name":"Jesus Bautista Martinez","grade":"10"},{"id":"di2x1ns1","name":"Ecson Bermudez","grade":"10"},{"id":"rp106o8r","name":"Kai Bishop","grade":"10"},{"id":"by2xjxqw","name":"Predi Bomolo","grade":"10"},{"id":"j4fdqv6c","name":"Preston Brassine","grade":"9"},{"id":"4g4ibbxt","name":"Colton Brewer","grade":"10"},{"id":"dzzzyxum","name":"Malik Bushaala","grade":"11"},{"id":"udgafq9f","name":"Jaleel Cadgan","grade":"11"},{"id":"zsj8ng38","name":"Justin Calixtro","grade":"10"},{"id":"fydmfuon","name":"Williams Canelo","grade":"9"},{"id":"sjoztd71","name":"Carlos Cervantes","grade":"12"},{"id":"r694r6xl","name":"Jonathan Chavez","grade":"10"},{"id":"evxxfxt8","name":"Dylan Collins","grade":"10"},{"id":"x4yhulsv","name":"Carter Crovo","grade":"9"},{"id":"o96hlyat","name":"Justin Cruz","grade":"12"},{"id":"x72tqw5n","name":"Brandon Cuellar","grade":"9"},{"id":"cvht5d9m","name":"Kellen Daugherty","grade":"10"},{"id":"2t59eo0b","name":"Kieran Derbyshire","grade":"10"},{"id":"w5y7fine","name":"Jayden Descartes","grade":"11"},{"id":"b0o2bs5g","name":"Oliver Diaz","grade":"12"},{"id":"8i9wdua5","name":"Oscar Diaz","grade":"10"},{"id":"09qe0tdc","name":"Ulises Diaz","grade":"10"},{"id":"2u1m21d4","name":"Cash Donoghue","grade":"10"},{"id":"74ajgwnd","name":"Darwin Doodnauth","grade":"12"},{"id":"jcskc16p","name":"Santi Duque","grade":"10"},{"id":"gyzkakj0","name":"Pablo Enriquez","grade":"10"},{"id":"c4y5e58d","name":"Carson Fair","grade":"10"},{"id":"okz5odcg","name":"Landon Fair","grade":"12"},{"id":"40x87l6d","name":"Aahad Farhan","grade":"12"},{"id":"ax1txvk9","name":"Joseph Feola","grade":"12"},{"id":"7q02p4ji","name":"Adam Fidowicz","grade":"12"},{"id":"ulf8nup5","name":"Alex Fidowicz","grade":"9"},{"id":"tijgz97s","name":"Ronan Flemming","grade":"9"},{"id":"2f4b6yku","name":"Silas Flemming","grade":"11"},{"id":"qa64zyut","name":"Jareth Funes","grade":"12"},{"id":"khgpl011","name":"Miguel E Garcia Salgado","grade":"10"},{"id":"ncudr4tf","name":"Eyasu Gentaneh","grade":"12"},{"id":"h57pis70","name":"Drew Gibson","grade":"11"},{"id":"x65xeggi","name":"Donnie Gonzalez","grade":"10"},{"id":"spq8oxir","name":"Miguel Gracia","grade":"9"},{"id":"hbxo2rbr","name":"Adrian Gutierrez","grade":"9"},{"id":"zd5vgba6","name":"Jesus Gutierrez","grade":"12"},{"id":"u5us68pg","name":"Jobani Gutierrez","grade":"11"},{"id":"d1h9p5wu","name":"Bentley Hardin","grade":"9"},{"id":"3sf75gki","name":"Bradyn Haycraft","grade":"9"},{"id":"kr9rfm9a","name":"Ryder Hays","grade":"10"},{"id":"cvg1q96r","name":"Panha Heng","grade":"10"},{"id":"sb3vebu8","name":"Nico Hernandez","grade":"10"},{"id":"ywsz6bbb","name":"Christian Hernandez","grade":"11"},{"id":"zyw8dgq8","name":"Levi Hollen","grade":"9"},{"id":"frd18j0t","name":"Jeremie Iranzi","grade":"9"},{"id":"8ad9e68e","name":"Christian Jones","grade":"9"},{"id":"50l2yudl","name":"Ishaan Joshi","grade":"10"},{"id":"qi4p6yx2","name":"Voldi Kalindula","grade":"12"},{"id":"fkkr5a5q","name":"Mikadadi Kansale","grade":"12"},{"id":"u7nib83v","name":"Elijah Kelly","grade":"9"},{"id":"kv80cirl","name":"Mason Kelly","grade":"10"},{"id":"smwu52ec","name":"Ismail Khan","grade":"10"},{"id":"b7zlx24s","name":"Prikash Kharel","grade":"9"},{"id":"zschis4j","name":"Stephen Lee","grade":"12"},{"id":"75i8vl0z","name":"Edoardo Leonardi","grade":"9"},{"id":"afm0500f","name":"Parker Leugers","grade":"9"},{"id":"npjmr61s","name":"Eliott Lopez","grade":"9"},{"id":"5gw8rsst","name":"Ted Lubin","grade":"10"},{"id":"pn5yqo6l","name":"Channing Ma","grade":"9"},{"id":"3igp7ncr","name":"Didier Magallanes Chavez","grade":"9"},{"id":"gwwcewoh","name":"Deborah Makonda","grade":"9"},{"id":"qfimuhuh","name":"Amando Martinez Bautista","grade":"10"},{"id":"s3imszs5","name":"Rene Martinez Bautista","grade":"10"},{"id":"g2g1lzzy","name":"Mac Messer","grade":"11"},{"id":"ez0j3pf0","name":"Kenas Mone","grade":"9"},{"id":"6qdrqido","name":"Yhakxel Monfort","grade":"10"},{"id":"uc675qun","name":"Derek Montoyra Alvarado","grade":"10"},{"id":"ld08bgby","name":"Jean Mwela","grade":"10"},{"id":"va5ejgws","name":"Alex Naydenov","grade":"12"},{"id":"zpg5mmih","name":"Elisha Ngumoya","grade":"10"},{"id":"0ryu4afq","name":"Anderson Nsonguh","grade":"12"},{"id":"814z41ph","name":"Jameson Ocampo","grade":"11"},{"id":"xzn6qlv9","name":"Jose Oropeza","grade":"9"},{"id":"oco00m0e","name":"Spencer Patton","grade":"10"},{"id":"d9jup1mr","name":"Kevin Perez","grade":"10"},{"id":"hnstomko","name":"Carter Peyton","grade":"10"},{"id":"7zo1qer7","name":"Arpan Pokhrel","grade":"10"},{"id":"0vu2gyhs","name":"Harrison Pope","grade":"12"},{"id":"oosrcn8r","name":"Speed Price","grade":"10"},{"id":"47cxddgv","name":"Oliver Pulito","grade":"10"},{"id":"6hio9f19","name":"Isaac Qualls","grade":"9"},{"id":"pz5d4hfw","name":"Angel Ramirez","grade":"10"},{"id":"cetxsq28","name":"Aldo Rivera","grade":"11"},{"id":"1ye61l5c","name":"Damon Rodriguez-Hernandez","grade":"9"},{"id":"geyiy2qp","name":"Tristan Roetnz","grade":"12"},{"id":"qj3dn5ah","name":"Brandon Romero","grade":"9"},{"id":"7bfzo3k3","name":"Lincoln Salsman","grade":"12"},{"id":"5yk4mvyy","name":"Johncarlo Santiago","grade":"10"},{"id":"fdcgijan","name":"Hugh Seo","grade":"10"},{"id":"oc3tsqtt","name":"Joochan Shin","grade":"10"},{"id":"buxq1y49","name":"Nicolas Silva","grade":"10"},{"id":"dh8cmpw5","name":"Vidal Simo","grade":"10"},{"id":"ew81mueb","name":"Austin Soriano","grade":"10"},{"id":"u4z8p344","name":"Micah Spencer","grade":"11"},{"id":"pqwhptld","name":"Sebastian Strachan","grade":"12"},{"id":"7dqlf5ch","name":"Rhodes Theakston","grade":"11"},{"id":"4awkk306","name":"Ulisses Torres Rodriguez","grade":"9"},{"id":"y7ors9av","name":"Kash Tritsch","grade":"11"},{"id":"zitpttbf","name":"Junior Valdivia","grade":"12"},{"id":"k795r45x","name":"Jayden Vazquez","grade":"12"},{"id":"kd6gfh7e","name":"Liberto Villanueva Montes","grade":"12"},{"id":"pwfsdgb5","name":"Alex Wang","grade":"9"},{"id":"cznbdkiw","name":"Mark Wilson","grade":"10"},{"id":"5icbtowx","name":"Xander Windsor","grade":"12"},{"id":"56k11k2s","name":"Augusten Zuliani","grade":"9"}];
+const PLAYERS = [{"id":"fdlfo1wc","name":"Juan Abad","grade":"10","phys":"#N/A","email1":"joseabad837@yahoo.com","email2":""},{"id":"i0tnz8c1","name":"Yaseen Agoub","grade":"10","phys":"8/27/26","email1":"saddarrat@gmail.com","email2":"yaseen.agoub@stu.fayette.kyschools.us"},{"id":"kdeiyx2i","name":"Anthony Aguilar","grade":"11","phys":"#N/A","email1":"anthonymartinezaguilar7@gmail.com","email2":"aguilarcynthia93@gmail.com"},{"id":"hcwbhcnn","name":"Tarek Ahmad","grade":"12","phys":"7/3/26","email1":"tarek.ahmad@stu.fayette.kyschools.us","email2":"Muna.amry@uky.edu"},{"id":"mztub2e5","name":"Grady Alberti","grade":"10","phys":"2/28/27","email1":"emilymalberti@gmail.com","email2":"Grady1121@gmail.com"},{"id":"genrd9e0","name":"Abdul Aziz Aljanabi","grade":"9","phys":"6/10/27","email1":"abdulaziz.aljanabi@stu.fayette.kyschools.us","email2":"omar.aljanabi2020@gmail.com"},{"id":"nldhrzat","name":"Antony Alvarez","grade":"9","phys":"#N/A","email1":"adrialvarez1212aaaa@gmail.com","email2":"olindaalvarezgarcia38@gmail.com"},{"id":"nk1u0avh","name":"Fernando Arellano","grade":"11","phys":"#N/A","email1":"chavezmanuel90@gmail.com","email2":""},{"id":"azb1uosq","name":"Samuel Armstrong","grade":"10","phys":"9/10/26","email1":"armstrongsamuel648@gmail.com","email2":"Aarmst748@msn.com"},{"id":"daao81rr","name":"Jesus Bautista Martinez","grade":"10","phys":"#N/A","email1":"pedro.bautistamartinez@stu.fayette.kyschools.us","email2":""},{"id":"di2x1ns1","name":"Ecson Bermudez","grade":"10","phys":"#N/A","email1":"bermudezecsonjosue@gmail.com","email2":"Amayareyesmarisol@gmail.com"},{"id":"rp106o8r","name":"Kai Bishop","grade":"10","phys":"7/5/27","email1":"kaisbishop@gmail.com","email2":"christinaebishop@hotmail.com"},{"id":"by2xjxqw","name":"Predi Bomolo","grade":"10","phys":"#N/A","email1":"predi.bomolo@stu.fayette.kyschools.us","email2":"predib2000@gmail.com"},{"id":"j4fdqv6c","name":"Preston Brassine","grade":"9","phys":"7/7/27","email1":"courtney.e.brassine@gmail.com","email2":"P3bobby@gmail.com"},{"id":"4g4ibbxt","name":"Colton Brewer","grade":"10","phys":"#N/A","email1":"colton.brewer@stu.fayette.kyschools.us","email2":"brewer7969@gmail.com"},{"id":"dzzzyxum","name":"Malik Bushaala","grade":"11","phys":"#N/A","email1":"abdulmalik.bushaala@stu.fayette.kyschools.us","email2":""},{"id":"udgafq9f","name":"Jaleel Cadgan","grade":"11","phys":"#N/A","email1":"Cadaganjaleel18@gmail.com","email2":"lcadagan@hotmail.com"},{"id":"zsj8ng38","name":"Justin Calixtro","grade":"10","phys":"#N/A","email1":"jim.tatiana.nava@hotmail.com","email2":"vello25@hotmail.com"},{"id":"fydmfuon","name":"Williams Canelo","grade":"9","phys":"#N/A","email1":"ccawilliams319@gmail.con","email2":"fannycanelo45@gmail.com"},{"id":"sjoztd71","name":"Carlos Cervantes","grade":"12","phys":"#N/A","email1":"carlos.cevantes@icloud.com","email2":""},{"id":"r694r6xl","name":"Jonathan Chavez","grade":"10","phys":"#N/A","email1":"chavezmanuel90@gmail.com","email2":"jonathan.chavez7515@gmail.com"},{"id":"evxxfxt8","name":"Dylan Collins","grade":"10","phys":"#N/A","email1":"collins0905@gmail.com","email2":""},{"id":"x4yhulsv","name":"Carter Crovo","grade":"9","phys":"7/6/27","email1":"Carter.crovo@stu.fayette.kyschools.us","email2":"Lizcrovo@gmail.com"},{"id":"o96hlyat","name":"Justin Cruz","grade":"12","phys":"7/9/27","email1":"Cruzjustin408@gmail.com","email2":"Paulaha1876@gmail.com"},{"id":"x72tqw5n","name":"Brandon Cuellar","grade":"9","phys":"#N/A","email1":"brandon.cuellarromero@stu.fayette.kyschools.us","email2":""},{"id":"cvht5d9m","name":"Kellen Daugherty","grade":"10","phys":"11/27/26","email1":"clifton.daugherty@gmail.com","email2":"hmwigg@aol.com"},{"id":"2t59eo0b","name":"Kieran Derbyshire","grade":"10","phys":"6/24/27","email1":"derbyshirekieran@gmail.com","email2":"zachary.derbyshire@gmail.com"},{"id":"w5y7fine","name":"Jayden Descartes","grade":"11","phys":"#N/A","email1":"jayden.descartes1984@gmail.com","email2":"nicole_descartes@yahoo.com"},{"id":"b0o2bs5g","name":"Oliver Diaz","grade":"12","phys":"#N/A","email1":"alexia.122009@hotmail.com","email2":""},{"id":"8i9wdua5","name":"Oscar Diaz","grade":"10","phys":"#N/A","email1":"vbelinda36@gmail.com","email2":""},{"id":"09qe0tdc","name":"Ulises Diaz","grade":"10","phys":"#N/A","email1":"Alexia.122009@hotmail.com","email2":""},{"id":"2u1m21d4","name":"Cash Donoghue","grade":"10","phys":"#N/A","email1":"scdproperties@gmail.com","email2":"rayann_m@hotmail.com"},{"id":"74ajgwnd","name":"Darwin Doodnauth","grade":"12","phys":"#N/A","email1":"christinedoodnauth@gmail.com","email2":"darwindoodnauth@icloud.com"},{"id":"jcskc16p","name":"Santi Duque","grade":"10","phys":"#N/A","email1":"santiago.duquelugo@stu.fayette.kyschools.us","email2":"wladimirduque@gmail.com"},{"id":"gyzkakj0","name":"Pablo Enriquez","grade":"10","phys":"#N/A","email1":"Pabloenriquez885@gmail.com","email2":"juanenriquez040773@icloud.com"},{"id":"c4y5e58d","name":"Carson Fair","grade":"10","phys":"#N/A","email1":"katie.e.fair@gmail.com","email2":"joseph.r.fair@gmail.com"},{"id":"okz5odcg","name":"Landon Fair","grade":"12","phys":"#N/A","email1":"katie.e.fair@gmail.com","email2":"joseph.r.fair@gmail.com"},{"id":"40x87l6d","name":"Aahad Farhan","grade":"12","phys":"#N/A","email1":"aahadfarhan23@gmail.com","email2":"lubnajamal@hotmail.com"},{"id":"ax1txvk9","name":"Joseph Feola","grade":"12","phys":"7/9/27","email1":"josephfeola13@icloud.com","email2":"david.feola@uky.edu"},{"id":"7q02p4ji","name":"Adam Fidowicz","grade":"12","phys":"6/14/26","email1":"lfidowicz@gmail.com","email2":"afidowicz@gmail.com"},{"id":"ulf8nup5","name":"Alex Fidowicz","grade":"9","phys":"#N/A","email1":"lfidowicz@gmail.com","email2":""},{"id":"tijgz97s","name":"Ronan Flemming","grade":"9","phys":"#N/A","email1":"xcondog100@gmail.com;ballyhooaef@hotmail.com","email2":""},{"id":"2f4b6yku","name":"Silas Flemming","grade":"11","phys":"#N/A","email1":"xcondog100@gmail.com;ballyhooaef@hotmail.com","email2":"xcondog100@gmail.com"},{"id":"qa64zyut","name":"Jareth Funes","grade":"12","phys":"#N/A","email1":"diajareth0@gmail.com","email2":""},{"id":"khgpl011","name":"Miguel E Garcia Salgado","grade":"10","phys":"#N/A","email1":"miguel.garciasalgado@stu.fayette.kyschools.us","email2":"k.princesa1094@gmail.com"},{"id":"ncudr4tf","name":"Eyasu Getaneh","grade":"12","phys":"7/2/27","email1":"eyasugetaneh1@gmail.com","email2":"mihirety@yahoo.com"},{"id":"h57pis70","name":"Drew Gibson","grade":"11","phys":"#N/A","email1":"cadgibson@gmail.com","email2":"dacgibson@yahoo.com"},{"id":"x65xeggi","name":"Donnie Gonzalez","grade":"10","phys":"#N/A","email1":"Donniegonzalez01@gmail.com","email2":"jgonzo99@gmail.com"},{"id":"spq8oxir","name":"Miguel Gracia","grade":"9","phys":"#N/A","email1":"Salgado_m4@icloud.com","email2":"Kprincesa1094@gmail.com"},{"id":"hbxo2rbr","name":"Adrian Gutierrez","grade":"9","phys":"#N/A","email1":"adriangu374@gmail.com","email2":"noelgtz74@hotmail.com"},{"id":"zd5vgba6","name":"Jesus Gutierrez","grade":"12","phys":"#N/A","email1":"Ezequielvilla1919@gmail.com","email2":""},{"id":"u5us68pg","name":"Jobani Gutierrez","grade":"11","phys":"8/29/26","email1":"Jobani.gutierrezvera@stu.fayette.kyschool.us","email2":""},{"id":"d1h9p5wu","name":"Bentley Hardin","grade":"9","phys":"5/23/27","email1":"bentley.hardin@provmont.org","email2":"vitale.buford@gmail.com"},{"id":"3sf75gki","name":"Bradyn Haycraft","grade":"9","phys":"#N/A","email1":"Cb.haycraft94@gmail.com","email2":""},{"id":"kr9rfm9a","name":"Ryder Hays","grade":"10","phys":"7/25/26","email1":"Niki@calvarybaptistchurch.com","email2":"bassoon4jesus@gmail.com"},{"id":"cvg1q96r","name":"Panha Heng","grade":"10","phys":"#N/A","email1":"hengpanha2@yahoo.com","email2":"hengngiep@yahoo.com"},{"id":"sb3vebu8","name":"Nico Hernandez","grade":"10","phys":"#N/A","email1":"cnelly2523@yahoo.com","email2":"n8923456@yahoo.com"},{"id":"ywsz6bbb","name":"Christian Hernandez","grade":"11","phys":"#N/A","email1":"potozino3@gmail.com","email2":"kriz799@gmail.com"},{"id":"zyw8dgq8","name":"Levi Hollen","grade":"9","phys":"7/20/26","email1":"cthollen@gmail.com","email2":"mirandahollen@gmail.com"},{"id":"frd18j0t","name":"Jeremie Iranzi","grade":"9","phys":"#N/A","email1":"Jeremieiranzi14@gmail.com","email2":"mugabedesire33@gmail.com"},{"id":"8ad9e68e","name":"Christian Jones","grade":"9","phys":"#N/A","email1":"John@jonesin.com","email2":"amanda@jonesin.com"},{"id":"50l2yudl","name":"Ishaan Joshi","grade":"10","phys":"#N/A","email1":"ishaan.joshi@stu.fayette.kyschools.us","email2":"smitanjosh@gmail.com"},{"id":"qi4p6yx2","name":"Voldi Kalindula","grade":"12","phys":"#N/A","email1":"voldi.kalindula@stu.fayette.kyschools.us","email2":""},{"id":"fkkr5a5q","name":"Mikadadi Kansale","grade":"12","phys":"#N/A","email1":"kansale.mikidadi@stu.fayette.kyschools.us","email2":""},{"id":"u7nib83v","name":"Elijah Kelly","grade":"9","phys":"#N/A","email1":"elijahckelly1@gmail.com","email2":"jkellypt@gmail.com"},{"id":"kv80cirl","name":"Mason Kelly","grade":"10","phys":"#N/A","email1":"jkellypt@gmail.com","email2":"blkelly97@yahoo.com"},{"id":"smwu52ec","name":"Ismail Khan","grade":"10","phys":"#N/A","email1":"asma.imran@gmail.com","email2":"ismail.khan@stu.fayette.kyschools.us"},{"id":"b7zlx24s","name":"Prikash Kharel","grade":"9","phys":"1/28/27","email1":"prikashkharel5@gmail.com","email2":"pkharel.6169@gmail.com"},{"id":"zschis4j","name":"Stephen Lee","grade":"12","phys":"5/29/27","email1":"joyer72@gmail.com","email2":"kebi1212@gmail.com"},{"id":"75i8vl0z","name":"Edoardo Leonardi","grade":"9","phys":"#N/A","email1":"edoardo.leonardi@stu.fayette.kyschools.us","email2":"gabriella.borca@yahoo.com"},{"id":"afm0500f","name":"Parker Leugers","grade":"9","phys":"#N/A","email1":"Parker.leugers@stu.fayette.kyschools.us","email2":"kalie0729@gmail.com"},{"id":"npjmr61s","name":"Eliott Lopez","grade":"9","phys":"#N/A","email1":"eliottlopezgonzalez@gmail.com","email2":"fabelad171@gmail.com"},{"id":"5gw8rsst","name":"Ted Lubin","grade":"10","phys":"5/1/26","email1":"tedlubin8@gmail.com","email2":"pauldieulane@yahoo.com"},{"id":"pn5yqo6l","name":"Channing Ma","grade":"9","phys":"10/26/26","email1":"feima74@hotmail.com","email2":""},{"id":"3igp7ncr","name":"Didier Magallanes Chavez","grade":"9","phys":"#N/A","email1":"Didiermagallanes@yahoo.com","email2":"renemagallanes@ymail.com"},{"id":"gwwcewoh","name":"Deborah Makonda","grade":"9","phys":"#N/A","email1":"deborahmakonda17@gmail.com","email2":""},{"id":"qfimuhuh","name":"Amando Martinez Bautista","grade":"10","phys":"#N/A","email1":"amando.martinez859@gmail.com","email2":"gloriabautista278@gmail.com"},{"id":"s3imszs5","name":"Rene Martinez Bautista","grade":"10","phys":"#N/A","email1":"rene.martinezbautista8906@gmail.com","email2":"gloriabautista278@gmail.com"},{"id":"g2g1lzzy","name":"Mac Messer","grade":"11","phys":"#N/A","email1":"will.messer@gmail.com","email2":"messer.libby@gmail.com"},{"id":"ez0j3pf0","name":"Kenas Mone","grade":"9","phys":"#N/A","email1":"Monekenas08@gmail.com","email2":""},{"id":"6qdrqido","name":"Yhakxel Monfort","grade":"10","phys":"#N/A","email1":"diana.isela.delgado@gmail.com","email2":"Dianaisela0407@gmail.com"},{"id":"uc675qun","name":"Derek Montoyra Alvarado","grade":"10","phys":"#N/A","email1":"montoyaderky642@icloud.com","email2":""},{"id":"ld08bgby","name":"Jean Mwela","grade":"10","phys":"#N/A","email1":"Jean.Mwela@stu.fayette.kyschools.us","email2":"zamwambomwela05@gmail.com"},{"id":"va5ejgws","name":"Alex Naydenov","grade":"12","phys":"#N/A","email1":"zyumbyuleva@gmail.com","email2":"alex.naydenov10@gmail.com"},{"id":"zpg5mmih","name":"Elisha Ngumoya","grade":"10","phys":"#N/A","email1":"ngumoyaelisha@gmail.com","email2":"Katundungumoya@gmail.com"},{"id":"0ryu4afq","name":"Anderson Nsonguh","grade":"12","phys":"#N/A","email1":"anderson.nsonguh@stu.fayette.kyschools.us","email2":"Nsonguhwladys83@gmail.com"},{"id":"814z41ph","name":"Jameson Ocampo","grade":"11","phys":"#N/A","email1":"jameson.ocampo@stu.fayette.kyschools.us","email2":""},{"id":"xzn6qlv9","name":"Jose Oropeza","grade":"9","phys":"#N/A","email1":"Jose.oropeza6419@gmail.com","email2":"Anayarmando6@gmail.com"},{"id":"oco00m0e","name":"Spencer Patton","grade":"10","phys":"8/28/26","email1":"spencer.patton@stu.fayette.kyschools.us","email2":"jeremy.patton@fayette.kyschools.us"},{"id":"d9jup1mr","name":"Kevin Perez","grade":"10","phys":"#N/A","email1":"Kevin.perezrodriguez1810@gmail.com","email2":"Silvinarodriguez448@gmail.com"},{"id":"hnstomko","name":"Carter Peyton","grade":"10","phys":"7/16/26","email1":"t6p2@yahoo.com","email2":"jennifer.peyton@uky.edu"},{"id":"0vu2gyhs","name":"Harrison Pope","grade":"12","phys":"7/5/27","email1":"bryan.pope@me.com","email2":"melissamcgrawpope@me.com"},{"id":"oosrcn8r","name":"Speed Price","grade":"10","phys":"#N/A","email1":"pappy0357@gmail.com","email2":"rebecca.price@scaleready.com"},{"id":"47cxddgv","name":"Oliver Pulito","grade":"10","phys":"7/22/27","email1":"oliver.pulito@icloud.com","email2":"brianpulito1@gmail.com"},{"id":"6hio9f19","name":"Isaac Qualls","grade":"9","phys":"#N/A","email1":"Isaac.qualls@stu.fayette.kyschools.us","email2":"Joshua.qualls@eku.edu"},{"id":"pz5d4hfw","name":"Angel Ramirez","grade":"10","phys":"#N/A","email1":"angel.ramirezz12234@icloud.com","email2":"ramirezz1224@hotmail.com"},{"id":"cetxsq28","name":"Aldo Rivera","grade":"11","phys":"#N/A","email1":"aldo.riveraborja@stu.fayette.kyschools.us","email2":""},{"id":"1ye61l5c","name":"Damon Rodriguez-Hernandez","grade":"9","phys":"7/9/27","email1":"damonrdgz11@gmail.com","email2":"gabyhdz88@gmail.com"},{"id":"geyiy2qp","name":"Tristan Roentz","grade":"12","phys":"7/3/27","email1":"gretchen.roentz@gmail.com","email2":"tristan.roentz@gmail.com"},{"id":"qj3dn5ah","name":"Brandon Romero","grade":"9","phys":"#N/A","email1":"fr240538@icloud.com","email2":"lizhernandez1391@gmail.com"},{"id":"7bfzo3k3","name":"Lincoln Salsman","grade":"12","phys":"7/8/27","email1":"kristynsalsman@yahoo.com","email2":"lsalsman09@gmail.com"},{"id":"5yk4mvyy","name":"Johncarlo Santiago","grade":"10","phys":"#N/A","email1":"Johngoalie1@icloud.com","email2":"Cecijimenez124@icloud.com"},{"id":"fdcgijan","name":"Hugh Seo","grade":"10","phys":"#N/A","email1":"pajarolove@hotmail.com","email2":""},{"id":"oc3tsqtt","name":"Joochan Shin","grade":"10","phys":"#N/A","email1":"teresa.khe@gmail.com","email2":"joochanjshin@gmail.com"},{"id":"buxq1y49","name":"Nicolas Silva","grade":"10","phys":"#N/A","email1":"silvapuentes0615@gmail.com","email2":"sebasilvas@gmail.com"},{"id":"dh8cmpw5","name":"Vidal Simo","grade":"10","phys":"#N/A","email1":"Lksimo@yahoo.ca","email2":"simomarcel0007@gmail.com"},{"id":"ew81mueb","name":"Austin Soriano","grade":"10","phys":"#N/A","email1":"austinorelsana01@gmail.com","email2":""},{"id":"u4z8p344","name":"Micah Spencer","grade":"11","phys":"#N/A","email1":"brandon.spencer@gmail.com","email2":"micah.spencer1214@gmail.com"},{"id":"pqwhptld","name":"Sebastian Strachan","grade":"12","phys":"8/29/26","email1":"bguiton@gmail.com","email2":"drst222@gmail.com"},{"id":"7dqlf5ch","name":"Rhodes Theakston","grade":"11","phys":"7/3/27","email1":"rob.theakston@gmail.com","email2":"stephanie.theakston@gmail.com"},{"id":"4awkk306","name":"Ulisses Torres Rodriguez","grade":"9","phys":"#N/A","email1":"Ulisses.torresrodriguez@stu.fayette.kyschools.us","email2":"Cy_torres92@yahoo.com"},{"id":"y7ors9av","name":"Kash Tritsch","grade":"11","phys":"9/25/26","email1":"kurt.tritsch@gmail.com","email2":"kash.tritsch@icloud.com"},{"id":"zitpttbf","name":"Junior Valdivia","grade":"12","phys":"#N/A","email1":"vicente50valdivia@gmail.com","email2":"Jennifer56@live.com"},{"id":"k795r45x","name":"Jayden Vazquez","grade":"12","phys":"#N/A","email1":"jayden1111.jv.jav@icloud.com","email2":"clappx2019@gmail.com"},{"id":"kd6gfh7e","name":"Liberto Villanueva Montes","grade":"12","phys":"7/4/27","email1":"liberto.villanuevamontes@stu.fayette.kyschools.us","email2":"montessandra2019@gmail.com"},{"id":"pwfsdgb5","name":"Alex Wang","grade":"9","phys":"#N/A","email1":"Alex.wang1@stu.fayette.kyschools.us","email2":"Chi.wang@uky.edu"},{"id":"cznbdkiw","name":"Mark Wilson","grade":"10","phys":"#N/A","email1":"mdwilson04@yahoo.com","email2":"marniawilson@yahoo.com"},{"id":"5icbtowx","name":"Xander Windsor","grade":"12","phys":"#N/A","email1":"xwind5137@icloud.com","email2":"ahwindsor1@gmail.com"},{"id":"56k11k2s","name":"Augusten Zuliani","grade":"9","phys":"10/18/26","email1":"zuliani.augusten@gmail.com","email2":""}];
 
 // ── State ─────────────────────────────────────────────────────────────────────
 let db, firebaseReady = false;
 let checkinData  = {};   // {playerKey: {name, grade, num, ts}}
-let emailData    = {};   // {playerKey: email}
+let emailData    = {};   // {playerKey: email1}
+let email2Data   = {};   // {playerKey: email2}
+let physData     = {};   // {playerKey: physical expiration}
 let extraPlayers = [];    // walk-ons
 let currentFilter = 'all';
-let editingEmailKey = null; // which player's email is being edited
+let editingEmailKey  = null;
+let editingEmail2Key = null;
+let editingPhysKey   = null;
 
 function playerKey(name) {
   return name.toLowerCase().replace(/[^a-z0-9]/g, '_');
@@ -387,6 +397,16 @@ function initFirebase() {
     renderTable();
   });
 
+  db.ref('tryouts2026/varsity/email2').on('value', snap => {
+    email2Data = snap.val() || {};
+    renderTable();
+  });
+
+  db.ref('tryouts2026/varsity/phys').on('value', snap => {
+    physData = snap.val() || {};
+    renderTable();
+  });
+
   db.ref('tryouts2026/varsity/extra_players').on('value', snap => {
     const data = snap.val() || {};
     extraPlayers = Object.values(data).sort((a, b) => a.name.localeCompare(b.name));
@@ -400,6 +420,18 @@ function setSyncStatus(state, text) {
 }
 
 // ── Save tryout number ────────────────────────────────────────────────────────
+// Returns true if phys date is before 7/15/2026
+function isPhysExpired(dateStr) {
+  if (!dateStr) return false;
+  // Accept MM/DD/YY or MM/DD/YYYY
+  const parts = dateStr.trim().split('/');
+  if (parts.length !== 3) return false;
+  let [m, d, y] = parts.map(Number);
+  if (y < 100) y += 2000;
+  const date = new Date(y, m - 1, d);
+  return date < new Date(2026, 6, 15); // July 15, 2026
+}
+
 function saveNum(player, rawVal) {
   if (!firebaseReady) return;
   const val = rawVal.trim();
@@ -428,7 +460,52 @@ function saveEmail(name, email) {
   }
 }
 
-// ── Email inline editing ──────────────────────────────────────────────────────
+
+// ── Save physical expiration ─────────────────────────────────────────────────
+function savePhys(name, val) {
+  if (!firebaseReady) return;
+  const key = playerKey(name);
+  setSyncStatus('syncing', 'Saving…');
+  const done = () => setSyncStatus('online', 'Connected — numbers sync live to evaluation forms');
+  if (val.trim()) { db.ref('tryouts2026/varsity/phys/' + key).set(val.trim()).then(done); }
+  else { db.ref('tryouts2026/varsity/phys/' + key).remove().then(done); }
+}
+function saveEmail2(name, email) {
+  if (!firebaseReady) return;
+  const key = playerKey(name);
+  setSyncStatus('syncing', 'Saving…');
+  const done = () => setSyncStatus('online', 'Connected — numbers sync live to evaluation forms');
+  if (email.trim()) { db.ref('tryouts2026/varsity/email2/' + key).set(email.trim()).then(done); }
+  else { db.ref('tryouts2026/varsity/email2/' + key).remove().then(done); }
+}
+function startEditPhys(key, cur) {
+  editingPhysKey = key; editingEmail2Key = null; editingEmailKey = null;
+  renderTable();
+  setTimeout(() => { const i = document.getElementById('phys-inp-'+key); if(i){i.focus();i.select();} }, 30);
+}
+function commitPhys(name) {
+  const key = playerKey(name);
+  const inp = document.getElementById('phys-inp-'+key);
+  if (!inp) return;
+  savePhys(name, inp.value);
+  editingPhysKey = null;
+}
+function cancelPhys() { editingPhysKey = null; renderTable(); }
+function startEditEmail2(key, cur) {
+  editingEmail2Key = key; editingPhysKey = null; editingEmailKey = null;
+  renderTable();
+  setTimeout(() => { const i = document.getElementById('email2-inp-'+key); if(i){i.focus();i.select();} }, 30);
+}
+function commitEmail2(name) {
+  const key = playerKey(name);
+  const inp = document.getElementById('email2-inp-'+key);
+  if (!inp) return;
+  saveEmail2(name, inp.value);
+  editingEmail2Key = null;
+}
+function cancelEmail2() { editingEmail2Key = null; renderTable(); }
+
+// ── Email 1 inline editing ───────────────────────────────────────────────────────
 function startEditEmail(key, currentEmail) {
   editingEmailKey = key;
   renderTable();
@@ -467,16 +544,41 @@ function renderTable() {
     const rec       = checkinData[key];
     const num       = rec ? rec.num : '';
     const email     = emailData[key] || '';
+    const email2    = email2Data[key] || p.email2 || '';
+    const phys      = physData[key]   || p.phys   || '';
     const isAssigned = !!num;
     if (isAssigned) assigned++;
     if (email) emailCount++;
 
-    if (query && !p.name.toLowerCase().includes(query) && !String(p.grade).includes(query) && !email.toLowerCase().includes(query)) return;
+    if (query && !p.name.toLowerCase().includes(query) && !String(p.grade).includes(query) && !email.toLowerCase().includes(query) && !email2.toLowerCase().includes(query)) return;
     if (currentFilter === 'assigned'   && !isAssigned) return;
     if (currentFilter === 'unassigned' &&  isAssigned) return;
 
     visibleCount++;
     const isEditingEmail = (editingEmailKey === key);
+
+    const isEditingPhys = (editingPhysKey === key);
+    let physCell;
+    if (isEditingPhys) {
+      physCell = `<div class="email-cell"><input id="phys-inp-${key}" class="email-input" type="text" value="${phys}" placeholder="MM/DD/YY"
+        onblur="commitPhys('${p.name.replace(/'/g, "\\'")}')"
+        onkeydown="if(event.key==='Enter')commitPhys('${p.name.replace(/'/g, "\\\'")}'); if(event.key==='Escape')cancelPhys();"></div>`;
+    } else {
+      physCell = `<div class="email-cell"><span class="email-display${phys ? '' : ' empty'}"
+        onclick="startEditPhys('${key}','${phys}')"
+        title="${phys ? 'Click to edit' : 'Click to add date'}">${phys || 'Add date…'}</span></div>`;
+    }
+    const isEditingEmail2 = (editingEmail2Key === key);
+    let email2Cell;
+    if (isEditingEmail2) {
+      email2Cell = `<div class="email-cell"><input id="email2-inp-${key}" class="email-input" type="email" value="${email2}" placeholder="email@example.com"
+        onblur="commitEmail2('${p.name.replace(/'/g, "\\'")}')"
+        onkeydown="if(event.key==='Enter')commitEmail2('${p.name.replace(/'/g, "\\\'")}'); if(event.key==='Escape')cancelEmail2();"></div>`;
+    } else {
+      email2Cell = `<div class="email-cell"><span class="email-display${email2 ? '' : ' empty'}"
+        onclick="startEditEmail2('${key}','${email2}')"
+        title="${email2 ? 'Click to edit' : 'Click to add email'}">${email2 || 'Add email…'}</span></div>`;
+    }
 
     let emailCell;
     if (isEditingEmail) {
@@ -518,7 +620,9 @@ function renderTable() {
             onkeydown="handleKey(event, this)"
           >
         </td>
+        <td class="p-phys${isPhysExpired(phys) ? ' phys-expired' : ''}">${physCell}</td>
         <td class="p-email">${emailCell}</td>
+        <td class="p-email2">${email2Cell}</td>
         <td class="p-status">
           <span class="badge ${isAssigned ? 'done' : 'pending'}">${isAssigned ? '✓ T-' + num : 'Pending'}</span>
         </td>
