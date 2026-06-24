@@ -146,6 +146,8 @@
     td.p-grade  { color: var(--muted); width: 44px; }
     td.p-num    { width: 120px; }
     td.p-phys   { min-width: 110px; white-space: nowrap; }
+    td.p-phys.phys-expired .email-display { color: #f87171; font-weight: 600; }
+    td.p-phys.phys-expired .email-display::after { content: ' ⚠'; font-size: 11px; }
     td.p-email  { min-width: 200px; }
     td.p-email2 { min-width: 200px; }
     td.p-status { width: 100px; }
@@ -418,6 +420,18 @@ function setSyncStatus(state, text) {
 }
 
 // ── Save tryout number ────────────────────────────────────────────────────────
+// Returns true if phys date is before 7/15/2026
+function isPhysExpired(dateStr) {
+  if (!dateStr) return false;
+  // Accept MM/DD/YY or MM/DD/YYYY
+  const parts = dateStr.trim().split('/');
+  if (parts.length !== 3) return false;
+  let [m, d, y] = parts.map(Number);
+  if (y < 100) y += 2000;
+  const date = new Date(y, m - 1, d);
+  return date < new Date(2026, 6, 15); // July 15, 2026
+}
+
 function saveNum(player, rawVal) {
   if (!firebaseReady) return;
   const val = rawVal.trim();
@@ -606,7 +620,7 @@ function renderTable() {
             onkeydown="handleKey(event, this)"
           >
         </td>
-        <td class="p-phys">${physCell}</td>
+        <td class="p-phys${isPhysExpired(phys) ? ' phys-expired' : ''}">${physCell}</td>
         <td class="p-email">${emailCell}</td>
         <td class="p-email2">${email2Cell}</td>
         <td class="p-status">
