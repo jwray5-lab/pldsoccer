@@ -330,6 +330,21 @@ footer {
 </head>
 <body>
 
+<div class="pw-gate visible" id="pw-gate">
+  <div class="pw-box">
+    <div class="pw-box-crest"><img src="6 Star Dunbar Crest.png" alt="PLD" onerror="this.style.display='none'"></div>
+    <div class="pw-box-eyebrow">PLD Boys Soccer · 2026</div>
+    <div class="pw-box-title">Tryouts Portal</div>
+    <div class="pw-box-sub">Enter your password to access the tryout tools.</div>
+    <input class="pw-input" type="password" id="pw-input" placeholder="Password"
+      onkeydown="if(event.key==='Enter')submitGate()"
+      oninput="document.getElementById('pw-error').textContent=''">
+    <div class="pw-error" id="pw-error"></div>
+    <button class="pw-submit" onclick="submitGate()">Enter</button>
+    <a class="pw-back" href="index.html">← Back to Home</a>
+  </div>
+</div>
+
 <header class="page-header">
   <a href="index.html" class="back-link">← Home</a>
   <div class="header-crest">
@@ -346,7 +361,7 @@ footer {
   <div class="section-label">JV Tryouts — Grades 7–10</div>
   <div class="resource-grid">
 
-    <a href="tryout_checkin_jv.html" class="resource-card">
+    <a href="Check In/tryout_checkin_jv.html" class="resource-card">
       <div class="resource-card-accent"></div>
       <div class="resource-card-body">
         <div class="resource-card-type">Check-In Station · JV</div>
@@ -359,7 +374,7 @@ footer {
       </div>
     </a>
 
-    <a href="tryout_evaluation_jv.html" class="resource-card">
+    <a href="Evaluations/tryout_evaluation_jv.html" class="resource-card">
       <div class="resource-card-accent"></div>
       <div class="resource-card-body">
         <div class="resource-card-type">Coach Tool · JV</div>
@@ -390,7 +405,7 @@ footer {
   <div class="section-label" style="margin-top:36px">Varsity Tryouts — Grades 9–12</div>
   <div class="resource-grid">
 
-    <a href="tryout_checkin_varsity.html" class="resource-card">
+    <a href="Check In/tryout_checkin_varsity.html" class="resource-card">
       <div class="resource-card-accent"></div>
       <div class="resource-card-body">
         <div class="resource-card-type">Check-In Station · Varsity</div>
@@ -403,7 +418,7 @@ footer {
       </div>
     </a>
 
-    <a href="tryout_evaluation_varsity.html" class="resource-card">
+    <a href="Evaluations/tryout_evaluation_varsity.html" class="resource-card">
       <div class="resource-card-accent"></div>
       <div class="resource-card-body">
         <div class="resource-card-type">Coach Tool · Varsity</div>
@@ -460,6 +475,28 @@ footer {
   <div class="footer-text">Paul Laurence Dunbar</div>
 </footer>
 
-<script></script>
+<script>
+const PW_HASH = '9325b3a90d0a1b6d728a3428a28cbf88529f7cd19e9e61277383612b92da942d';
+async function sha256(s) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+if (sessionStorage.getItem('pld-tryouts-auth') === 'true') {
+  document.getElementById('pw-gate').classList.remove('visible');
+}
+async function submitGate() {
+  const val = document.getElementById('pw-input').value;
+  if (await sha256(val) === PW_HASH) {
+    sessionStorage.setItem('pld-tryouts-auth', 'true');
+    document.getElementById('pw-gate').classList.remove('visible');
+  } else {
+    const inp = document.getElementById('pw-input');
+    inp.classList.add('error');
+    document.getElementById('pw-error').textContent = 'Incorrect password.';
+    setTimeout(() => inp.classList.remove('error'), 400);
+    inp.value = ''; inp.focus();
+  }
+}
+</script>
 </body>
 </html>
