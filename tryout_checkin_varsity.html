@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PLD Soccer — Varsity Player Check-In</title>
+  <title>PLD Soccer — Varsity Soccer Player Check-In</title>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -19,24 +19,24 @@
       --white: #ffffff;
       --green: #4ade80;
       --yellow: #facc15;
+      --blue: #60a5fa;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; min-height: 100vh; }
 
-    /* ── Header ─────────────────────────────────────────────────────────── */
+    /* ── Header ── */
     .header {
       background: var(--red);
       padding: 14px 24px;
       display: flex;
       align-items: center;
       gap: 16px;
-      justify-content: flex-start;
     }
     .header-left { display: flex; flex-direction: column; gap: 2px; }
     .header-title { font-family: 'Bebas Neue', sans-serif; font-size: 26px; color: white; letter-spacing: 1px; }
     .header-sub { color: rgba(255,255,255,0.75); font-size: 13px; }
 
-    /* ── Sync bar ───────────────────────────────────────────────────────── */
+    /* ── Sync bar ── */
     .sync-bar {
       background: var(--surface);
       border-bottom: 1px solid var(--border);
@@ -53,7 +53,7 @@
     .sync-dot.offline { background: #f87171; }
     @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
 
-    /* ── Controls ───────────────────────────────────────────────────────── */
+    /* ── Controls ── */
     .controls {
       padding: 14px 24px;
       display: flex;
@@ -62,7 +62,7 @@
       flex-wrap: wrap;
       border-bottom: 1px solid var(--border);
     }
-    .search-wrap { position: relative; flex: 1; min-width: 180px; max-width: 380px; }
+    .search-wrap { position: relative; flex: 1; min-width: 180px; max-width: 320px; }
     .search-wrap input {
       width: 100%;
       background: var(--surface);
@@ -79,7 +79,6 @@
       background: none; border: none; color: var(--muted); cursor: pointer; font-size: 15px; padding: 0;
     }
     .search-clear:hover { color: var(--white); }
-
     .stats-pill {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -90,7 +89,7 @@
       color: var(--muted);
     }
     .stats-pill strong { color: var(--green); }
-
+    .stats-pill .email-count { color: var(--blue); }
     .filter-btns { display: flex; gap: 6px; }
     .filter-btn {
       background: var(--surface);
@@ -104,11 +103,24 @@
       transition: border-color .15s, color .15s;
     }
     .filter-btn.active { border-color: var(--red); color: var(--white); }
+    .btn-add-player {
+      margin-left: auto;
+      background: var(--red);
+      border: none;
+      border-radius: 6px;
+      padding: 9px 16px;
+      color: white;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      white-space: nowrap;
+    }
+    .btn-add-player:hover { background: #a80b24; }
 
-
-    /* ── Table ──────────────────────────────────────────────────────────── */
-    .table-wrap { padding: 0 24px 48px; }
-    table { width: 100%; border-collapse: collapse; }
+    /* ── Table ── */
+    .table-wrap { padding: 0 24px 48px; overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; min-width: 680px; }
     thead th {
       text-align: left;
       padding: 10px 12px;
@@ -130,9 +142,10 @@
     tbody tr.unassigned { border-left: 3px solid transparent; }
     td { padding: 9px 12px; font-size: 14px; vertical-align: middle; }
     td.row-num  { color: var(--muted); font-size: 12px; width: 36px; }
-    td.p-name   { font-weight: 500; }
-    td.p-grade  { color: var(--muted); width: 50px; }
-    td.p-num    { width: 140px; }
+    td.p-name   { font-weight: 500; min-width: 160px; }
+    td.p-grade  { color: var(--muted); width: 44px; }
+    td.p-num    { width: 120px; }
+    td.p-email  { min-width: 220px; }
     td.p-status { width: 100px; }
 
     .num-input {
@@ -144,12 +157,43 @@
       font-size: 15px;
       font-family: 'DM Sans', sans-serif;
       font-weight: 600;
-      width: 100px;
+      width: 90px;
       text-align: center;
       transition: border-color .15s;
     }
     .num-input:focus { outline: none; border-color: var(--red); }
     .num-input.has-value { border-color: var(--green); color: var(--green); }
+
+    /* ── Email cell ── */
+    .email-cell {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .email-display {
+      font-size: 13px;
+      color: var(--blue);
+      cursor: pointer;
+      border-radius: 4px;
+      padding: 3px 4px;
+      transition: background .12s;
+      word-break: break-all;
+    }
+    .email-display:hover { background: rgba(96,165,250,.12); }
+    .email-display.empty { color: var(--muted); font-style: italic; }
+    .email-input {
+      background: var(--surface2);
+      border: 1px solid var(--blue);
+      border-radius: 6px;
+      padding: 6px 10px;
+      color: var(--text);
+      font-size: 13px;
+      font-family: 'DM Sans', sans-serif;
+      width: 100%;
+      min-width: 180px;
+      outline: none;
+    }
+    .email-input:focus { border-color: #93c5fd; }
 
     .badge {
       display: inline-block;
@@ -160,10 +204,20 @@
     }
     .badge.done    { background: rgba(74,222,128,.15); color: var(--green); }
     .badge.pending { background: var(--surface2); color: var(--muted); }
+    .badge.walkon  { background: rgba(250,204,21,.15); color: var(--yellow); }
 
+    tbody tr.walkon-row td.p-name::after {
+      content: ' walk-on';
+      font-size: 10px;
+      font-weight: 400;
+      color: var(--yellow);
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      margin-left: 6px;
+    }
     .no-results { text-align: center; padding: 56px 0; color: var(--muted); font-size: 15px; }
 
-    /* ── PASSWORD GATE ── */
+    /* ── Password gate ── */
     .pw-gate { display:none; position:fixed; inset:0; background:#0f0f0f; z-index:9999; align-items:center; justify-content:center; }
     .pw-gate.visible { display:flex; }
     .pw-box { text-align:center; width:320px; padding:48px 36px; }
@@ -177,100 +231,43 @@
     .pw-input.error { border-color:#e84545; animation:shake .3s; }
     @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-8px)} 75%{transform:translateX(8px)} }
     .pw-error { font-size:12px; color:#e84545; min-height:16px; margin-bottom:8px; }
-    .pw-submit { width:100%; background:var(--red); color:#fff; border:none; border-radius:8px; padding:12px; font-family:'DM Sans',sans-serif; font-size:14px; font-weight:700; cursor:pointer; transition:background .15s; }
+    .pw-submit { width:100%; background:var(--red); color:#fff; border:none; border-radius:8px; padding:12px; font-family:'DM Sans',sans-serif; font-size:14px; font-weight:700; cursor:pointer; }
     .pw-submit:hover { background:#a80b24; }
     .pw-back { display:inline-block; margin-top:12px; font-size:12px; color:rgba(255,255,255,0.25); text-decoration:none; }
     .pw-back:hover { color:rgba(255,255,255,0.5); }
 
-    /* ── Add Player button ──────────────────────────────────────────────── */
-    .btn-add-player {
-      margin-left: auto;
-      background: var(--red);
-      border: none;
-      border-radius: 6px;
-      padding: 9px 16px;
-      color: white;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      font-family: 'DM Sans', sans-serif;
-      white-space: nowrap;
-    }
-    .btn-add-player:hover { background: #a80b24; }
-
-    /* ── Walk-on badge ──────────────────────────────────────────────────── */
-    .badge.walkon { background: rgba(250,204,21,.15); color: var(--yellow); }
-    tbody tr.walkon-row td.p-name::after {
-      content: ' walk-on';
-      font-size: 10px;
-      font-weight: 400;
-      color: var(--yellow);
-      text-transform: uppercase;
-      letter-spacing: .5px;
-      margin-left: 6px;
-    }
-
-    /* ── Modal ──────────────────────────────────────────────────────────── */
+    /* ── Modal ── */
     .modal-overlay {
-      display: none;
-      position: fixed; inset: 0;
-      background: rgba(0,0,0,.7);
-      z-index: 100;
-      align-items: center;
-      justify-content: center;
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.7); z-index: 100;
+      align-items: center; justify-content: center;
     }
     .modal-overlay.open { display: flex; }
     .modal {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 28px;
-      width: 360px;
-      max-width: 90vw;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 28px; width: 380px; max-width: 90vw;
     }
-    .modal-title {
-      font-family: 'Bebas Neue', sans-serif;
-      font-size: 22px;
-      letter-spacing: 1px;
-      margin-bottom: 20px;
-    }
+    .modal-title { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 1px; margin-bottom: 20px; }
     .field { margin-bottom: 16px; }
     .field label { display: block; font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 6px; }
     .field input, .field select {
-      width: 100%;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 9px 12px;
-      color: var(--text);
-      font-size: 14px;
-      font-family: 'DM Sans', sans-serif;
+      width: 100%; background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 6px; padding: 9px 12px; color: var(--text);
+      font-size: 14px; font-family: 'DM Sans', sans-serif;
     }
     .field input:focus, .field select:focus { outline: none; border-color: var(--red); }
     .field select option { background: var(--surface2); }
     .modal-actions { display: flex; gap: 10px; margin-top: 20px; }
     .btn-submit {
-      flex: 1;
-      background: var(--red);
-      border: none;
-      border-radius: 6px;
-      padding: 10px;
-      color: white;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      font-family: 'DM Sans', sans-serif;
+      flex: 1; background: var(--red); border: none; border-radius: 6px;
+      padding: 10px; color: white; font-size: 14px; font-weight: 600;
+      cursor: pointer; font-family: 'DM Sans', sans-serif;
     }
     .btn-submit:hover { background: #a80b24; }
     .btn-cancel {
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 10px 16px;
-      color: var(--muted);
-      font-size: 14px;
-      cursor: pointer;
-      font-family: 'DM Sans', sans-serif;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 6px; padding: 10px 16px; color: var(--muted);
+      font-size: 14px; cursor: pointer; font-family: 'DM Sans', sans-serif;
     }
     .btn-cancel:hover { color: var(--white); }
     .modal-error { color: #f87171; font-size: 13px; margin-top: 8px; display: none; }
@@ -281,39 +278,42 @@
 <div class="pw-gate visible" id="pw-gate">
   <div class="pw-box">
     <div class="pw-box-crest"><img src="6 Star Dunbar Crest.png" alt="PLD" onerror="this.style.display='none'"></div>
-    <div class="pw-box-eyebrow">Varsity Check-In Staff</div>
-    <div class="pw-box-title">Varsity Check-In</div>
+    <div class="pw-box-eyebrow">Varsity Soccer Check-In Staff</div>
+    <div class="pw-box-title">Varsity Soccer Check-In</div>
     <div class="pw-box-sub">Enter your password to continue.</div>
     <input class="pw-input" type="password" id="pw-input" placeholder="Password"
       onkeydown="if(event.key==='Enter')submitGate()"
       oninput="document.getElementById('pw-error').textContent=''">
     <div class="pw-error" id="pw-error"></div>
     <button class="pw-submit" onclick="submitGate()">Enter</button>
-    <a class="pw-back" href="tryouts.html">← Back</a>
+    <a class="pw-back" href="tryouts.html">&#8592; Back</a>
   </div>
 </div>
 
 <div class="header">
   <img src="6 Star Dunbar Crest.png" alt="PLD Crest" style="height:52px;width:auto;flex-shrink:0;">
   <div class="header-left">
-    <div class="header-title">PLD Soccer — Varsity Player Check-In</div>
-    <div class="header-sub">Varsity tryout numbers — sync live to Varsity evaluation forms</div>
+    <div class="header-title">PLD Soccer &#8212; Varsity Soccer Player Check-In</div>
+    <div class="header-sub">Varsity Soccer tryout numbers &#8212; sync live to Varsity Soccer evaluation forms</div>
   </div>
 </div>
 
 <div class="sync-bar">
   <div class="sync-dot" id="sync-dot"></div>
-  <span id="sync-text">Connecting…</span>
+  <span id="sync-text">Connecting&#8230;</span>
 </div>
 
 <div class="controls">
   <div class="search-wrap">
-    <input type="text" id="search" placeholder="Search by name or grade…" oninput="renderTable()">
-    <button class="search-clear" onclick="document.getElementById('search').value='';renderTable()">✕</button>
+    <input type="text" id="search" placeholder="Search by name or grade&#8230;" oninput="renderTable()">
+    <button class="search-clear" onclick="document.getElementById('search').value='';renderTable()">&#10005;</button>
   </div>
-  <div class="stats-pill">Checked in: <strong id="count-assigned">0</strong> / <strong id="count-total">135</strong></div>
+  <div class="stats-pill">
+    Checked in: <strong id="count-assigned">0</strong> / <strong id="count-total">0</strong>
+    &nbsp;&#183;&nbsp; Emails: <span class="email-count" id="count-emails">0</span>
+  </div>
   <div class="filter-btns">
-    <button class="filter-btn active" data-filter="all"      onclick="setFilter(this)">All</button>
+    <button class="filter-btn active" data-filter="all"       onclick="setFilter(this)">All</button>
     <button class="filter-btn"        data-filter="assigned"  onclick="setFilter(this)">Assigned</button>
     <button class="filter-btn"        data-filter="unassigned" onclick="setFilter(this)">Unassigned</button>
   </div>
@@ -331,14 +331,13 @@
     <div class="field">
       <label>Grade *</label>
       <select id="new-grade">
-        <option value="">Select grade…</option>
-        <option value="7">7</option>
-        <option value="8">8</option>
-        <option value="9">9</option>
-        <option value="10">10</option>
-        <option value="11">11</option>
-        <option value="12">12</option>
+        <option value="">Select grade&#8230;</option>
+        <option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option>
       </select>
+    </div>
+    <div class="field">
+      <label>Email Address</label>
+      <input type="email" id="new-email" placeholder="student@school.edu">
     </div>
     <div class="field">
       <label>Tryout # (optional)</label>
@@ -360,6 +359,7 @@
         <th>Name</th>
         <th>Gr</th>
         <th>Tryout #</th>
+        <th>Email</th>
         <th>Status</th>
       </tr>
     </thead>
@@ -379,18 +379,19 @@ const FIREBASE_CONFIG = {
   appId: "1:105016963227:web:57e1a927613aaa9f04163e"
 };
 
-const PLAYERS = [{"id":"pkgrhpyq","name":"Juan Abad","grade":"10"},{"id":"6adffrxe","name":"Yaseen Agoub","grade":"10"},{"id":"w918n8ub","name":"Anthony Aguilar","grade":"11"},{"id":"826t1yum","name":"Tarek Ahmad","grade":"12"},{"id":"0a9r23xb","name":"Grady Alberti","grade":"10"},{"id":"emw26xur","name":"Abdul Aziz Aljanabi","grade":"9"},{"id":"jbrekx9n","name":"Antony Alvarez","grade":"9"},{"id":"xukqks2l","name":"Fernando Arilliano","grade":"11"},{"id":"9m67h85x","name":"Samuel Armstrong","grade":"10"},{"id":"009c6u25","name":"Ecson Bermudez","grade":"10"},{"id":"619tyffx","name":"Kai Bishop","grade":"10"},{"id":"cgvqbkk8","name":"Predi Bomolo","grade":"10"},{"id":"8z06rnsf","name":"Preston Brassine","grade":"9"},{"id":"mp3p1nf8","name":"colton brewer","grade":"10"},{"id":"doo9jhmi","name":"Malik Bushaala","grade":"11"},{"id":"lgljmg4x","name":"Jaleel Cadgan","grade":"11"},{"id":"z9x80rw4","name":"Justin Calixtro","grade":"10"},{"id":"mmz8cm6k","name":"Williams Canelo","grade":"9"},{"id":"l7s8bnif","name":"Carlos Cervantes","grade":"12"},{"id":"zfd8ggfh","name":"Jonathan Chavez","grade":"10"},{"id":"jxkg62yf","name":"Dylan Collins","grade":"10"},{"id":"lm3kp3k4","name":"Carter Crovo","grade":"9"},{"id":"mnxvmt4s","name":"Justin Cruz","grade":"12"},{"id":"jzr60b6q","name":"Brandon Cuellar","grade":"9"},{"id":"ygti0xjm","name":"Kellan Daugherty","grade":"10"},{"id":"jtx7cje7","name":"Kieran Derbyshire","grade":"10"},{"id":"jpjl3qtu","name":"Jayden Descartes","grade":"11"},{"id":"5kj5oyqr","name":"Oliver Diaz","grade":"12"},{"id":"p4poipkb","name":"Oscar Diaz","grade":"10"},{"id":"yiyig4aq","name":"Ulises Diaz","grade":"10"},{"id":"hp0dkxn2","name":"Cash Donoghue","grade":"10"},{"id":"ik1pu1mi","name":"Darwin Doodnauth","grade":"12"},{"id":"o7ygivyy","name":"Santi Duque","grade":"10"},{"id":"ja2ty7ry","name":"Pablo Enriquez","grade":"10"},{"id":"dpo3l2li","name":"Carson Fair","grade":"10"},{"id":"o6jvyg67","name":"Landon Fair","grade":"12"},{"id":"ywinl754","name":"Aahad Farhan","grade":"12"},{"id":"jyri63ke","name":"Joseph Feola","grade":"12"},{"id":"6vuw01vj","name":"Adam Fidowicz","grade":"12"},{"id":"40a87jmv","name":"Alex Fidowicz","grade":"9"},{"id":"xpxs35ru","name":"Ronan Flemming","grade":"9"},{"id":"5w4e4fxf","name":"Silas Flemming","grade":"11"},{"id":"krdva1wq","name":"Jareth Funes","grade":"12"},{"id":"3r4ir4zc","name":"Miguel E Garcia Salgado","grade":"10"},{"id":"iq2xlvdv","name":"Eyasu Gatenah","grade":"12"},{"id":"nzxmi14p","name":"Drew Gibson","grade":"11"},{"id":"2qx44bvd","name":"Donnie Gonzalez","grade":"10"},{"id":"b59bf48x","name":"Miguel Gracia","grade":"9"},{"id":"7o3t1qq6","name":"Adrian Gutierrez","grade":"9"},{"id":"25cv9mm4","name":"Jesus Gutierrez","grade":"12"},{"id":"q4958s3b","name":"Jobani Gutierrez","grade":"11"},{"id":"qqf2sfls","name":"Bentley Hardin","grade":"9"},{"id":"d0w6cq88","name":"Bradyn Haycraft","grade":"9"},{"id":"vvwfic81","name":"Ryder Hays","grade":"10"},{"id":"4wvdu610","name":"Panha Heng","grade":"10"},{"id":"xnj91g4e","name":"Christian Hernandez","grade":"11"},{"id":"1bvqy4b3","name":"Nico Hernandez","grade":"10"},{"id":"ac4cv4co","name":"Levi Hollen","grade":"9"},{"id":"6ga9silw","name":"Jeremie Iranzi","grade":"9"},{"id":"gne0eq2v","name":"Christian Jones","grade":"9"},{"id":"2w37zcrn","name":"Ishaan Joshi","grade":"10"},{"id":"2jpyljv9","name":"Voldi Kalindula","grade":"12"},{"id":"5qv92er9","name":"Mikadadi Kansale","grade":"12"},{"id":"yxce8msd","name":"Elijah Kelly","grade":"9"},{"id":"751lwaqi","name":"Mason Kelly","grade":"10"},{"id":"650nk527","name":"Ismael Khan","grade":"10"},{"id":"0xcxs7ze","name":"Prikash Kharel","grade":"9"},{"id":"urntbf19","name":"Stephen Lee","grade":"12"},{"id":"4t9trjmh","name":"Edoardo Leonardi","grade":"9"},{"id":"q2rm8o7i","name":"Parker Leugers","grade":"9"},{"id":"y9ksj930","name":"Eliott Lopez","grade":"9"},{"id":"2jeau136","name":"Ted Lubin","grade":"10"},{"id":"enyp36vz","name":"Channing Ma","grade":"9"},{"id":"5p977v30","name":"Didier Magallanes Chavez","grade":"9"},{"id":"ul8at86w","name":"Deborah Makonda","grade":"9"},{"id":"ntch8wm7","name":"Amando Martinez Bautista","grade":"10"},{"id":"bxe95qrp","name":"Jesus Martinez Bautista","grade":"10"},{"id":"kjh46plr","name":"Rene Martinez Bautista","grade":"10"},{"id":"badxj59h","name":"Mac Messer","grade":"11"},{"id":"3mlhszuj","name":"Kenas Mone","grade":"9"},{"id":"ldeg02t2","name":"Yhakxel Monfort","grade":"10"},{"id":"nm8ab2l2","name":"Derek Montoyra Alvarado","grade":"10"},{"id":"td70m4qk","name":"Jean Mwela","grade":"10"},{"id":"9afi795l","name":"Alex Naydenov","grade":"12"},{"id":"kp0dyu14","name":"Elisha Ngumoya","grade":"10"},{"id":"tdz5298u","name":"Anderson Nsonguh","grade":"12"},{"id":"muom1ynz","name":"Jameson Ocampo","grade":"11"},{"id":"63d2gksy","name":"Jose Oropeza","grade":"9"},{"id":"96e2o71p","name":"Spencer Patton","grade":"10"},{"id":"i1ik3e11","name":"Kevin Perez","grade":"10"},{"id":"3esd99r2","name":"Carter Peyton","grade":"10"},{"id":"ptjy8a7b","name":"Arpan Pokhrel","grade":"10"},{"id":"nar4jztd","name":"Harrison Pope","grade":"12"},{"id":"fvyljx3u","name":"Speed Price","grade":"10"},{"id":"w3or1p4b","name":"Oliver Pulito","grade":"10"},{"id":"zvzvh0dr","name":"Isaac Qualls","grade":"9"},{"id":"yne7lajy","name":"Angel Ramirez","grade":"10"},{"id":"3byo8fwp","name":"Aldo Rivera","grade":"11"},{"id":"o5qd486e","name":"Damon Rodriguez-Hernandez","grade":"9"},{"id":"3n8q6vkf","name":"Tristan Roetnz","grade":"12"},{"id":"wm8fprxa","name":"Brandon Romero","grade":"9"},{"id":"s2dv9oxy","name":"Lincoln Salsman","grade":"12"},{"id":"9gtdgmco","name":"Johncarlo Santiago","grade":"10"},{"id":"jd83swha","name":"Hugh Seo","grade":"10"},{"id":"d30tk7ck","name":"Joochan Shin","grade":"10"},{"id":"eeqgzxvf","name":"Nicolas Silva","grade":"10"},{"id":"v786fphd","name":"Vidal Simo","grade":"10"},{"id":"8gvikcqy","name":"Austin Soriano","grade":"10"},{"id":"l7fw5x2u","name":"Micah Spencer","grade":"11"},{"id":"3wric90g","name":"Sebastian Strachen","grade":"12"},{"id":"dekffmd8","name":"Rhodes Theakston","grade":"11"},{"id":"n9lhpko2","name":"Ulisses Torres Rodriguez","grade":"9"},{"id":"7wotf34e","name":"Kash Tritsch","grade":"11"},{"id":"lc70ewa8","name":"Junior Valdivia","grade":"12"},{"id":"nut1474a","name":"Jayden Vazquez","grade":"12"},{"id":"cmu769iv","name":"Liberto Villanueva Montes","grade":"12"},{"id":"xn99rl6b","name":"Alex Wang","grade":"9"},{"id":"l92222xn","name":"Mark Wilson","grade":"10"},{"id":"y7xlvnzw","name":"Xander Windsor","grade":"12"},{"id":"fcto8jhs","name":"Augusten Zuliani","grade":"9"}]];
+const PLAYERS = [{"id":"fdlfo1wc","name":"Juan Abad","grade":"10"},{"id":"i0tnz8c1","name":"Yaseen Agoub","grade":"10"},{"id":"kdeiyx2i","name":"Anthony Aguilar","grade":"11"},{"id":"hcwbhcnn","name":"Tarek Ahmad","grade":"12"},{"id":"mztub2e5","name":"Grady Alberti","grade":"10"},{"id":"genrd9e0","name":"Abdul Aziz Aljanabi","grade":"9"},{"id":"nldhrzat","name":"Antony Alvarez","grade":"9"},{"id":"nk1u0avh","name":"Fernando Arellano","grade":"11"},{"id":"azb1uosq","name":"Samuel Armstrong","grade":"10"},{"id":"daao81rr","name":"Jesus Bautista Martinez","grade":"10"},{"id":"di2x1ns1","name":"Ecson Bermudez","grade":"10"},{"id":"rp106o8r","name":"Kai Bishop","grade":"10"},{"id":"by2xjxqw","name":"Predi Bomolo","grade":"10"},{"id":"j4fdqv6c","name":"Preston Brassine","grade":"9"},{"id":"4g4ibbxt","name":"Colton Brewer","grade":"10"},{"id":"dzzzyxum","name":"Malik Bushaala","grade":"11"},{"id":"udgafq9f","name":"Jaleel Cadgan","grade":"11"},{"id":"zsj8ng38","name":"Justin Calixtro","grade":"10"},{"id":"fydmfuon","name":"Williams Canelo","grade":"9"},{"id":"sjoztd71","name":"Carlos Cervantes","grade":"12"},{"id":"r694r6xl","name":"Jonathan Chavez","grade":"10"},{"id":"evxxfxt8","name":"Dylan Collins","grade":"10"},{"id":"x4yhulsv","name":"Carter Crovo","grade":"9"},{"id":"o96hlyat","name":"Justin Cruz","grade":"12"},{"id":"x72tqw5n","name":"Brandon Cuellar","grade":"9"},{"id":"cvht5d9m","name":"Kellen Daugherty","grade":"10"},{"id":"2t59eo0b","name":"Kieran Derbyshire","grade":"10"},{"id":"w5y7fine","name":"Jayden Descartes","grade":"11"},{"id":"b0o2bs5g","name":"Oliver Diaz","grade":"12"},{"id":"8i9wdua5","name":"Oscar Diaz","grade":"10"},{"id":"09qe0tdc","name":"Ulises Diaz","grade":"10"},{"id":"2u1m21d4","name":"Cash Donoghue","grade":"10"},{"id":"74ajgwnd","name":"Darwin Doodnauth","grade":"12"},{"id":"jcskc16p","name":"Santi Duque","grade":"10"},{"id":"gyzkakj0","name":"Pablo Enriquez","grade":"10"},{"id":"c4y5e58d","name":"Carson Fair","grade":"10"},{"id":"okz5odcg","name":"Landon Fair","grade":"12"},{"id":"40x87l6d","name":"Aahad Farhan","grade":"12"},{"id":"ax1txvk9","name":"Joseph Feola","grade":"12"},{"id":"7q02p4ji","name":"Adam Fidowicz","grade":"12"},{"id":"ulf8nup5","name":"Alex Fidowicz","grade":"9"},{"id":"tijgz97s","name":"Ronan Flemming","grade":"9"},{"id":"2f4b6yku","name":"Silas Flemming","grade":"11"},{"id":"qa64zyut","name":"Jareth Funes","grade":"12"},{"id":"khgpl011","name":"Miguel E Garcia Salgado","grade":"10"},{"id":"ncudr4tf","name":"Eyasu Gentaneh","grade":"12"},{"id":"h57pis70","name":"Drew Gibson","grade":"11"},{"id":"x65xeggi","name":"Donnie Gonzalez","grade":"10"},{"id":"spq8oxir","name":"Miguel Gracia","grade":"9"},{"id":"hbxo2rbr","name":"Adrian Gutierrez","grade":"9"},{"id":"zd5vgba6","name":"Jesus Gutierrez","grade":"12"},{"id":"u5us68pg","name":"Jobani Gutierrez","grade":"11"},{"id":"d1h9p5wu","name":"Bentley Hardin","grade":"9"},{"id":"3sf75gki","name":"Bradyn Haycraft","grade":"9"},{"id":"kr9rfm9a","name":"Ryder Hays","grade":"10"},{"id":"cvg1q96r","name":"Panha Heng","grade":"10"},{"id":"sb3vebu8","name":"Nico Hernandez","grade":"10"},{"id":"ywsz6bbb","name":"Christian Hernandez","grade":"11"},{"id":"zyw8dgq8","name":"Levi Hollen","grade":"9"},{"id":"frd18j0t","name":"Jeremie Iranzi","grade":"9"},{"id":"8ad9e68e","name":"Christian Jones","grade":"9"},{"id":"50l2yudl","name":"Ishaan Joshi","grade":"10"},{"id":"qi4p6yx2","name":"Voldi Kalindula","grade":"12"},{"id":"fkkr5a5q","name":"Mikadadi Kansale","grade":"12"},{"id":"u7nib83v","name":"Elijah Kelly","grade":"9"},{"id":"kv80cirl","name":"Mason Kelly","grade":"10"},{"id":"smwu52ec","name":"Ismail Khan","grade":"10"},{"id":"b7zlx24s","name":"Prikash Kharel","grade":"9"},{"id":"zschis4j","name":"Stephen Lee","grade":"12"},{"id":"75i8vl0z","name":"Edoardo Leonardi","grade":"9"},{"id":"afm0500f","name":"Parker Leugers","grade":"9"},{"id":"npjmr61s","name":"Eliott Lopez","grade":"9"},{"id":"5gw8rsst","name":"Ted Lubin","grade":"10"},{"id":"pn5yqo6l","name":"Channing Ma","grade":"9"},{"id":"3igp7ncr","name":"Didier Magallanes Chavez","grade":"9"},{"id":"gwwcewoh","name":"Deborah Makonda","grade":"9"},{"id":"qfimuhuh","name":"Amando Martinez Bautista","grade":"10"},{"id":"s3imszs5","name":"Rene Martinez Bautista","grade":"10"},{"id":"g2g1lzzy","name":"Mac Messer","grade":"11"},{"id":"ez0j3pf0","name":"Kenas Mone","grade":"9"},{"id":"6qdrqido","name":"Yhakxel Monfort","grade":"10"},{"id":"uc675qun","name":"Derek Montoyra Alvarado","grade":"10"},{"id":"ld08bgby","name":"Jean Mwela","grade":"10"},{"id":"va5ejgws","name":"Alex Naydenov","grade":"12"},{"id":"zpg5mmih","name":"Elisha Ngumoya","grade":"10"},{"id":"0ryu4afq","name":"Anderson Nsonguh","grade":"12"},{"id":"814z41ph","name":"Jameson Ocampo","grade":"11"},{"id":"xzn6qlv9","name":"Jose Oropeza","grade":"9"},{"id":"oco00m0e","name":"Spencer Patton","grade":"10"},{"id":"d9jup1mr","name":"Kevin Perez","grade":"10"},{"id":"hnstomko","name":"Carter Peyton","grade":"10"},{"id":"7zo1qer7","name":"Arpan Pokhrel","grade":"10"},{"id":"0vu2gyhs","name":"Harrison Pope","grade":"12"},{"id":"oosrcn8r","name":"Speed Price","grade":"10"},{"id":"47cxddgv","name":"Oliver Pulito","grade":"10"},{"id":"6hio9f19","name":"Isaac Qualls","grade":"9"},{"id":"pz5d4hfw","name":"Angel Ramirez","grade":"10"},{"id":"cetxsq28","name":"Aldo Rivera","grade":"11"},{"id":"1ye61l5c","name":"Damon Rodriguez-Hernandez","grade":"9"},{"id":"geyiy2qp","name":"Tristan Roetnz","grade":"12"},{"id":"qj3dn5ah","name":"Brandon Romero","grade":"9"},{"id":"7bfzo3k3","name":"Lincoln Salsman","grade":"12"},{"id":"5yk4mvyy","name":"Johncarlo Santiago","grade":"10"},{"id":"fdcgijan","name":"Hugh Seo","grade":"10"},{"id":"oc3tsqtt","name":"Joochan Shin","grade":"10"},{"id":"buxq1y49","name":"Nicolas Silva","grade":"10"},{"id":"dh8cmpw5","name":"Vidal Simo","grade":"10"},{"id":"ew81mueb","name":"Austin Soriano","grade":"10"},{"id":"u4z8p344","name":"Micah Spencer","grade":"11"},{"id":"pqwhptld","name":"Sebastian Strachan","grade":"12"},{"id":"7dqlf5ch","name":"Rhodes Theakston","grade":"11"},{"id":"4awkk306","name":"Ulisses Torres Rodriguez","grade":"9"},{"id":"y7ors9av","name":"Kash Tritsch","grade":"11"},{"id":"zitpttbf","name":"Junior Valdivia","grade":"12"},{"id":"k795r45x","name":"Jayden Vazquez","grade":"12"},{"id":"kd6gfh7e","name":"Liberto Villanueva Montes","grade":"12"},{"id":"pwfsdgb5","name":"Alex Wang","grade":"9"},{"id":"cznbdkiw","name":"Mark Wilson","grade":"10"},{"id":"5icbtowx","name":"Xander Windsor","grade":"12"},{"id":"56k11k2s","name":"Augusten Zuliani","grade":"9"}];
 
 // ── State ─────────────────────────────────────────────────────────────────────
 let db, firebaseReady = false;
 let checkinData  = {};   // {playerKey: {name, grade, num, ts}}
-let extraPlayers = [];   // walk-ons added at check-in [{id, name, grade}]
+let emailData    = {};   // {playerKey: email}
+let extraPlayers = [];    // walk-ons
 let currentFilter = 'all';
+let editingEmailKey = null; // which player's email is being edited
 
 function playerKey(name) {
   return name.toLowerCase().replace(/[^a-z0-9]/g, '_');
 }
-
 function uid() {
   return Math.random().toString(36).slice(2, 10);
 }
@@ -408,13 +409,16 @@ function initFirebase() {
     );
   });
 
-  // Checkin numbers
   db.ref('tryouts2026/varsity/checkin').on('value', snap => {
     checkinData = snap.val() || {};
     renderTable();
   });
 
-  // Walk-on players added at check-in
+  db.ref('tryouts2026/varsity/email').on('value', snap => {
+    emailData = snap.val() || {};
+    renderTable();
+  });
+
   db.ref('tryouts2026/varsity/extra_players').on('value', snap => {
     const data = snap.val() || {};
     extraPlayers = Object.values(data).sort((a, b) => a.name.localeCompare(b.name));
@@ -436,14 +440,49 @@ function saveNum(player, rawVal) {
   const done = () => setSyncStatus('online', 'Connected — numbers sync live to evaluation forms');
   if (val) {
     db.ref('tryouts2026/varsity/checkin/' + key).set({
-      name: player.name,
-      grade: player.grade,
-      num: val,
-      ts: Date.now()
+      name: player.name, grade: player.grade, num: val, ts: Date.now()
     }).then(done);
   } else {
     db.ref('tryouts2026/varsity/checkin/' + key).remove().then(done);
   }
+}
+
+// ── Save email ────────────────────────────────────────────────────────────────
+function saveEmail(name, email) {
+  if (!firebaseReady) return;
+  const key = playerKey(name);
+  setSyncStatus('syncing', 'Saving…');
+  const done = () => setSyncStatus('online', 'Connected — numbers sync live to evaluation forms');
+  if (email.trim()) {
+    db.ref('tryouts2026/varsity/email/' + key).set(email.trim()).then(done);
+  } else {
+    db.ref('tryouts2026/varsity/email/' + key).remove().then(done);
+  }
+}
+
+// ── Email inline editing ──────────────────────────────────────────────────────
+function startEditEmail(key, currentEmail) {
+  editingEmailKey = key;
+  renderTable();
+  // Focus the input after render
+  setTimeout(() => {
+    const inp = document.getElementById('email-inp-' + key);
+    if (inp) { inp.focus(); inp.select(); }
+  }, 30);
+}
+
+function commitEmail(name) {
+  const key = playerKey(name);
+  const inp = document.getElementById('email-inp-' + key);
+  if (!inp) return;
+  saveEmail(name, inp.value);
+  editingEmailKey = null;
+  // Don't re-render — Firebase listener will trigger it
+}
+
+function cancelEmail() {
+  editingEmailKey = null;
+  renderTable();
 }
 
 // ── Render ────────────────────────────────────────────────────────────────────
@@ -451,22 +490,49 @@ function renderTable() {
   const query  = document.getElementById('search').value.toLowerCase().trim();
   const tbody  = document.getElementById('tbody');
   const allPlayers = [...PLAYERS, ...extraPlayers.map(p => ({ ...p, walkon: true }))];
-  let assigned = 0;
+  let assigned = 0, emailCount = 0;
   let visibleCount = 0;
   let html = '';
 
   allPlayers.forEach((p, i) => {
-    const key  = playerKey(p.name);
-    const rec  = checkinData[key];
-    const num  = rec ? rec.num : '';
+    const key       = playerKey(p.name);
+    const rec       = checkinData[key];
+    const num       = rec ? rec.num : '';
+    const email     = emailData[key] || '';
     const isAssigned = !!num;
     if (isAssigned) assigned++;
+    if (email) emailCount++;
 
-    if (query && !p.name.toLowerCase().includes(query) && !String(p.grade).includes(query)) return;
+    if (query && !p.name.toLowerCase().includes(query) && !String(p.grade).includes(query) && !email.toLowerCase().includes(query)) return;
     if (currentFilter === 'assigned'   && !isAssigned) return;
     if (currentFilter === 'unassigned' &&  isAssigned) return;
 
     visibleCount++;
+    const isEditingEmail = (editingEmailKey === key);
+
+    let emailCell;
+    if (isEditingEmail) {
+      emailCell = `<div class="email-cell">
+        <input
+          id="email-inp-${key}"
+          class="email-input"
+          type="email"
+          value="${email}"
+          placeholder="email@school.edu"
+          onblur="commitEmail('${p.name.replace(/'/g, "\'")}');"
+          onkeydown="if(event.key==='Enter')commitEmail('${p.name.replace(/'/g, "\'")}'); if(event.key==='Escape')cancelEmail();"
+        >
+      </div>`;
+    } else {
+      emailCell = `<div class="email-cell">
+        <span
+          class="email-display${email ? '' : ' empty'}"
+          onclick="startEditEmail('${key}', '${email}')"
+          title="${email ? 'Click to edit' : 'Click to add email'}"
+        >${email || 'Add email…'}</span>
+      </div>`;
+    }
+
     html += `
       <tr class="${isAssigned ? 'assigned' : 'unassigned'}${p.walkon ? ' walkon-row' : ''}">
         <td class="row-num">${i + 1}</td>
@@ -484,6 +550,7 @@ function renderTable() {
             onkeydown="handleKey(event, this)"
           >
         </td>
+        <td class="p-email">${emailCell}</td>
         <td class="p-status">
           <span class="badge ${isAssigned ? 'done' : 'pending'}">${isAssigned ? '✓ T-' + num : 'Pending'}</span>
         </td>
@@ -493,6 +560,7 @@ function renderTable() {
   tbody.innerHTML = html;
   document.getElementById('count-assigned').textContent = assigned;
   document.getElementById('count-total').textContent = allPlayers.length;
+  document.getElementById('count-emails').textContent = emailCount;
   document.getElementById('no-results').style.display = visibleCount === 0 ? 'block' : 'none';
 }
 
@@ -520,9 +588,10 @@ function setFilter(btn) {
 
 // ── Add Player Modal ──────────────────────────────────────────────────────────
 function openModal() {
-  document.getElementById('new-name').value = '';
-  document.getElementById('new-grade').value = '';
-  document.getElementById('new-num').value = '';
+  ['new-name','new-grade','new-email','new-num'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
   document.getElementById('modal-error').style.display = 'none';
   document.getElementById('modal-overlay').classList.add('open');
   setTimeout(() => document.getElementById('new-name').focus(), 50);
@@ -539,13 +608,12 @@ function handleOverlayClick(e) {
 function submitNewPlayer() {
   const name  = document.getElementById('new-name').value.trim();
   const grade = document.getElementById('new-grade').value;
+  const email = document.getElementById('new-email').value.trim();
   const num   = document.getElementById('new-num').value.trim();
-  const errEl = document.getElementById('modal-error');
 
-  if (!name) { showModalError('Name is required.'); return; }
+  if (!name)  { showModalError('Name is required.'); return; }
   if (!grade) { showModalError('Grade is required.'); return; }
 
-  // Check for duplicate name
   const allNames = [...PLAYERS, ...extraPlayers].map(p => p.name.toLowerCase());
   if (allNames.includes(name.toLowerCase())) {
     showModalError('A player with that name already exists.');
@@ -557,17 +625,12 @@ function submitNewPlayer() {
   setSyncStatus('syncing', 'Saving…');
   const done = () => setSyncStatus('online', 'Connected — numbers sync live to evaluation forms');
 
-  // Save to extra_players
   db.ref('tryouts2026/varsity/extra_players/' + id).set(player).then(() => {
-    // If a tryout number was entered, save that too
-    if (num) {
-      db.ref('tryouts2026/checkin/' + playerKey(name)).set({
-        name, grade, num, ts: Date.now()
-      }).then(done);
-    } else {
-      done();
-    }
-  });
+    const tasks = [];
+    if (email) tasks.push(db.ref('tryouts2026/varsity/email/' + playerKey(name)).set(email));
+    if (num)   tasks.push(db.ref('tryouts2026/varsity/checkin/' + playerKey(name)).set({ name, grade, num, ts: Date.now() }));
+    return Promise.all(tasks);
+  }).then(done);
 
   closeModal();
 }
