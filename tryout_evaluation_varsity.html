@@ -545,26 +545,12 @@ body {
 </head>
 <body>
 
-<div class="pw-gate visible" id="pw-gate">
-  <div class="pw-box">
-    <div class="pw-box-crest"><img src="6 Star Dunbar Crest.png" alt="PLD" onerror="this.style.display='none'"></div>
-    <div class="pw-box-eyebrow">Varsity Coaches</div>
-    <div class="pw-box-title">Varsity Evaluations</div>
-    <div class="pw-box-sub">Enter your password to continue.</div>
-    <input class="pw-input" type="password" id="pw-input" placeholder="Password"
-      onkeydown="if(event.key==='Enter')submitGate()"
-      oninput="document.getElementById('pw-error').textContent=''">
-    <div class="pw-error" id="pw-error"></div>
-    <button class="pw-submit" onclick="submitGate()">Enter</button>
-    <a class="pw-back" href="tryouts.html">← Back</a>
-  </div>
-</div>
 
 <!-- HEADER -->
 <div class="page-header">
   <a href="index.html" class="back-link">← Home</a>
   <div class="header-crest">
-    <img src="6 Star Dunbar Crest.png" alt="PLD Crest" onerror="this.style.display='none'">
+    <img src="../6 Star Dunbar Crest.png" alt="PLD Crest" onerror="this.style.display='none'">
   </div>
   <div class="header-text">
     <div class="header-eyebrow">Paul Laurence Dunbar Boys Soccer · 2026</div>
@@ -1372,28 +1358,6 @@ const ROSTER_D2 = [{"id":"ffr55n6w","name":"Juan Abad","grade":"10","num":"","sc
 if (!localStorage.getItem(KEYS[1]) || state[1].length === 0) { state[1] = ROSTER_D1; saveDay(1); }
 if (!localStorage.getItem(KEYS[2]) || state[2].length === 0) { state[2] = ROSTER_D2; saveDay(2); }
 
-// ── Password Gate ─────────────────────────────────────────────────────────────
-const PW_HASH_EV = 'e4467318120754dacee06c4f97e285b187f4188f0dda8fb2972c4c74fee3413d';
-async function sha256(s) {
-  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
-  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
-}
-if (sessionStorage.getItem('pld-eval-varsity-auth') === 'true') {
-  document.getElementById('pw-gate').classList.remove('visible');
-}
-async function submitGate() {
-  const val = document.getElementById('pw-input').value;
-  if (await sha256(val) === PW_HASH_EV) {
-    sessionStorage.setItem('pld-eval-varsity-auth', 'true');
-    document.getElementById('pw-gate').classList.remove('visible');
-  } else {
-    const inp = document.getElementById('pw-input');
-    inp.classList.add('error');
-    document.getElementById('pw-error').textContent = 'Incorrect password.';
-    setTimeout(() => inp.classList.remove('error'), 400);
-    inp.value = ''; inp.focus();
-  }
-}
 
 initFirebase();
 loadCoachName();
