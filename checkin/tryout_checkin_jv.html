@@ -148,6 +148,7 @@
     td.p-phys   { min-width: 110px; white-space: nowrap; }
     td.p-phys.phys-expired .email-display { color: #f87171; font-weight: 600; }
     td.p-phys.phys-expired .email-display::after { content: ' ⚠'; font-size: 11px; }
+    td.p-phys.phys-missing .email-display { color: #facc15; font-weight: 600; }
     td.p-email  { min-width: 200px; }
     td.p-email2 { min-width: 200px; }
     td.p-status { width: 100px; }
@@ -620,7 +621,7 @@ function renderTable() {
             onkeydown="handleKey(event, this)"
           >
         </td>
-        <td class="p-phys${isPhysExpired(phys) ? ' phys-expired' : ''}">${physCell}</td>
+        <td class="p-phys${isPhysExpired(phys) ? ' phys-expired' : !phys ? ' phys-missing' : ''}">${physCell}</td>
         <td class="p-email">${emailCell}</td>
         <td class="p-email2">${email2Cell}</td>
         <td class="p-status">
