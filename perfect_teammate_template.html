@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Build the Perfect Teammate — PLD Soccer 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --red: #ce0e2d;
+  --red-mid: #e8324f;
+  --dark: #111111;
+  --gray-mid: #5a5a5a;
+  --gray-light: #f5f5f5;
+  --gray-line: #d8d8d8;
+  --white: #ffffff;
+}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: #e8e8e8;
+  color: var(--dark);
+}
+
+.page {
+  width: 8.5in;
+  min-height: 11in;
+  background: var(--white);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── HEADER ── */
+.header {
+  background: var(--dark);
+  padding: 22px 36px 18px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-shrink: 0;
+}
+.header-crest {
+  width: 60px;
+  height: 60px;
+  flex-shrink: 0;
+}
+.header-crest img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 8px rgba(206,14,45,0.4));
+}
+.header-crest-placeholder {
+  width: 60px;
+  height: 60px;
+  border: 2px solid rgba(206,14,45,0.5);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.header-text {
+  flex: 1;
+}
+.header-eyebrow {
+  font-size: 9px;
+  letter-spacing: 3.5px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.4);
+  font-weight: 600;
+  margin-bottom: 3px;
+}
+.header-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 34px;
+  letter-spacing: 3px;
+  color: var(--white);
+  line-height: 1;
+}
+.header-title span { color: var(--red-mid); }
+.header-tag {
+  background: var(--red);
+  border-radius: 6px;
+  padding: 6px 14px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--white);
+  flex-shrink: 0;
+}
+
+/* ── GROUP INFO BAR ── */
+.group-bar {
+  background: var(--gray-light);
+  border-bottom: 2px solid var(--gray-line);
+  padding: 10px 36px;
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  flex-shrink: 0;
+}
+.group-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+}
+.group-field label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--gray-mid);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.group-field .write-line {
+  flex: 1;
+  border: none;
+  border-bottom: 1.5px solid var(--gray-line);
+  background: transparent;
+  height: 22px;
+}
+
+/* ── INSTRUCTION STRIP ── */
+.instruction {
+  background: rgba(206,14,45,0.05);
+  border-left: 3px solid var(--red);
+  margin: 14px 36px;
+  padding: 9px 14px;
+  border-radius: 0 6px 6px 0;
+  flex-shrink: 0;
+}
+.instruction p {
+  font-size: 11.5px;
+  color: var(--gray-mid);
+  line-height: 1.55;
+}
+.instruction strong { color: var(--dark); }
+
+/* ── DAWGS SECTIONS ── */
+.dawgs-list {
+  flex: 1;
+  padding: 4px 36px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.dawgs-row {
+  display: flex;
+  align-items: stretch;
+  border: 1px solid var(--gray-line);
+  border-radius: 10px;
+  overflow: hidden;
+  flex: 1;
+  min-height: 0;
+}
+
+.dawgs-letter-col {
+  width: 64px;
+  flex-shrink: 0;
+  background: var(--red);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.dawgs-row:nth-child(2) .dawgs-letter-col,
+.dawgs-row:nth-child(4) .dawgs-letter-col {
+  background: var(--dark);
+}
+.dawgs-letter {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 52px;
+  color: var(--white);
+  line-height: 1;
+  letter-spacing: -1px;
+  position: relative;
+  z-index: 1;
+}
+
+.dawgs-word-col {
+  width: 155px;
+  flex-shrink: 0;
+  background: var(--gray-light);
+  border-right: 1px solid var(--gray-line);
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.dawgs-word {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 18px;
+  letter-spacing: 1.5px;
+  color: var(--dark);
+  line-height: 1.1;
+  margin-bottom: 5px;
+}
+.dawgs-desc {
+  font-size: 9px;
+  color: var(--gray-mid);
+  line-height: 1.5;
+  font-weight: 400;
+}
+
+.dawgs-write-col {
+  flex: 1;
+  padding: 10px 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+
+.write-prompt-label {
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(206,14,45,0.6);
+  margin-bottom: 5px;
+}
+
+.write-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  justify-content: space-around;
+}
+
+.write-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.write-number {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--red);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--white);
+  flex-shrink: 0;
+}
+.dawgs-row:nth-child(2) .write-number,
+.dawgs-row:nth-child(4) .write-number {
+  background: var(--dark);
+}
+
+.write-input-line {
+  flex: 1;
+  border: none;
+  border-bottom: 1px solid var(--gray-line);
+  height: 20px;
+  background: transparent;
+}
+
+/* ── FOOTER ── */
+.footer {
+  background: var(--dark);
+  padding: 10px 36px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+.footer-text {
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.25);
+}
+.footer-dot {
+  width: 4px; height: 4px;
+  background: var(--red);
+  border-radius: 50%;
+}
+
+/* ── PRINT ── */
+@media print {
+  body { background: white; }
+  .page {
+    width: 100%;
+    min-height: 100vh;
+    margin: 0;
+    box-shadow: none;
+  }
+  @page {
+    size: letter portrait;
+    margin: 0;
+  }
+}
+
+@media screen {
+  .page {
+    margin: 24px auto;
+    box-shadow: 0 4px 32px rgba(0,0,0,0.18);
+  }
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-crest">
+      <img src="6 Star Dunbar Crest.png" alt="PLD" onerror="this.parentElement.innerHTML='<div class=\'header-crest-placeholder\'></div>'">
+    </div>
+    <div class="header-text">
+      <div class="header-eyebrow">Paul Laurence Dunbar Boys Soccer · 2026</div>
+      <div class="header-title">BUILD THE <span>PERFECT TEAMMATE</span></div>
+    </div>
+    <div class="header-tag">Team Activity</div>
+  </header>
+
+  <!-- GROUP INFO -->
+  <div class="group-bar">
+    <div class="group-field">
+      <label>Group #</label>
+      <div class="write-line"></div>
+    </div>
+    <div class="group-field" style="flex:2">
+      <label>Players</label>
+      <div class="write-line"></div>
+    </div>
+    <div class="group-field">
+      <label>Date</label>
+      <div class="write-line"></div>
+    </div>
+  </div>
+
+  <!-- INSTRUCTIONS -->
+  <div class="instruction">
+    <p>In your group of 4, discuss and agree on <strong>4 specific attributes</strong> you want to see from your teammates for each DAWGS value. Be honest, be specific — think about what would actually make this team better.</p>
+  </div>
+
+  <!-- DAWGS SECTIONS -->
+  <div class="dawgs-list">
+
+    <!-- D -->
+    <div class="dawgs-row">
+      <div class="dawgs-letter-col">
+        <div class="dawgs-letter">D</div>
+      </div>
+      <div class="dawgs-word-col">
+        <div class="dawgs-word">Determination</div>
+        <div class="dawgs-desc">Relentless effort every moment. Compete through adversity. Never back down.</div>
+      </div>
+      <div class="dawgs-write-col">
+        <div class="write-prompt-label">What does Determination look like from a teammate?</div>
+        <div class="write-rows">
+          <div class="write-row"><div class="write-number">1</div><div class="write-input-line"></div></div>
+          <div class="write-row"><div class="write-number">2</div><div class="write-input-line"></div></div>
+          <div class="write-row"><div class="write-number">3</div><div class="write-input-line"></div></div>
+          <div class="write-row"><div class="write-number">4</div><div class="write-input-line"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- A -->
+    <div class="dawgs-row">
+      <div class="dawgs-letter-col">
+        <div class="dawgs-letter">A</div>
+      </div>
+      <div class="dawgs-word-col">
+        <div class="dawgs-word">Awareness</div>
+        <div class="dawgs-desc">Know the game, the moment, each other. Stay alert. Communicate constantly.</div>
+      </div>
+      <div class="dawgs-write-col">
+        <div class="write-prompt-label">What does Awareness look like from a teammate?</div>
+        <div class="write-rows">
+          <div class="write-row"><div class="write-number">1</div><div class="write-input-line"></div></div>
+          <div class="write-row"><div class="write-number">2</div><div class="write-input-line"></div></div>
+          <div class="write-row"><div class="write-number">3</div><div class="write-input-line"></div></div>
+          <div class="write-row"><div class="write-number">4</div><div class="write-input-line"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- W -->
+    <div class="dawgs-row">
+      <div class="dawgs-letter-col">
+        <div class="dawgs-letter">W</div>
+      </div>
+      <div class="dawgs-word-col">
+        <div class="dawgs-word">Winning Mentality</div>
+        <div class="dawgs-desc">Commit to excellence. Prepare with purpose. Hold yourself to a high standard.</div>
+      </div>
+      <div class="dawgs-write-col">
+        <div class="write-prompt-label">What does a Winning Mentality look like from a teammate?</div>
+        <div class="write-rows">
+          <div class="write-row"><div class="write-number">1</div><div class="write-input-line"></div></div>
+          <div class="write-row"><div class="write-number">2</div><div class="write-input-line"></div></div>
+          <div class="write-row"><div class="write-number">3</div><div class="write-input-line"></div></div>
+          <div class="write-row"><div class="write-number">4</div><div class="write-input-line"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- G -->
+    <div class="dawgs-row">
+      <div class="dawgs-letter-col">
+        <div class="dawgs-letter">G</div>
+      </div>
+      <div class="dawgs-word-col">
+        <div class="dawgs-word">Growth Mindset</div>
+        <div class="dawgs-desc">Always improving. Embrace coaching. Attack every practice as a chance to get better.</div>
+      </div>
+      <div class="dawgs-write-col">
+        <div class="write-prompt-label">What does a Growth Mindset look like from a teammate?</div>
+        <div class="write-rows">
+          <div class="write-row"><div class="write-number">1</div><div class="write-input-line"></div></div>
+          <div class="write-row"><div class="write-number">2</div><div class="write-input-line"></div></div>
+          <div class="write-row"><div class="write-number">3</div><div class="write-input-line"></div></div>
+          <div class="write-row"><div class="write-number">4</div><div class="write-input-line"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- S -->
+    <div class="dawgs-row">
+      <div class="dawgs-letter-col">
+        <div class="dawgs-letter">S</div>
+      </div>
+      <div class="dawgs-word-col">
+        <div class="dawgs-word">Supportive</div>
+        <div class="dawgs-desc">Team-first attitude. Encourage, hold accountable, stand by one another.</div>
+      </div>
+      <div class="dawgs-write-col">
+        <div class="write-prompt-label">What does being Supportive look like from a teammate?</div>
+        <div class="write-rows">
+          <div class="write-row"><div class="write-number">1</div><div class="write-input-line"></div></div>
+          <div class="write-row"><div class="write-number">2</div><div class="write-input-line"></div></div>
+          <div class="write-row"><div class="write-number">3</div><div class="write-input-line"></div></div>
+          <div class="write-row"><div class="write-number">4</div><div class="write-input-line"></div></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-text">PLD Boys Soccer · 2026</div>
+    <div class="footer-dot"></div>
+    <div class="footer-text">DAWGS · Build the Perfect Teammate</div>
+    <div class="footer-dot"></div>
+    <div class="footer-text">Paul Laurence Dunbar High School</div>
+  </footer>
+
+</div>
+</body>
+</html>
