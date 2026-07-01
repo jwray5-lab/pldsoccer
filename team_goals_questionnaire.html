@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Player Goals Questionnaire — PLD Soccer 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --red: #ce0e2d;
+  --red-mid: #e8324f;
+  --dark: #0e0e0e;
+  --dark-2: #1a1a1a;
+  --dark-3: #252525;
+  --dark-4: #2e2e2e;
+  --white: #ffffff;
+  --gray: #888;
+}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--dark);
+  color: var(--white);
+  min-height: 100vh;
+}
+
+/* ── HEADER ── */
+.page-header {
+  background: var(--dark);
+  border-bottom: 4px solid var(--red);
+  padding: 24px 48px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  position: relative;
+  overflow: hidden;
+}
+.page-header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 80% 120% at 0% 50%, rgba(206,14,45,0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+.header-crest { width: 56px; height: 56px; flex-shrink: 0; position: relative; }
+.header-crest img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 2px 10px rgba(206,14,45,0.4)); }
+.header-text { position: relative; flex: 1; }
+.header-eyebrow { font-size: 10px; letter-spacing: 4px; text-transform: uppercase; color: var(--red-mid); font-weight: 600; margin-bottom: 3px; }
+.header-title { font-family: 'Bebas Neue', sans-serif; font-size: 34px; letter-spacing: 4px; color: var(--white); line-height: 1; }
+.header-title span { color: var(--red); }
+
+/* ── MAIN ── */
+.main { max-width: 780px; width: 100%; margin: 0 auto; padding: 36px 32px 80px; }
+
+/* ── INTRO ── */
+.intro {
+  background: rgba(206,14,45,0.07);
+  border: 1px solid rgba(206,14,45,0.2);
+  border-radius: 10px;
+  padding: 18px 22px;
+  margin-bottom: 28px;
+}
+.intro p { font-size: 13.5px; color: rgba(255,255,255,0.65); line-height: 1.65; }
+.intro strong { color: var(--white); }
+
+
+/* ── PROGRESS ── */
+.progress-bar-wrap {
+  background: rgba(255,255,255,0.06);
+  border-radius: 4px;
+  height: 4px;
+  margin-bottom: 28px;
+  overflow: hidden;
+}
+.progress-bar-fill {
+  height: 100%;
+  background: var(--red);
+  border-radius: 4px;
+  width: 0%;
+  transition: width 0.4s ease;
+}
+
+/* ── QUESTION CARD ── */
+.question-card {
+  background: var(--dark-2);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 12px;
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+.question-header {
+  padding: 16px 20px 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+.question-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 22px;
+  letter-spacing: 1px;
+  color: var(--red);
+  line-height: 1;
+  flex-shrink: 0;
+  min-width: 28px;
+}
+.question-text {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--white);
+  line-height: 1.45;
+}
+
+/* ── OPTIONS ── */
+.options { padding: 8px 0; }
+
+.option {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 20px;
+  cursor: pointer;
+  transition: background 0.15s;
+  border: none;
+  width: 100%;
+  background: transparent;
+  text-align: left;
+}
+.option:hover { background: rgba(255,255,255,0.03); }
+.option.selected { background: rgba(206,14,45,0.08); }
+.option.selected .option-letter {
+  background: var(--red);
+  border-color: var(--red);
+  color: var(--white);
+}
+
+.option-letter {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255,255,255,0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.4);
+  flex-shrink: 0;
+  margin-top: 1px;
+  transition: all 0.15s;
+}
+
+.option-text {
+  font-size: 13.5px;
+  color: rgba(255,255,255,0.65);
+  line-height: 1.5;
+  padding-top: 4px;
+  transition: color 0.15s;
+}
+.option.selected .option-text { color: rgba(255,255,255,0.9); }
+
+input[type="radio"] { display: none; }
+
+/* ── SUBMIT ── */
+.submit-area { margin-top: 28px; text-align: center; }
+.submit-btn {
+  background: var(--red);
+  color: var(--white);
+  border: none;
+  border-radius: 10px;
+  padding: 14px 48px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+}
+.submit-btn:hover { background: var(--red-mid); }
+.submit-btn:active { transform: scale(0.98); }
+.submit-note {
+  font-size: 12px;
+  color: rgba(255,255,255,0.25);
+  margin-top: 10px;
+}
+
+/* ── RESULTS ── */
+.results { display: none; margin-top: 32px; }
+.results.visible { display: block; }
+
+.results-header {
+  text-align: center;
+  margin-bottom: 28px;
+}
+.results-eyebrow {
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--red-mid);
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.results-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 44px;
+  letter-spacing: 4px;
+  color: var(--white);
+  line-height: 1;
+}
+
+.profile-card {
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+.profile-card-top {
+  background: var(--red);
+  padding: 28px 32px;
+  text-align: center;
+}
+.profile-icon { font-size: 52px; margin-bottom: 8px; }
+.profile-label {
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.7);
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.profile-type {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 42px;
+  letter-spacing: 4px;
+  color: var(--white);
+  line-height: 1;
+}
+
+.profile-card-body {
+  background: var(--dark-2);
+  padding: 24px 32px;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-top: none;
+}
+.profile-desc {
+  font-size: 14px;
+  color: rgba(255,255,255,0.7);
+  line-height: 1.7;
+  margin-bottom: 16px;
+}
+.profile-strengths-title {
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--red-mid);
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+.strength-pill {
+  display: inline-block;
+  background: rgba(206,14,45,0.12);
+  border: 1px solid rgba(206,14,45,0.2);
+  color: rgba(255,255,255,0.75);
+  border-radius: 5px;
+  padding: 4px 11px;
+  font-size: 12px;
+  font-weight: 600;
+  margin: 0 5px 7px 0;
+}
+
+.score-bar-area { margin-bottom: 20px; }
+.score-bar-label {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+.score-bar-label span {
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.4);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.score-bar-label .score-val { color: var(--white); font-size: 14px; }
+.score-bar-track {
+  background: rgba(255,255,255,0.07);
+  border-radius: 4px;
+  height: 8px;
+  overflow: hidden;
+}
+.score-bar-fill {
+  height: 100%;
+  background: var(--red);
+  border-radius: 4px;
+  transition: width 1s ease;
+}
+
+.growth-area {
+  background: var(--dark-3);
+  border-radius: 8px;
+  padding: 16px 18px;
+  margin-top: 16px;
+}
+.growth-title {
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.35);
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.growth-text {
+  font-size: 13px;
+  color: rgba(255,255,255,0.55);
+  line-height: 1.65;
+}
+
+.save-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 16px;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.35);
+  letter-spacing: 1px;
+}
+.save-badge.saved { color: #4caf50; }
+.save-badge.saving { color: rgba(255,255,255,0.3); }
+.save-badge.error { color: #e8324f; }
+.save-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+}
+
+.results-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 24px;
+}
+.results-btn {
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.7);
+  border-radius: 8px;
+  padding: 10px 22px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.results-btn:hover { background: rgba(255,255,255,0.12); color: var(--white); }
+
+/* ── FOOTER ── */
+footer {
+  background: var(--dark-2);
+  border-top: 1px solid rgba(255,255,255,0.06);
+  padding: 16px 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.footer-text { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.25); }
+.footer-dot { width: 4px; height: 4px; background: var(--red); border-radius: 50%; }
+
+@media (max-width: 600px) {
+  .page-header { padding: 18px 20px; }
+  .main { padding: 24px 16px 60px; }
+  .header-title { font-size: 26px; }
+  footer { padding: 14px 20px; }
+}
+</style>
+</head>
+<body>
+
+<header class="page-header">
+  <div class="header-crest">
+    <img src="6 Star Dunbar Crest.png" alt="PLD" onerror="this.style.display='none'">
+  </div>
+  <div class="header-text">
+    <div class="header-eyebrow">PLD Soccer · 2026 Season</div>
+    <div class="header-title">PLAYER <span>GOALS</span> QUESTIONNAIRE</div>
+  </div>
+</header>
+
+<main class="main">
+
+  <div class="intro">
+    <p><strong>There are no right or wrong answers.</strong> Answer honestly — the goal of this questionnaire is to help coaches understand who you are as a player and teammate, and to start a real conversation about what this team means to each of you.</p>
+  </div>
+
+  <div class="progress-bar-wrap">
+    <div class="progress-bar-fill" id="progress-fill"></div>
+  </div>
+
+  <form id="quiz-form">
+
+    <!-- Q1 -->
+    <div class="question-card" data-q="1">
+      <div class="question-header">
+        <div class="question-num">01</div>
+        <div class="question-text">The coach reduces your playing time to give other players more opportunity. What is your immediate reaction?</div>
+      </div>
+      <div class="options">
+        <label class="option" onclick="selectOption(this, 'q1', 4)">
+          <input type="radio" name="q1" value="4">
+          <div class="option-letter">A</div>
+          <div class="option-text">I accept it — the coach sees things I can't from inside the game. My job is to stay ready and keep working.</div>
+        </label>
+        <label class="option" onclick="selectOption(this, 'q1', 3)">
+          <input type="radio" name="q1" value="3">
+          <div class="option-letter">B</div>
+          <div class="option-text">I ask the coach privately what I need to improve. I want to understand so I can earn it back.</div>
+        </label>
+        <label class="option" onclick="selectOption(this, 'q1', 2)">
+          <input type="radio" name="q1" value="2">
+          <div class="option-letter">C</div>
+          <div class="option-text">I'm frustrated, but I'll use that frustration to push harder and prove myself.</div>
+        </label>
+        <label class="option" onclick="selectOption(this, 'q1', 1)">
+          <input type="radio" name="q1" value="1">
+          <div class="option-letter">D</div>
+          <div class="option-text">I'm upset — I've worked hard for my minutes and I don't think it's the right call.</div>
+        </label>
+      </div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="question-card" data-q="2">
+      <div class="question-header">
+        <div class="question-num">02</div>
+        <div class="question-text">In a close game, you're in a good position to shoot. A teammate is in a slightly better position. What do you do?</div>
+      </div>
+      <div class="options">
+        <label class="option" onclick="selectOption(this, 'q2', 4)">
+          <input type="radio" name="q2" value="4">
+          <div class="option-letter">A</div>
+          <div class="option-text">Pass immediately — the team's best chance at scoring is all that matters.</div>
+        </label>
+        <label class="option" onclick="selectOption(this, 'q2', 3)">
+          <input type="radio" name="q2" value="3">
+          <div class="option-letter">B</div>
+          <div class="option-text">Make the fastest decision possible — sometimes shoot, sometimes pass. Read the moment.</div>
+        </label>
+        <label class="option" onclick="selectOption(this, 'q2', 2)">
+          <input type="radio" name="q2" value="2">
+          <div class="option-letter">C</div>
+          <div class="option-text">Take the shot — it's still a good look and I back my ability.</div>
+        </label>
+        <label class="option" onclick="selectOption(this, 'q2', 1)">
+          <input type="radio" name="q2" value="1">
+          <div class="option-letter">D</div>
+          <div class="option-text">Try to find a better angle for myself before committing to pass or shoot.</div>
+        </label>
+      </div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="question-card" data-q="3">
+      <div class="question-header">
+        <div class="question-num">03</div>
+        <div class="question-text">Your team loses a big game. You personally played well. What is your honest feeling when you walk off the field?</div>
+      </div>
+      <div class="options">
+        <label class="option" onclick="selectOption(this, 'q3', 4)">
+          <input type="radio" name="q3" value="4">
+          <div class="option-letter">A</div>
+          <div class="option-text">Gutted. A loss is a loss. My individual performance doesn't matter if the team didn't win.</div>
+        </label>
+        <label class="option" onclick="selectOption(this, 'q3', 3)">
+          <input type="radio" name="q3" value="3">
+          <div class="option-letter">B</div>
+          <div class="option-text">Disappointed in the result, but I know I did my part — now I focus on what we do next.</div>
+        </label>
+        <label class="option" onclick="selectOption(this, 'q3', 2)">
+          <input type="radio" name="q3" value="2">
+          <div class="option-letter">C</div>
+          <div class="option-text">Mixed — the loss hurts, but it's somewhat comforting that I played well.</div>
+        </label>
+        <label class="option" onclick="selectOption(this, 'q3', 1)">
+          <input type="radio" name="q3" value="1">
+          <div class="option-letter">D</div>
+          <div class="option-text">Honestly, I'm proud of how I played. I can only control my own performance.</div>
+        </label>
+      </div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="question-card" data-q="4">
+      <div class="question-header">
+        <div class="question-num">04</div>
+        <div class="question-text">A teammate is going through a rough stretch — poor form, missing sessions, seems checked out. What do you do?</div>
+      </div>
+      <div class="options">
+        <label class="option" onclick="selectOption(this, 'q4', 4)">
+          <input type="radio" name="q4" value="4">
+          <div class="option-letter">A</div>
+          <div class="option-text">Reach out personally — check in on them, not just as a player but as a person.</div>
+        </label>
+        <label class="option" onclick="selectOption(this, 'q4', 3)">
+          <input type="radio" name="q4" value="3">
+          <div class="option-letter">B</div>
+          <div class="option-text">Encourage them in training and make sure they feel like they're still part of the group.</div>
+        </label>
+        <label class="option" onclick="selectOption(this, 'q4', 2)">
+          <input type="radio" name="q4" value="2">
+          <div class="option-letter">C</div>
+          <div class="option-text">Let the coaches handle it — that's their job. I focus on my own preparation.</div>
+        </label>
+        <label class="option" onclick="selectOption(this, 'q4', 1)">
+          <input type="radio" name="q4" value="1">
+          <div class="option-letter">D</div>
+          <div class="option-text">Nothing — everyone goes through stretches. They need to figure it out themselves.</div>
+        </label>
+      </div>
+    </div>
+
+    <!-- Q5 -->
+    <div class="question-card" data-q="5">
+      <div class="question-header">
+        <div class="question-num">05</div>
+        <div class="question-text">What is your most important personal goal for this season?</div>
+      </div>
+      <div class="options">
+        <label class="option" onclick="selectOption(this, 'q5', 4)">
+          <input type="radio" name="q5" value="4">
+          <div class="option-letter">A</div>
+          <div class="option-text">Help this team win and be someone my teammates can genuinely count on.</div>
+        </label>
+        <label class="option" onclick="selectOption(this, 'q5', 3)">
+          <input type="radio" name="q5" value="3">
+          <div class="option-letter">B</div>
+          <div class="option-text">Grow as a player in every area — if I'm better, the team is better.</div>
+        </label>
+        <label class="option" onclick="selectOption(this, 'q5', 2)">
+          <input type="radio" name="q5" value="2">
+          <div class="option-letter">C</div>
+          <div class="option-text">Improve my individual stats and increase my visibility for the next level.</div>
+        </label>
+        <label class="option" onclick="selectOption(this, 'q5', 1)">
+          <input type="radio" name="q5" value="1">
+          <div class="option-letter">D</div>
+          <div class="option-text">Prove to myself and others what I'm capable of as an individual player.</div>
+        </label>
+      </div>
+    </div>
+
+    <!-- Q6 -->
+    <div class="question-card" data-q="6">
+      <div class="question-header">
+        <div class="question-num">06</div>
+        <div class="question-text">You make a costly mistake that leads directly to the other team scoring. What do you do?</div>
+      </div>
+      <div class="options">
+        <label class="option" onclick="selectOption(this, 'q6', 4)">
+          <input type="radio" name="q6" value="4">
+          <div class="option-letter">A</div>
+          <div class="option-text">Acknowledge it to my teammates, reset immediately, and compete harder for the rest of the game.</div>
+        </label>
+        <label class="option" onclick="selectOption(this, 'q6', 3)">
+          <input type="radio" name="q6" value="3">
+          <div class="option-letter">B</div>
+          <div class="option-text">Put it behind me and look for a way to make a positive impact on the next play.</div>
+        </label>
+        <label class="option" onclick="selectOption(this, 'q6', 2)">
+          <input type="radio" name="q6" value="2">
+          <div class="option-letter">C</div>
+          <div class="option-text">Shake it off — mistakes happen to everyone. I move on without overthinking it.</div>
+        </label>
+        <label class="option" onclick="selectOption(this, 'q6', 1)">
+          <input type="radio" name="q6" value="1">
+          <div class="option-letter">D</div>
+          <div class="option-text">I find it hard to let it go — mistakes like that stay with me for a while.</div>
+        </label>
+      </div>
+    </div>
+
+    <!-- Q7 -->
+    <div class="question-card" data-q="7">
+      <div class="question-header">
+        <div class="question-num">07</div>
+        <div class="question-text">The coaching staff organizes voluntary training sessions over winter break. What do you do?</div>
+      </div>
+      <div class="options">
+        <label class="option" onclick="selectOption(this, 'q7', 4)">
+          <input type="radio" name="q7" value="4">
+          <div class="option-letter">A</div>
+          <div class="option-text">Attend every session — I want every edge I can get, and I want my teammates to see that commitment.</div>
+        </label>
+        <label class="option" onclick="selectOption(this, 'q7', 3)">
+          <input type="radio" name="q7" value="3">
+          <div class="option-letter">B</div>
+          <div class="option-text">Go when I can — I'll also do my own individual work on off days.</div>
+        </label>
+        <label class="option" onclick="selectOption(this, 'q7', 2)">
+          <input type="radio" name="q7" value="2">
+          <div class="option-letter">C</div>
+          <div class="option-text">Go to a few — it's voluntary and I need some mental and physical rest too.</div>
+        </label>
+        <label class="option" onclick="selectOption(this, 'q7', 1)">
+          <input type="radio" name="q7" value="1">
+          <div class="option-letter">D</div>
+          <div class="option-text">Skip it — it's voluntary. I'll be ready when the season starts back up.</div>
+        </label>
+      </div>
+    </div>
+
+    <!-- Q8 -->
+    <div class="question-card" data-q="8">
+      <div class="question-header">
+        <div class="question-num">08</div>
+        <div class="question-text">Your team is winning 4–0 and the coach is rotating players. You've played 20 minutes. How do you feel?</div>
+      </div>
+      <div class="options">
+        <label class="option" onclick="selectOption(this, 'q8', 4)">
+          <input type="radio" name="q8" value="4">
+          <div class="option-letter">A</div>
+          <div class="option-text">Genuinely happy — we're winning, everyone's getting time, and I'll contribute when I'm called on.</div>
+        </label>
+        <label class="option" onclick="selectOption(this, 'q8', 3)">
+          <input type="radio" name="q8" value="3">
+          <div class="option-letter">B</div>
+          <div class="option-text">Fine with it — every player deserves time and I'll make mine count when I'm back in.</div>
+        </label>
+        <label class="option" onclick="selectOption(this, 'q8', 2)">
+          <input type="radio" name="q8" value="2">
+          <div class="option-letter">C</div>
+          <div class="option-text">Happy we're winning, but honestly I want more time to show what I can do.</div>
+        </label>
+        <label class="option" onclick="selectOption(this, 'q8', 1)">
+          <input type="radio" name="q8" value="1">
+          <div class="option-letter">D</div>
+          <div class="option-text">Frustrated — 20 minutes isn't enough. I should be playing more regardless of the score.</div>
+        </label>
+      </div>
+    </div>
+
+    <!-- Q9 -->
+    <div class="question-card" data-q="9">
+      <div class="question-header">
+        <div class="question-num">09</div>
+        <div class="question-text">The coach makes a tactical decision you strongly disagree with. What do you do?</div>
+      </div>
+      <div class="options">
+        <label class="option" onclick="selectOption(this, 'q9', 4)">
+          <input type="radio" name="q9" value="4">
+          <div class="option-letter">A</div>
+          <div class="option-text">Execute it fully and bring it up respectfully after the game if I still feel strongly about it.</div>
+        </label>
+        <label class="option" onclick="selectOption(this, 'q9', 3)">
+          <input type="radio" name="q9" value="3">
+          <div class="option-letter">B</div>
+          <div class="option-text">Voice my thoughts to the coach briefly in the moment, then commit to the plan regardless.</div>
+        </label>
+        <label class="option" onclick="selectOption(this, 'q9', 2)">
+          <input type="radio" name="q9" value="2">
+          <div class="option-letter">C</div>
+          <div class="option-text">Go along with it, but talk to a few teammates about how I feel during the game.</div>
+        </label>
+        <label class="option" onclick="selectOption(this, 'q9', 1)">
+          <input type="radio" name="q9" value="1">
+          <div class="option-letter">D</div>
+          <div class="option-text">Play the way I think is right — if it works, it'll prove my point.</div>
+        </label>
+      </div>
+    </div>
+
+    <!-- Q10 -->
+    <div class="question-card" data-q="10">
+      <div class="question-header">
+        <div class="question-num">10</div>
+        <div class="question-text">A teammate calls you out in front of the team for something they feel you did wrong. How do you respond?</div>
+      </div>
+      <div class="options">
+        <label class="option" onclick="selectOption(this, 'q10', 4)">
+          <input type="radio" name="q10" value="4">
+          <div class="option-letter">A</div>
+          <div class="option-text">Listen — even if I disagree with how they said it, there might be truth in what they're saying.</div>
+        </label>
+        <label class="option" onclick="selectOption(this, 'q10', 3)">
+          <input type="radio" name="q10" value="3">
+          <div class="option-letter">B</div>
+          <div class="option-text">Acknowledge it in the moment, then have a direct one-on-one conversation with them later.</div>
+        </label>
+        <label class="option" onclick="selectOption(this, 'q10', 2)">
+          <input type="radio" name="q10" value="2">
+          <div class="option-letter">C</div>
+          <div class="option-text">Defend myself — I'm not going to let someone call me out publicly without responding.</div>
+        </label>
+        <label class="option" onclick="selectOption(this, 'q10', 1)">
+          <input type="radio" name="q10" value="1">
+          <div class="option-letter">D</div>
+          <div class="option-text">Hold a grudge — public call-outs cross a line and I won't forget it easily.</div>
+        </label>
+      </div>
+    </div>
+
+    <!-- Q11 -->
+    <div class="question-card" data-q="11">
+      <div class="question-header">
+        <div class="question-num">11</div>
+        <div class="question-text">You and a teammate have personal tension that's creating friction in the squad. What do you do?</div>
+      </div>
+      <div class="options">
+        <label class="option" onclick="selectOption(this, 'q11', 4)">
+          <input type="radio" name="q11" value="4">
+          <div class="option-letter">A</div>
+          <div class="option-text">Address it directly with them as soon as possible — team chemistry is too important to let it fester.</div>
+        </label>
+        <label class="option" onclick="selectOption(this, 'q11', 3)">
+          <input type="radio" name="q11" value="3">
+          <div class="option-letter">B</div>
+          <div class="option-text">Keep it professional on the field and work it out off the field when both of us are ready.</div>
+        </label>
+        <label class="option" onclick="selectOption(this, 'q11', 2)">
+          <input type="radio" name="q11" value="2">
+          <div class="option-letter">C</div>
+          <div class="option-text">Bring in the coach or a trusted teammate to help mediate.</div>
+        </label>
+        <label class="option" onclick="selectOption(this, 'q11', 1)">
+          <input type="radio" name="q11" value="1">
+          <div class="option-letter">D</div>
+          <div class="option-text">Ignore it and hope it resolves on its own — I'm not going to make the first move.</div>
+        </label>
+      </div>
+    </div>
+
+    <!-- Q12 -->
+    <div class="question-card" data-q="12">
+      <div class="question-header">
+        <div class="question-num">12</div>
+        <div class="question-text">Honestly — when you picture a successful season for yourself, what does it look like?</div>
+      </div>
+      <div class="options">
+        <label class="option" onclick="selectOption(this, 'q12', 4)">
+          <input type="radio" name="q12" value="4">
+          <div class="option-letter">A</div>
+          <div class="option-text">This team winning together and every player looking back knowing they were part of something special.</div>
+        </label>
+        <label class="option" onclick="selectOption(this, 'q12', 3)">
+          <input type="radio" name="q12" value="3">
+          <div class="option-letter">B</div>
+          <div class="option-text">The team succeeds and I grow into a player who genuinely helped make that happen.</div>
+        </label>
+        <label class="option" onclick="selectOption(this, 'q12', 2)">
+          <input type="radio" name="q12" value="2">
+          <div class="option-letter">C</div>
+          <div class="option-text">I have a standout season individually and the team performs well around that.</div>
+        </label>
+        <label class="option" onclick="selectOption(this, 'q12', 1)">
+          <input type="radio" name="q12" value="1">
+          <div class="option-letter">D</div>
+          <div class="option-text">I prove my ability and open doors for my future — college, next level, whatever it is.</div>
+        </label>
+      </div>
+    </div>
+
+  </form>
+
+  <div class="submit-area">
+    <button class="submit-btn" onclick="submitQuiz()">See My Profile</button>
+    <div class="submit-note">Answer all 12 questions before submitting.</div>
+  </div>
+
+  <!-- RESULTS -->
+  <div class="results" id="results">
+    <div class="results-header">
+      <div class="results-eyebrow">Your Player Profile</div>
+      <div class="results-title" id="profile-title">—</div>
+    </div>
+
+    <div class="profile-card">
+      <div class="profile-card-top" id="profile-top">
+        <div class="profile-icon" id="profile-icon"></div>
+        <div class="profile-label">Player Type</div>
+        <div class="profile-type" id="profile-type-label"></div>
+      </div>
+      <div class="profile-card-body">
+        <div class="score-bar-area">
+          <div class="score-bar-label">
+            <span>Team Orientation</span>
+            <span class="score-val" id="score-display"></span>
+          </div>
+          <div class="score-bar-track">
+            <div class="score-bar-fill" id="score-fill" style="width:0%"></div>
+          </div>
+        </div>
+        <p class="profile-desc" id="profile-desc"></p>
+        <div class="profile-strengths-title">Your Strengths</div>
+        <div id="profile-strengths"></div>
+        <div class="growth-area">
+          <div class="growth-title">Challenge for This Season</div>
+          <div class="growth-text" id="profile-growth"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="save-badge saving" id="save-badge" style="display:none">
+      <div class="save-dot"></div>
+      <span id="save-badge-text">Saving…</span>
+    </div>
+
+    <div class="results-actions">
+      <button class="results-btn" onclick="window.print()">⎙ Print My Results</button>
+      <button class="results-btn" onclick="resetQuiz()">← Retake</button>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  <div class="footer-text">PLD Boys Soccer · 2026</div>
+  <div class="footer-dot"></div>
+  <div class="footer-text">Player Goals Questionnaire</div>
+</footer>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script>
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyCSWl0deRXE3ieLMM2TQy1h6rUmzTr0-W4",
+  authDomain: "pld-soccer-tryout-evaluations.firebaseapp.com",
+  databaseURL: "https://pld-soccer-tryout-evaluations-default-rtdb.firebaseio.com",
+  projectId: "pld-soccer-tryout-evaluations",
+  storageBucket: "pld-soccer-tryout-evaluations.firebasestorage.app",
+  messagingSenderId: "105016963227",
+  appId: "1:105016963227:web:57e1a927613aaa9f04163e"
+};
+firebase.initializeApp(FIREBASE_CONFIG);
+const db = firebase.database();
+
+const answers = {};
+const totalQ = 12;
+
+const profiles = [
+  {
+    min: 42, max: 48,
+    title: 'THE ANCHOR',
+    icon: '⚓',
+    desc: 'You are the kind of teammate every winning program is built around. Your instinct is always to serve the team first — in how you train, how you respond to adversity, and how you show up for the people around you. Coaches trust players like you with the moments that matter most.',
+    strengths: ['Selflessness', 'Accountability', 'Leadership presence', 'Team-first instincts', 'Resilience'],
+    growth: 'Challenge yourself to be vocal — not just in action, but in words. The team needs your voice as much as your effort. Great anchors don\'t just lead by example; they speak up when it matters.'
+  },
+  {
+    min: 33, max: 41,
+    title: 'THE COMPETITOR',
+    icon: '🔥',
+    desc: 'You bring intensity and a genuine desire to win — for yourself and for the team. You care deeply about results and you\'re willing to put in the work. You still have personal ambitions, and that\'s healthy — the best teams are built with competitive players who channel that drive into collective success.',
+    strengths: ['Work ethic', 'Competitive drive', 'Coachability', 'Accountability', 'Resilience'],
+    growth: 'Watch the moments when your individual frustration creeps in — playing time, mistakes, the spotlight. In those moments, your team needs your best self, not your ego. The great ones learn to compete harder for the team when it\'s hardest.'
+  },
+  {
+    min: 22, max: 32,
+    title: 'THE SPARK',
+    icon: '⚡',
+    desc: 'You have real individual talent and personal ambition — that fire can be an asset to this team. But right now, your instincts are still leaning toward self first. That\'s honest, and it\'s coachable. The best players eventually realize that the individual goals they want are almost always achieved through team success, not in spite of it.',
+    strengths: ['Individual ability', 'Competitive hunger', 'Personal accountability', 'Ambition', 'Direct communication'],
+    growth: 'This season, challenge yourself to celebrate a teammate\'s success as loudly as your own. Ask yourself in every tough moment: what does the team need from me right now? The players who answer that question consistently are the ones who get everything they want individually too.'
+  },
+  {
+    min: 12, max: 21,
+    title: 'THE MAVERICK',
+    icon: '🎯',
+    desc: 'You\'re here for yourself first, and you know it. There\'s nothing wrong with personal ambition — but on a team, individual success without investment in others has a ceiling. The game will ask you, in its toughest moments, to put something on the line for the person next to you. Right now, that\'s the biggest question mark.',
+    strengths: ['Self-reliance', 'Individual drive', 'Directness', 'Confidence', 'Independence'],
+    growth: 'Real talk: the teams and coaches at the next level are watching how you compete for others, not just for yourself. Buy into this group — not because you have to, but because the version of you that does is better than the version that doesn\'t.'
+  }
+];
+
+function selectOption(el, qName, val) {
+  const card = el.closest('.question-card');
+  card.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  const letter = el.querySelector('.option-letter').textContent.trim().toLowerCase();
+  answers[qName] = { score: val, letter };
+  updateProgress();
+}
+
+function updateProgress() {
+  const answered = Object.keys(answers).length;
+  document.getElementById('progress-fill').style.width = (answered / totalQ * 100) + '%';
+}
+
+function submitQuiz() {
+  const answered = Object.keys(answers).length;
+  if (answered < totalQ) {
+    const unanswered = [];
+    for (let i = 1; i <= totalQ; i++) {
+      if (!answers['q' + i]) unanswered.push(i);
+    }
+    alert('Please answer all 12 questions. Missing: Q' + unanswered.join(', Q'));
+    const firstMissing = document.querySelector('[data-q="' + unanswered[0] + '"]');
+    if (firstMissing) firstMissing.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+
+  const total = Object.values(answers).reduce((a, b) => a + Number(b.score), 0);
+  const pct = Math.round((total / 48) * 100);
+
+  let profile = profiles[3];
+  for (const p of profiles) {
+    if (total >= p.min && total <= p.max) { profile = p; break; }
+  }
+
+  document.getElementById('profile-title').textContent = profile.title;
+  document.getElementById('profile-icon').textContent = profile.icon;
+  document.getElementById('profile-type-label').textContent = profile.title;
+  document.getElementById('profile-desc').textContent = profile.desc;
+  document.getElementById('score-display').textContent = total + ' / 48';
+  document.getElementById('profile-growth').textContent = profile.growth;
+
+  const strengthsEl = document.getElementById('profile-strengths');
+  strengthsEl.innerHTML = '';
+  profile.strengths.forEach(s => {
+    const pill = document.createElement('span');
+    pill.className = 'strength-pill';
+    pill.textContent = s;
+    strengthsEl.appendChild(pill);
+  });
+
+  const resultsEl = document.getElementById('results');
+  resultsEl.classList.add('visible');
+  setTimeout(() => {
+    document.getElementById('score-fill').style.width = pct + '%';
+    resultsEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 100);
+
+  // Save to Firebase
+  const badge = document.getElementById('save-badge');
+  const badgeText = document.getElementById('save-badge-text');
+  badge.style.display = 'flex';
+  badge.className = 'save-badge saving';
+  badgeText.textContent = 'Sending to coach…';
+
+  const profileKey = profile.title.replace(/^THE /, '').toLowerCase();
+  const answerLetters = {};
+  Object.entries(answers).forEach(([k, v]) => { answerLetters[k] = v.letter; });
+
+  db.ref('questionnaire/responses').push({
+    score: total,
+    profileKey: profileKey,
+    profileTitle: profile.title,
+    timestamp: Date.now(),
+    answers: answerLetters
+  }).then(() => {
+    badge.className = 'save-badge saved';
+    badgeText.textContent = '✓ Sent to coach dashboard';
+  }).catch(() => {
+    badge.className = 'save-badge error';
+    badgeText.textContent = 'Could not connect — show coach your screen';
+  });
+}
+
+function resetQuiz() {
+  Object.keys(answers).forEach(k => delete answers[k]);
+  document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+  document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
+  document.getElementById('results').classList.remove('visible');
+  document.getElementById('score-fill').style.width = '0%';
+  document.getElementById('progress-fill').style.width = '0%';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
