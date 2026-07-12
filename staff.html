@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Staff Resources — PLD Soccer 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --red: #ce0e2d;
+  --red-mid: #e8324f;
+  --dark: #0e0e0e;
+  --dark-2: #1a1a1a;
+  --dark-3: #252525;
+  --white: #ffffff;
+  --gray: #888;
+}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--dark);
+  color: var(--white);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── HEADER ── */
+.page-header {
+  background: var(--dark);
+  border-bottom: 4px solid var(--red);
+  padding: 28px 48px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  position: relative;
+  overflow: hidden;
+}
+.page-header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 80% 120% at 0% 50%, rgba(206,14,45,0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+.header-crest {
+  width: 64px; height: 64px;
+  flex-shrink: 0; position: relative;
+}
+.header-crest img {
+  width: 100%; height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 10px rgba(206,14,45,0.4));
+}
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.4);
+  text-decoration: none;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  padding: 7px 14px;
+  border-radius: 6px;
+  flex-shrink: 0;
+  transition: all 0.2s;
+  position: relative;
+}
+.back-link:hover { color: var(--white); background: rgba(255,255,255,0.1); }
+.header-text { position: relative; flex: 1; }
+.header-eyebrow {
+  font-size: 10px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--red-mid);
+  font-weight: 600;
+  margin-bottom: 3px;
+}
+.header-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 38px;
+  letter-spacing: 4px;
+  color: var(--white);
+  line-height: 1;
+}
+.header-title span { color: var(--red); }
+
+/* ── MAIN ── */
+.main {
+  flex: 1;
+  max-width: 1100px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 44px 48px 64px;
+}
+
+/* ── RESOURCE GRID ── */
+.resource-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+/* ── GROUP CARD ── */
+.group-card {
+  background: var(--dark-2);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 10px;
+  overflow: hidden;
+  grid-column: 1 / -1;
+}
+.group-card-accent { height: 3px; background: var(--red); }
+.group-card-header {
+  padding: 16px 22px 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.group-card-type {
+  font-size: 13px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--red-mid);
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.group-card-title {
+  font-weight: 700;
+  font-size: 26px;
+  color: var(--white);
+}
+.group-items { display: flex; flex-direction: column; }
+.group-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 22px;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  transition: background 0.15s;
+}
+.group-item:last-child { border-bottom: none; }
+.group-item:hover { background: var(--dark-3); }
+.group-item-text { flex: 1; }
+.group-item-label {
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--red-mid);
+  font-weight: 600;
+  margin-bottom: 3px;
+}
+.group-item-title {
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--white);
+  margin-bottom: 2px;
+}
+.group-item-desc {
+  font-size: 12px;
+  color: rgba(255,255,255,0.45);
+  line-height: 1.5;
+}
+.group-item-arrow {
+  width: 28px; height: 28px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  color: rgba(255,255,255,0.3);
+  font-size: 14px;
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+.group-item:hover .group-item-arrow { background: var(--red); color: var(--white); }
+
+/* ── FOOTER ── */
+footer {
+  background: var(--dark-2);
+  border-top: 1px solid rgba(255,255,255,0.06);
+  padding: 18px 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.footer-text {
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.25);
+}
+.footer-dot { width: 5px; height: 5px; background: var(--red); border-radius: 50%; }
+
+@media (max-width: 600px) {
+  .page-header { padding: 20px 24px; }
+  .main { padding: 32px 24px 48px; }
+  .header-title { font-size: 28px; }
+  footer { padding: 16px 24px; }
+}
+
+/* ── PASSWORD GATE ── */
+.pw-gate {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: var(--dark);
+  z-index: 9999;
+  align-items: center;
+  justify-content: center;
+}
+.pw-gate.visible { display: flex; }
+.pw-box {
+  text-align: center;
+  width: 340px;
+  padding: 48px 40px;
+}
+.pw-box-crest {
+  width: 90px; height: 90px;
+  margin: 0 auto 24px;
+}
+.pw-box-crest img {
+  width: 100%; height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 16px rgba(206,14,45,0.4));
+}
+.pw-box-eyebrow {
+  font-size: 10px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--red-mid);
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.pw-box-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 30px;
+  letter-spacing: 3px;
+  color: var(--white);
+  margin-bottom: 6px;
+}
+.pw-box-sub {
+  font-size: 13px;
+  color: rgba(255,255,255,0.35);
+  margin-bottom: 28px;
+  line-height: 1.5;
+}
+.pw-input {
+  width: 100%;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  color: var(--white);
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  outline: none;
+  text-align: center;
+  letter-spacing: 3px;
+  margin-bottom: 12px;
+  transition: border-color 0.2s;
+}
+.pw-input:focus { border-color: var(--red); }
+.pw-input.error { border-color: #e84545; animation: shake 0.3s; }
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  25% { transform: translateX(-8px); }
+  75% { transform: translateX(8px); }
+}
+.pw-error {
+  font-size: 12px;
+  color: #e84545;
+  min-height: 18px;
+  margin-bottom: 10px;
+}
+.pw-submit {
+  width: 100%;
+  background: var(--red);
+  color: var(--white);
+  border: none;
+  border-radius: 8px;
+  padding: 12px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: background 0.15s;
+}
+.pw-submit:hover { background: var(--red-mid); }
+.pw-back {
+  display: inline-block;
+  margin-top: 14px;
+  font-size: 12px;
+  color: rgba(255,255,255,0.25);
+  text-decoration: none;
+  cursor: pointer;
+}
+.pw-back:hover { color: rgba(255,255,255,0.5); }
+</style>
+</head>
+<body>
+
+<!-- PASSWORD GATE -->
+<div class="pw-gate visible" id="pw-gate">
+  <div class="pw-box">
+    <div class="pw-box-crest">
+      <img src="6 Star Dunbar Crest.png" alt="PLD" onerror="this.style.display='none'">
+    </div>
+    <div class="pw-box-eyebrow">Staff Only</div>
+    <div class="pw-box-title">Staff Resources</div>
+    <div class="pw-box-sub">Enter your password to access this area.</div>
+    <input class="pw-input" type="password" id="pw-input" placeholder="Password"
+      onkeydown="if(event.key==='Enter')submitGate()"
+      oninput="document.getElementById('pw-error').textContent=''">
+    <div class="pw-error" id="pw-error"></div>
+    <button class="pw-submit" onclick="submitGate()">Enter</button>
+    <a class="pw-back" href="index.html">← Back to home</a>
+  </div>
+</div>
+
+<header class="page-header">
+  <a href="index.html" class="back-link">← Home</a>
+  <div class="header-crest">
+    <img src="6 Star Dunbar Crest.png" alt="PLD Crest" onerror="this.style.display='none'">
+  </div>
+  <div class="header-text">
+    <div class="header-eyebrow">Paul Laurence Dunbar Boys Soccer · 2026</div>
+    <div class="header-title">STAFF <span>RESOURCES</span></div>
+  </div>
+</header>
+
+<main class="main">
+  <div class="resource-grid">
+
+    <!-- TRYOUTS -->
+    <div class="group-card">
+      <div class="group-card-accent"></div>
+      <div class="group-card-header">
+        <div class="group-card-type">Player Selection</div>
+        <div class="group-card-title">Tryouts</div>
+      </div>
+      <div class="group-items">
+        <a href="tryout_plan.html" class="group-item">
+          <div class="group-item-text">
+            <div class="group-item-label">Planning</div>
+            <div class="group-item-title">Tryout Plan</div>
+            <div class="group-item-desc">Full tryout structure, session schedule, evaluation criteria, and coaching notes for the 2026 selection process.</div>
+          </div>
+          <div class="group-item-arrow">→</div>
+        </a>
+        <a href="tryouts.html" class="group-item">
+          <div class="group-item-text">
+            <div class="group-item-label">Hub</div>
+            <div class="group-item-title">Tryout Hub</div>
+            <div class="group-item-desc">Central landing page for all tryout tools — check-in, evaluation, and master score dashboard for both Varsity and JV.</div>
+          </div>
+          <div class="group-item-arrow">→</div>
+        </a>
+        <a href="checkin/tryout_checkin_varsity.html" class="group-item">
+          <div class="group-item-text">
+            <div class="group-item-label">Varsity · Check-In</div>
+            <div class="group-item-title">Varsity Check-In</div>
+            <div class="group-item-desc">Live check-in sheet for Varsity tryouts. Assign tryout numbers and track player arrival in real time.</div>
+          </div>
+          <div class="group-item-arrow">→</div>
+        </a>
+        <a href="checkin/tryout_checkin_jv.html" class="group-item">
+          <div class="group-item-text">
+            <div class="group-item-label">JV · Check-In</div>
+            <div class="group-item-title">JV Check-In</div>
+            <div class="group-item-desc">Live check-in sheet for JV tryouts. Assign tryout numbers and track player arrival in real time.</div>
+          </div>
+          <div class="group-item-arrow">→</div>
+        </a>
+        <a href="evaluations/tryout_evaluation_varsity.html" class="group-item">
+          <div class="group-item-text">
+            <div class="group-item-label">Varsity · Evaluation</div>
+            <div class="group-item-title">Varsity Evaluation Tool</div>
+            <div class="group-item-desc">Coach scoring tool for Varsity tryouts. Score players by tryout number across all evaluation categories.</div>
+          </div>
+          <div class="group-item-arrow">→</div>
+        </a>
+        <a href="evaluations/tryout_evaluation_jv.html" class="group-item">
+          <div class="group-item-text">
+            <div class="group-item-label">JV · Evaluation</div>
+            <div class="group-item-title">JV Evaluation Tool</div>
+            <div class="group-item-desc">Coach scoring tool for JV tryouts. Score players by tryout number across all evaluation categories.</div>
+          </div>
+          <div class="group-item-arrow">→</div>
+        </a>
+        <a href="tryout_master_varsity.html" class="group-item">
+          <div class="group-item-text">
+            <div class="group-item-label">Varsity · Results</div>
+            <div class="group-item-title">Varsity Master Scores</div>
+            <div class="group-item-desc">Live aggregated score dashboard for all Varsity evaluations. See rankings across all coaches in real time.</div>
+          </div>
+          <div class="group-item-arrow">→</div>
+        </a>
+        <a href="tryout_master_jv.html" class="group-item">
+          <div class="group-item-text">
+            <div class="group-item-label">JV · Results</div>
+            <div class="group-item-title">JV Master Scores</div>
+            <div class="group-item-desc">Live aggregated score dashboard for all JV evaluations. See rankings across all coaches in real time.</div>
+          </div>
+          <div class="group-item-arrow">→</div>
+        </a>
+      </div>
+    </div>
+
+    <!-- ROSTER & UNIFORM MANAGEMENT -->
+    <div class="group-card">
+      <div class="group-card-accent"></div>
+      <div class="group-card-header">
+        <div class="group-card-type">Team Administration</div>
+        <div class="group-card-title">Roster &amp; Uniform Management</div>
+      </div>
+      <div class="group-items">
+        <a href="uniform_roster.html" class="group-item">
+          <div class="group-item-text">
+            <div class="group-item-label">Uniforms</div>
+            <div class="group-item-title">Varsity Roster</div>
+            <div class="group-item-desc">Assign jersey numbers to players. Numbers 00, 0, and 1–23 are Medium; 24–26 are Small; 27–29 are Large.</div>
+          </div>
+          <div class="group-item-arrow">→</div>
+        </a>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<footer>
+  <div class="footer-text">PLD Boys Soccer · 2026 Season</div>
+  <div class="footer-dot"></div>
+  <div class="footer-text">Staff Resources</div>
+</footer>
+
+<script>
+const PASS = '2026pldstaff';
+const SESSION_KEY = 'staffAuth';
+
+function submitGate() {
+  const val = document.getElementById('pw-input').value;
+  if (val === PASS) {
+    sessionStorage.setItem(SESSION_KEY, '1');
+    document.getElementById('pw-gate').classList.remove('visible');
+  } else {
+    const inp = document.getElementById('pw-input');
+    inp.classList.add('error');
+    document.getElementById('pw-error').textContent = 'Incorrect password.';
+    setTimeout(() => inp.classList.remove('error'), 400);
+  }
+}
+
+if (sessionStorage.getItem(SESSION_KEY) === '1') {
+  document.getElementById('pw-gate').classList.remove('visible');
+}
+</script>
+
+</body>
+</html>

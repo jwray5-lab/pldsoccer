@@ -172,18 +172,16 @@ footer { background: var(--dark-2); border-top: 1px solid rgba(255,255,255,0.06)
 </footer>
 
 <script>
-const PW_HASH = 'e4467318120754dacee06c4f97e285b187f4188f0dda8fb2972c4c74fee3413d';
-async function sha256(s) {
-  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
-  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
-}
-if (sessionStorage.getItem('pld-eval-auth') === 'true') {
+const PASS = 'dunbar1990';
+
+if (sessionStorage.getItem('pld-eval-auth') === '1') {
   document.getElementById('pw-gate').classList.remove('visible');
 }
-async function submitGate() {
+
+function submitGate() {
   const val = document.getElementById('pw-input').value;
-  if (await sha256(val) === PW_HASH) {
-    sessionStorage.setItem('pld-eval-auth', 'true');
+  if (val === PASS) {
+    sessionStorage.setItem('pld-eval-auth', '1');
     document.getElementById('pw-gate').classList.remove('visible');
   } else {
     const inp = document.getElementById('pw-input');

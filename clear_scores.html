@@ -71,18 +71,14 @@
     document.getElementById('btn').disabled = !s.val();
   });
 
-  const PW_HASH = '2ebda397567291e64bea0575d54715ea4ba8cec2606bf8b2da95df58df67ca8e';
-  async function sha256(s) {
-    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
-    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
-  }
-  if (sessionStorage.getItem('pld-admin-auth') === 'true') {
+  const PASS = 'dunbar1990';
+  if (sessionStorage.getItem('pld-admin-auth') === '1') {
     document.getElementById('pw-gate').classList.remove('visible');
   }
-  async function submitGate() {
+  function submitGate() {
     const val = document.getElementById('pw-input').value;
-    if (await sha256(val) === PW_HASH) {
-      sessionStorage.setItem('pld-admin-auth', 'true');
+    if (val === PASS) {
+      sessionStorage.setItem('pld-admin-auth', '1');
       document.getElementById('pw-gate').classList.remove('visible');
     } else {
       const inp = document.getElementById('pw-input');
