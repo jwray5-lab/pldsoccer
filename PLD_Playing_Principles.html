@@ -931,12 +931,13 @@ html, body {
       <div class="stage-card" style="text-align:center;">
         <div class="stage-num">L3</div>
         <div class="stage-name">Pivot / DM + Fullbacks</div>
-        <div class="stage-phase">Fullbacks join this line in advanced phases — overlaps & underlaps</div>
+        <div class="stage-phase">Fullbacks join this line in advanced phases — CM drops here when pressed deep</div>
       </div>
-      <div class="stage-card" style="text-align:center;">
+      <div class="stage-card" style="text-align:center; position:relative; border: 1px solid rgba(232,50,79,0.35);">
+        <div style="position:absolute;top:-11px;left:50%;transform:translateX(-50%);background:#ce0e2d;color:#fff;font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:2px 10px;border-radius:20px;white-space:nowrap;">CM · Floater</div>
         <div class="stage-num">L4</div>
         <div class="stage-name">No. 10 / CAM</div>
-        <div class="stage-phase">Receive between lines — face forward</div>
+        <div class="stage-phase">CM joins this line in open play — reads the press and shifts between L3 &amp; L4</div>
       </div>
       <div class="stage-card" style="text-align:center;">
         <div class="stage-num">L5</div>
@@ -945,7 +946,7 @@ html, body {
       </div>
     </div>
     <div style="margin-top:28px; font-size:14px; color:rgba(255,255,255,0.55); max-width:860px; line-height:1.7;">
-      Five lines spread the opposition, create numerical advantages in specific zones, and give the ball carrier <em style="color:rgba(255,255,255,0.8); font-style:normal;">multiple real options in every moment.</em> The ball carrier should always have at least two lines available. If only one line is open, circulation is needed before progressing.
+      Five lines spread the opposition, create numerical advantages in specific zones, and give the ball carrier <em style="color:rgba(255,255,255,0.8); font-style:normal;">multiple real options in every moment.</em> The ball carrier should always have at least two lines available. If only one line is open, circulation is needed before progressing. The CM reads the press — dropping to L3 under pressure, rising to L4 in open phases.
     </div>
   </div>
 
@@ -985,7 +986,7 @@ html, body {
           Moving from the half line into the attacking third through purposeful off-ball runs.
         </div>
         <div class="how-label">How we achieve this</div>
-        <button class="video-btn" onclick="openVideo('youtube','27k2QY8iFyU')"><span class="video-btn-icon">▶</span> Watch Clip</button>
+        <button class="video-btn" onclick="openVideo('youtube','2hvZTq7CG7Y')"><span class="video-btn-icon">▶</span> Watch Clip</button>
       </div>
       <div class="principle-right">
         <ul class="points-list">
@@ -1012,7 +1013,7 @@ html, body {
           Disorganize the opponent, make it difficult to mark us, and find space to get in behind their back line.
         </div>
         <div class="how-label">How we achieve this</div>
-        <button class="video-btn" onclick="openVideo('youtube','oF9ZoDMc1Jc')"><span class="video-btn-icon">▶</span> Watch Clip</button>
+        <button class="video-btn" onclick="openVideo('youtube','27k2QY8iFyU')"><span class="video-btn-icon">▶</span> Watch Clip</button>
       </div>
       <div class="principle-right">
         <ul class="points-list">
@@ -1039,7 +1040,7 @@ html, body {
           The moment possession changes is the most dangerous — and the most opportunistic — second in the game. Win it back before they can breathe.
         </div>
         <div class="how-label">The 4 moments — always happening simultaneously</div>
-        <button class="video-btn" onclick="openVideo('youtube','2hvZTq7CG7Y')"><span class="video-btn-icon">▶</span> Watch Clip</button>
+        <button class="video-btn" onclick="openVideo('youtube','oF9ZoDMc1Jc')"><span class="video-btn-icon">▶</span> Watch Clip</button>
       </div>
       <div class="principle-right">
         <ul class="points-list">
@@ -1181,6 +1182,7 @@ html, body {
   <button class="nav-btn" id="prev" onclick="move(-1)">&#8592;</button>
   <div class="nav-dots" id="dots"></div>
   <button class="nav-btn" id="next" onclick="move(1)">&#8594;</button>
+  <div class="slide-counter" id="counter"></div>
 </div>
 <div class="kbd-hint">← → keys to navigate</div>
 
@@ -1205,6 +1207,7 @@ function goTo(n) {
   dotsEl.children[current].classList.add('active');
   document.getElementById('prev').disabled = current === 0;
   document.getElementById('next').disabled = current === slides.length - 1;
+  document.getElementById('counter').textContent = (current + 1) + ' / ' + slides.length;
 }
 
 function move(dir) { goTo(current + dir); }
