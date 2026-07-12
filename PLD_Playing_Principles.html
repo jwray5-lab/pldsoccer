@@ -552,6 +552,95 @@ html, body {
   margin-top: 8px;
 }
 
+/* ── SCENARIO GRID (1v1 expansion) ── */
+.scenario-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 14px;
+  width: 100%;
+  margin-top: 8px;
+}
+.scenario-card {
+  background: var(--dark-3);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 10px;
+  padding: 20px 16px;
+  position: relative;
+  overflow: hidden;
+}
+.scenario-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--red);
+}
+.scenario-pct {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 36px;
+  color: rgba(206,14,45,0.5);
+  line-height: 1;
+  margin-bottom: 6px;
+  min-height: 40px;
+}
+.scenario-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--white);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  line-height: 1.3;
+  margin-bottom: 10px;
+}
+.scenario-detail {
+  font-size: 12px;
+  color: rgba(255,255,255,0.6);
+  line-height: 1.5;
+}
+.scenario-detail em { color: var(--red-mid); font-style: normal; font-weight: 600; }
+
+/* ── STAT SLIDE (movement off the ball) ── */
+.slide-stat {
+  background: var(--dark-2);
+  align-items: center;
+  text-align: center;
+}
+.bg-ring {
+  position: absolute;
+  width: 700px; height: 700px;
+  border-radius: 50%;
+  border: 80px solid rgba(206,14,45,0.06);
+  pointer-events: none;
+}
+.big-stat {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(80px, 14vw, 180px);
+  color: var(--red);
+  line-height: 1;
+  letter-spacing: 4px;
+  position: relative;
+}
+.big-stat-label {
+  font-size: 14px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.45);
+  font-weight: 500;
+  margin-top: 8px;
+  position: relative;
+}
+.stat-tagline {
+  font-size: clamp(15px, 1.8vw, 20px);
+  font-weight: 300;
+  color: rgba(255,255,255,0.6);
+  margin-top: 28px;
+  max-width: 640px;
+  line-height: 1.65;
+  position: relative;
+}
+.stat-tagline strong { color: var(--white); font-weight: 600; }
+.stat-tagline em { color: var(--red-mid); font-style: normal; font-weight: 600; }
+
 /* ── MOBILE ─────────────────────────────────────── */
 @media (max-width: 680px) {
 
@@ -828,25 +917,144 @@ html, body {
   </div>
 
   <!-- SLIDE 3: 1v1 -->
-  <div class="slide slide-principle slide-transition-principle" data-index="2">
+  <!-- 1v1 SLIDE A: THE 5 PRESSURE SCENARIOS -->
+  <div class="slide slide-tactical" data-index="2">
+    <div style="margin-bottom:28px;">
+      <div class="section-label">1v1 Mastery · Pressure Scenarios</div>
+      <div class="section-title">The 5 Situations We Train</div>
+    </div>
+    <div class="scenario-grid">
+      <div class="scenario-card">
+        <div class="scenario-pct">75%</div>
+        <div class="scenario-name">Pressure Behind</div>
+        <div class="scenario-detail">The most common situation at every level. <em>Protect first</em>, use your body and arms to shield, then spin, roll, or play away from pressure. Half-turn receiving is essential.</div>
+      </div>
+      <div class="scenario-card">
+        <div class="scenario-pct"></div>
+        <div class="scenario-name">Pressure Side / Shoulder</div>
+        <div class="scenario-detail"><em>Speed of turn and disguise</em> over power. Use body feints and directional changes to shift the defender's weight. Play into the space they vacated.</div>
+      </div>
+      <div class="scenario-card">
+        <div class="scenario-pct"></div>
+        <div class="scenario-name">Angled Approach</div>
+        <div class="scenario-detail">The angle of your run <em>changes the defender's cover shadow</em> and creates the extra half-yard. Receive across the body and open out in one touch.</div>
+      </div>
+      <div class="scenario-card">
+        <div class="scenario-pct"></div>
+        <div class="scenario-name">Defender in Front</div>
+        <div class="scenario-detail">Maximum <em>disguise</em>, not maximum speed. Show one way, go the other. Delay until the moment, then be decisive — hesitation kills the opportunity.</div>
+      </div>
+      <div class="scenario-card">
+        <div class="scenario-pct"></div>
+        <div class="scenario-name">2v2 Situation</div>
+        <div class="scenario-detail">Win your 1v1 and you create the team's next <em>2v1</em>. Individual quality cascades into collective advantage — your duel decides their structure.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 1v1 SLIDE B: THE OUTPLAYING MINDSET -->
+  <div class="slide slide-principle" data-index="3">
     <div class="principle-layout">
       <div class="principle-left">
-        <div class="section-label">Individual Development</div>
+        <div class="section-label">1v1 Mastery · Mindset</div>
         <div class="principle-num">1v1</div>
-        <div class="principle-title">1v1<br>Mastery</div>
+        <div class="principle-title">Outplay<br>to Keep.<br>Not to Show.</div>
         <div class="principle-desc">
-          Top players face over 2,700 receiving situations per season. <em>75% have pressure from behind.</em> You can be the most tactically astute coach on the planet — but the individual parts make your ideas function.
+          Outplaying an opponent is not tricks. It is using your body, your arms, your positioning, and your disguise to solve a problem — and the problem is almost always: find the pass.
         </div>
-        <div class="how-label">The 5 scenarios we train</div>
+        <div class="how-label">What outplaying actually means</div>
       </div>
       <div class="principle-right">
         <ul class="points-list">
-          <li><em>Pressure behind</em> — the most common situation (≈75%); protect, dominate, and play forward</li>
-          <li><em>Pressure on the side</em> — use speed of turn, disguise, or body feint to escape</li>
-          <li><em>Angled movements</em> — approach changes the defender's cover shadow, creates the extra half-yard</li>
-          <li><em>Defender in front</em> — requires maximum disguise, not maximum speed</li>
-          <li><em>2v2 situation</em> — win your 1v1 and you create the team's next 2v1</li>
-          <li class="bold-item">1v1 domination is the foundation of every team possession moment — from build-out to the final ball</li>
+          <li>The teams with the <em>highest possession</em> also have the highest 1v1 outplaying frequency and efficiency — these are not separate things</li>
+          <li>In the <em>majority of situations</em>, a player outplays to retain possession and find a teammate — not to dribble past someone for its own sake</li>
+          <li><em>Body position, arms, and shielding</em> are the first tools — before any move or trick. Learn to protect the ball under pressure</li>
+          <li><em>Twisting, turning, and disguise</em> to create safe exits — the goal is getting out of trouble, then playing forward</li>
+          <li>Every position outplays differently — a striker twists in the box, a defender cuts inside under a high press, a DM uses their body to shield and recycle</li>
+          <li class="bold-item">You can be the most tactically astute coach on the planet — but the individual parts make your ideas function</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- MOVEMENT OFF THE BALL SLIDE A: STAT HOOK -->
+  <div class="slide slide-stat" data-index="4">
+    <div class="bg-ring" style="top:-300px;right:-300px;"></div>
+    <div class="bg-ring" style="bottom:-350px;left:-280px;opacity:0.5;"></div>
+    <div class="section-label">Individual Dominance</div>
+    <div class="big-stat">60–90s</div>
+    <div class="big-stat-label">average time on the ball per game</div>
+    <div class="stat-tagline">
+      The other <strong>79 minutes</strong> are spent without it.<br>
+      <em>Movement without the ball is not preparation for the game — it IS the game.</em>
+    </div>
+  </div>
+
+  <!-- MOVEMENT OFF THE BALL SLIDE B: CORE PRINCIPLES -->
+  <div class="slide slide-principle" data-index="5">
+    <div class="principle-layout">
+      <div class="principle-left">
+        <div class="section-label">Individual Dominance</div>
+        <div class="principle-num">MOB</div>
+        <div class="principle-title">Movement<br>Without<br>the Ball</div>
+        <div class="principle-desc">
+          Dominating your opponent without the ball is the precursor to everything. The movement creates the receiving moment.
+        </div>
+        <div class="how-label">Core Principles</div>
+      </div>
+      <div class="principle-right">
+        <ul class="points-list">
+          <li><em>Occupy the eyeline</em> — position on the defender's shoulder so they cannot see both you and the ball. Start every run from outside their vision</li>
+          <li><em>The trigger</em> — when the defender's head turns to look at the ball, that is your window. Move then, not before</li>
+          <li><em>7:1 movements</em> — top players receive once every seven movements they make. Show, show, show — the ball will come. Don't stop moving</li>
+          <li><em>Double movements</em> — explode one way to commit the defender, then attack the other. Unpredictability is the weapon</li>
+          <li><em>Arrival movements</em> — slow and drifting, high to low, from distance. These are the key to dominating possession and controlling the positional game</li>
+          <li class="bold-item">Move against the circulation — when the ball slides laterally, defenders track it. Move the other way. That is the space</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- MOVEMENT OFF THE BALL SLIDE C: POSITION SPECIFIC -->
+  <div class="slide slide-tactical" data-index="6">
+    <div style="margin-bottom:32px;">
+      <div class="section-label">Individual Dominance · Position Specific</div>
+      <div class="section-title">How We Apply It</div>
+    </div>
+    <div class="tactical-grid">
+      <div class="tac-card">
+        <div class="tac-card-label">Midfielders</div>
+        <ul class="tac-points">
+          <li>Play on <em>three different receiving lines</em> — horizontal and vertical. Never receive in a straight line</li>
+          <li>Paired midfielders must move in <em>opposite directions</em> and react to each other — if one shows short, the other goes long</li>
+          <li>Never two players on the same vertical line simultaneously</li>
+          <li>Find a receiving angle where your <em>first touch opens play forward</em></li>
+        </ul>
+      </div>
+      <div class="tac-card">
+        <div class="tac-card-label">Forwards</div>
+        <ul class="tac-points">
+          <li>Movements must be <em>late and explosive</em> — appear lazy in build-up, then fire when the passer gets their head up</li>
+          <li>One forward <em>drags the center back deep</em> — the other spins in behind into the space created</li>
+          <li>Spin in behind early — every millisecond delayed gives the defender recovery time</li>
+          <li>Opposite movements: always reacting to each other, not pre-planned</li>
+        </ul>
+      </div>
+      <div class="tac-card">
+        <div class="tac-card-label">Wingers</div>
+        <ul class="tac-points">
+          <li><em>Jump inside</em> when the fullback is pressed and you are pressed wide</li>
+          <li><em>Stay high and wide</em> when there is no pressure on the ball</li>
+          <li><em>Drop down the line</em> when the fullback is under pressure from behind</li>
+          <li>Movement calibrated to pressure — read the situation, don't preset the run</li>
+        </ul>
+      </div>
+      <div class="tac-card">
+        <div class="tac-card-label">The Rule for Every Position</div>
+        <ul class="tac-points">
+          <li>Ask yourself: <em>"By the time that ball reaches me, can the defender intercept — or can my first touch go forward?"</em></li>
+          <li>Individual dominance off the ball is <em>not a natural talent</em>. It is a trained skill. Mental rehearsal, film study, and repetition</li>
+          <li>Every player must know their movement patterns and practise them daily</li>
         </ul>
       </div>
     </div>
