@@ -222,6 +222,17 @@
     }
     .no-results { text-align: center; padding: 56px 0; color: var(--muted); font-size: 15px; }
 
+    /* ── Day check buttons ── */
+    td.p-day { width: 68px; text-align: center; }
+    .day-btn {
+      border: none; border-radius: 6px; padding: 5px 0; width: 56px;
+      font-size: 13px; font-weight: 700; cursor: pointer;
+      font-family: 'DM Sans', sans-serif; transition: all .15s;
+    }
+    .day-btn.present { background: rgba(74,222,128,.18); color: var(--green); }
+    .day-btn.absent  { background: var(--surface2); color: var(--muted); }
+    .day-btn:hover   { filter: brightness(1.25); }
+
 
     /* ── Modal ── */
     .modal-overlay {
@@ -282,7 +293,9 @@
     <button class="search-clear" onclick="document.getElementById('search').value='';renderTable()">&#10005;</button>
   </div>
   <div class="stats-pill">
-    Checked in: <strong id="count-assigned">0</strong> / <strong id="count-total">0</strong>
+    Numbered: <strong id="count-assigned">0</strong> / <strong id="count-total">0</strong>
+    &nbsp;&#183;&nbsp; Day 1: <strong id="count-day1" style="color:var(--green)">0</strong>
+    &nbsp;&#183;&nbsp; Day 2: <strong id="count-day2" style="color:var(--blue)">0</strong>
     &nbsp;&#183;&nbsp; Emails: <span class="email-count" id="count-emails">0</span>
   </div>
   <div class="filter-btns">
@@ -335,7 +348,8 @@
         <th>Physical Exp.</th>
         <th>Email 1</th>
         <th>Email 2</th>
-        <th>Status</th>
+        <th style="text-align:center">Day 1</th>
+        <th style="text-align:center">Day 2</th>
       </tr>
     </thead>
     <tbody id="tbody"></tbody>
@@ -469,6 +483,8 @@ let checkinData  = {};   // {playerKey: {name, grade, num, ts}}
 let emailData    = {};   // {playerKey: email1}
 let email2Data   = {};   // {playerKey: email2}
 let physData     = {};   // {playerKey: physical expiration}
+let day1Data     = {};   // {playerKey: {name, grade, ts}}
+let day2Data     = {};   // {playerKey: {name, grade, ts}}
 let extraPlayers = [];    // walk-ons
 let currentFilter = 'all';
 let editingEmailKey  = null;
@@ -515,6 +531,16 @@ function initFirebase() {
     renderTable();
   });
 
+  db.ref('tryouts2026/jv/day1').on('value', snap => {
+    day1Data = snap.val() || {};
+    renderTable();
+  });
+
+  db.ref('tryouts2026/jv/day2').on('value', snap => {
+    day2Data = snap.val() || {};
+    renderTable();
+  });
+
   db.ref('tryouts2026/jv/extra_players').on('value', snap => {
     const data = snap.val() || {};
     extraPlayers = Object.values(data).sort((a, b) => a.name.localeCompare(b.name));
@@ -525,6 +551,20 @@ function initFirebase() {
 function setSyncStatus(state, text) {
   document.getElementById('sync-dot').className = 'sync-dot ' + state;
   document.getElementById('sync-text').textContent = text;
+}
+
+// ── Save day attendance ───────────────────────────────────────────────────────
+function saveDay(player, day, currentlyPresent) {
+  if (!firebaseReady) return;
+  const key = playerKey(player.name);
+  setSyncStatus('syncing', 'Saving…');
+  const done = () => setSyncStatus('online', 'Connected — numbers sync live to evaluation forms');
+  const ref = db.ref('tryouts2026/jv/' + day + '/' + key);
+  if (currentlyPresent) {
+    ref.remove().then(done);
+  } else {
+    ref.set({ name: player.name, grade: player.grade, ts: Date.now() }).then(done);
+  }
 }
 
 // ── Save tryout number ────────────────────────────────────────────────────────
@@ -643,7 +683,7 @@ function renderTable() {
   const query  = document.getElementById('search').value.toLowerCase().trim();
   const tbody  = document.getElementById('tbody');
   const allPlayers = [...PLAYERS, ...extraPlayers.map(p => ({ ...p, walkon: true }))];
-  let assigned = 0, emailCount = 0;
+  let assigned = 0, emailCount = 0, day1Count = 0, day2Count = 0;
   let visibleCount = 0;
   let html = '';
 
@@ -654,9 +694,13 @@ function renderTable() {
     const email     = emailData[key] || '';
     const email2    = email2Data[key] || p.email2 || '';
     const phys      = physData[key]   || p.phys   || '';
+    const day1      = !!day1Data[key];
+    const day2      = !!day2Data[key];
     const isAssigned = !!num;
     if (isAssigned) assigned++;
     if (email) emailCount++;
+    if (day1) day1Count++;
+    if (day2) day2Count++;
 
     if (query && !p.name.toLowerCase().includes(query) && !String(p.grade).includes(query) && !email.toLowerCase().includes(query) && !email2.toLowerCase().includes(query)) return;
     if (currentFilter === 'assigned'   && !isAssigned) return;
@@ -731,8 +775,15 @@ function renderTable() {
         <td class="p-phys${isPhysExpired(phys) ? ' phys-expired' : !phys ? ' phys-missing' : ''}">${physCell}</td>
         <td class="p-email">${emailCell}</td>
         <td class="p-email2">${email2Cell}</td>
-        <td class="p-status">
-          <span class="badge ${isAssigned ? 'done' : 'pending'}">${isAssigned ? '✓ T-' + num : 'Pending'}</span>
+        <td class="p-day">
+          <button class="day-btn ${day1 ? 'present' : 'absent'}"
+            onclick="saveDay({name:'${p.name.replace(/'/g,"\\'")}',grade:'${p.grade}'},'day1',${day1})"
+          >${day1 ? '✓' : '—'}</button>
+        </td>
+        <td class="p-day">
+          <button class="day-btn ${day2 ? 'present' : 'absent'}"
+            onclick="saveDay({name:'${p.name.replace(/'/g,"\\'")}',grade:'${p.grade}'},'day2',${day2})"
+          >${day2 ? '✓' : '—'}</button>
         </td>
       </tr>`;
   });
