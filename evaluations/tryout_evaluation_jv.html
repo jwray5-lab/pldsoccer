@@ -745,6 +745,9 @@ const FIREBASE_CONFIG = {
 
 let db = null;
 let firebaseReady = false;
+let lastCheckinData = {};
+let namesData = {};
+let extraPlayerNames = new Set();
 
 function initFirebase() {
   try {
@@ -766,12 +769,19 @@ function initFirebase() {
 
     // Live listener: apply tryout numbers assigned at check-in
     db.ref('tryouts2026/jv/checkin').on('value', snap => {
-      applyCheckinNums(snap.val() || {});
+      lastCheckinData = snap.val() || {};
+      applyCheckinNums(lastCheckinData);
     });
 
     // Live listener: add walk-on players added at check-in
     db.ref('tryouts2026/jv/extra_players').on('value', snap => {
       applyExtraPlayers(snap.val() || {});
+    });
+
+    // Live listener: name display overrides from check-in sheet
+    db.ref('tryouts2026/jv/names').on('value', snap => {
+      namesData = snap.val() || {};
+      renderDay(1); renderDay(2);
     });
   } catch(e) {
     setSyncStatus('offline', 'Firebase error: ' + e.message);
@@ -782,38 +792,55 @@ function checkinKey(name) {
   return name.toLowerCase().replace(/[^a-z0-9]/g, '_');
 }
 
+function lastName(name) {
+  const parts = name.trim().split(/\s+/);
+  return parts[parts.length - 1].toLowerCase();
+}
+
 function applyExtraPlayers(data) {
+  extraPlayerNames = new Set(Object.values(data).map(ep => ep.name));
   [1, 2].forEach(day => {
     let changed = false;
-    Object.values(data).forEach(ep => {
+    const sorted = Object.values(data).sort((a, b) => lastName(a.name).localeCompare(lastName(b.name)));
+    sorted.forEach(ep => {
       const exists = (state[day] || []).some(p => p.name === ep.name);
       if (!exists) {
-        state[day].push({ id: ep.id + '_d' + day, name: ep.name, grade: ep.grade, num: '', scores: {}, notes: '' });
+        const rec = lastCheckinData[checkinKey(ep.name)];
+        const num = rec ? rec.num : '';
+        state[day].push({ id: ep.id + '_d' + day, name: ep.name, grade: ep.grade, num, scores: {}, notes: '' });
         changed = true;
       }
     });
-    if (changed) {
-      saveDay(day);
-      renderDay(day);
-    }
+    if (changed) { saveDay(day); renderDay(day); }
   });
 }
 
 function applyCheckinNums(data) {
   [1, 2].forEach(day => {
     let changed = false;
-    (state[day] || []).forEach(p => {
-      const rec = data[checkinKey(p.name)];
-      const newNum = rec ? rec.num : '';
-      if (p.num !== newNum) {
-        p.num = newNum;
+
+    // Add players who now have a number and aren't in state yet
+    Object.values(data).forEach(rec => {
+      if (!rec.num) return;
+      const exists = (state[day] || []).some(p => checkinKey(p.name) === checkinKey(rec.name));
+      if (!exists) {
+        state[day].push({ id: uid(), name: rec.name, grade: rec.grade, num: rec.num, scores: {}, notes: '' });
         changed = true;
+      } else {
+        const p = state[day].find(p => checkinKey(p.name) === checkinKey(rec.name));
+        if (p && p.num !== rec.num) { p.num = rec.num; changed = true; }
       }
     });
-    if (changed) {
-      saveDay(day);
-      renderDay(day);
-    }
+
+    // Remove players who no longer have a number (keep walk-ons)
+    const before = state[day].length;
+    state[day] = state[day].filter(p => {
+      const rec = data[checkinKey(p.name)];
+      return (rec && rec.num) || extraPlayerNames.has(p.name);
+    });
+    if (state[day].length !== before) changed = true;
+
+    if (changed) { saveDay(day); renderDay(day); }
   });
 }
 
@@ -850,7 +877,7 @@ function pushScore(day, player) {
 
 // ── DATA ──────────────────────────────────────────────────────────────────────
 // Storage keys
-const KEYS = { 1: 'pld_tryout_jv_d1', 2: 'pld_tryout_jv_d2' };
+const KEYS = { 1: 'pld_tryout_jv_d1_v2', 2: 'pld_tryout_jv_d2_v2' };
 
 const CATEGORIES = [
   { id: 'technical', label: 'Technical' },
@@ -1001,7 +1028,7 @@ function renderDay(day) {
       <div class="card-header" onclick="toggleCard('${day}','${player.id}')">
         <div class="card-num">${player.num ? `T-${player.num}` : '—'}</div>
         <div class="card-name-block">
-          <div class="card-name">${escHtml(player.name)}</div>
+          <div class="card-name">${escHtml(namesData[checkinKey(player.name)] || player.name)}</div>
           <div class="card-pos">${player.grade ? `Gr. ${player.grade}` : ''}</div>
         </div>
         <div class="card-notes-preview" id="notes-preview-${day}-${player.id}">${escHtml(player.notes)}</div>
@@ -1064,7 +1091,7 @@ function renderSummary() {
   [1, 2].forEach(day => {
     state[day].forEach(p => {
       const key = p.name.trim().toLowerCase();
-      if (!merged[key]) merged[key] = { name: p.name, num: p.num, totals: [] };
+      if (!merged[key]) merged[key] = { name: namesData[checkinKey(p.name)] || p.name, num: p.num, totals: [] };
       merged[key].totals.push(playerTotal(p));
     });
   });
@@ -1122,7 +1149,7 @@ function exportCSV(which) {
     state[day].forEach(p => {
       const scores = CATEGORIES.map(c => p.scores[c.id] || '');
       const total = playerTotal(p);
-      rows.push([coach, p.name, p.num || '', p.grade || '', `Day ${day}`, ...scores, total, p.notes || '']);
+      rows.push([coach, namesData[checkinKey(p.name)] || p.name, p.num || '', p.grade || '', `Day ${day}`, ...scores, total, p.notes || '']);
     });
   };
 
@@ -1355,9 +1382,7 @@ const ROSTER_D1 = [{"id":"sup4owqk","name":"Jose Abad","grade":"8","num":"","sco
 
 const ROSTER_D2 = [{"id":"yluz6tdl","name":"Jose Abad","grade":"8","num":"","scores":{},"notes":""},{"id":"ffr55n6w","name":"Juan Abad","grade":"10","num":"","scores":{},"notes":""},{"id":"2v8vthfh","name":"Yaseen Agoub","grade":"10","num":"","scores":{},"notes":""},{"id":"u0h0eyjq","name":"Brandon Aguilar P\u00e9rez","grade":"8","num":"","scores":{},"notes":""},{"id":"c8graqyi","name":"Grady Alberti","grade":"10","num":"","scores":{},"notes":""},{"id":"a70h1cjh","name":"Abdul Aziz Aljanabi","grade":"9","num":"","scores":{},"notes":""},{"id":"0itv56rl","name":"Antony Alvarez","grade":"9","num":"","scores":{},"notes":""},{"id":"yo3gr8od","name":"Samuel Armstrong","grade":"10","num":"","scores":{},"notes":""},{"id":"yoo1gcw2","name":"Ecson Bermudez","grade":"10","num":"","scores":{},"notes":""},{"id":"q4ts84fb","name":"Kai Bishop","grade":"10","num":"","scores":{},"notes":""},{"id":"efcrrkgn","name":"Predi Bomolo","grade":"10","num":"","scores":{},"notes":""},{"id":"iariw5cv","name":"Preston Brassine","grade":"9","num":"","scores":{},"notes":""},{"id":"17s4hg2g","name":"Colton Brewer","grade":"10","num":"","scores":{},"notes":""},{"id":"dqp50ru7","name":"Justin Calixtro","grade":"10","num":"","scores":{},"notes":""},{"id":"l73om9pp","name":"Williams Canelo","grade":"9","num":"","scores":{},"notes":""},{"id":"r0te3ckg","name":"Pablo Castillo","grade":"8","num":"","scores":{},"notes":""},{"id":"p4woa1yk","name":"Jonathan Chavez","grade":"10","num":"","scores":{},"notes":""},{"id":"uysgta6b","name":"Dylan Collins","grade":"10","num":"","scores":{},"notes":""},{"id":"u95f1166","name":"Carter Crovo","grade":"9","num":"","scores":{},"notes":""},{"id":"4u2wz65y","name":"Brandon Cuellar","grade":"9","num":"","scores":{},"notes":""},{"id":"i70jp54d","name":"Kellan Daugherty","grade":"10","num":"","scores":{},"notes":""},{"id":"sbfjjo8p","name":"Dylan Delgado","grade":"8","num":"","scores":{},"notes":""},{"id":"641kdpxn","name":"Kieran Derbyshire","grade":"10","num":"","scores":{},"notes":""},{"id":"p6y6cb51","name":"Oscar Diaz","grade":"10","num":"","scores":{},"notes":""},{"id":"9bz7r4ve","name":"Ulises Diaz","grade":"10","num":"","scores":{},"notes":""},{"id":"dnuk461a","name":"Cash Donoghue","grade":"10","num":"","scores":{},"notes":""},{"id":"zwr3rm4w","name":"Santi Duque","grade":"10","num":"","scores":{},"notes":""},{"id":"76j00veb","name":"Pablo Enriquez","grade":"10","num":"","scores":{},"notes":""},{"id":"ilczp3mi","name":"Carson Fair","grade":"10","num":"","scores":{},"notes":""},{"id":"8dfdz5eb","name":"Alex Fidowicz","grade":"9","num":"","scores":{},"notes":""},{"id":"tg9d883n","name":"Ronan Flemming","grade":"9","num":"","scores":{},"notes":""},{"id":"kfksc4kw","name":"Miguel E Garcia Salgado","grade":"10","num":"","scores":{},"notes":""},{"id":"3hmov7j6","name":"Angel Gonzalez","grade":"8","num":"","scores":{},"notes":""},{"id":"c5f5h70u","name":"Donnie Gonzalez","grade":"10","num":"","scores":{},"notes":""},{"id":"hfshwzgp","name":"Miguel Gracia","grade":"9","num":"","scores":{},"notes":""},{"id":"n2yhztvi","name":"Eli Green","grade":"7","num":"","scores":{},"notes":""},{"id":"04bjrl9x","name":"Adrian Gutierrez","grade":"9","num":"","scores":{},"notes":""},{"id":"kl9lnre3","name":"Bentley Hardin","grade":"9","num":"","scores":{},"notes":""},{"id":"2lwgutuk","name":"Bradyn Haycraft","grade":"9","num":"","scores":{},"notes":""},{"id":"wg5f4v77","name":"Ryder Hays","grade":"10","num":"","scores":{},"notes":""},{"id":"0nbofgsw","name":"Panha Heng","grade":"10","num":"","scores":{},"notes":""},{"id":"z99iot2r","name":"Nico Hernandez","grade":"10","num":"","scores":{},"notes":""},{"id":"6zqo2iyi","name":"Levi Hollen","grade":"9","num":"","scores":{},"notes":""},{"id":"w963a52t","name":"Nigel Houchin","grade":"8","num":"","scores":{},"notes":""},{"id":"ctqaymv2","name":"Jeremie Iranzi","grade":"9","num":"","scores":{},"notes":""},{"id":"kp4rg3f4","name":"Christian Jones","grade":"9","num":"","scores":{},"notes":""},{"id":"p535rntw","name":"Ishaan Joshi","grade":"10","num":"","scores":{},"notes":""},{"id":"nyion0wl","name":"Elijah Kelly","grade":"9","num":"","scores":{},"notes":""},{"id":"s7va5t2n","name":"Mason Kelly","grade":"10","num":"","scores":{},"notes":""},{"id":"7euot2mg","name":"Ismael Khan","grade":"10","num":"","scores":{},"notes":""},{"id":"afdslahw","name":"Prikash Kharel","grade":"9","num":"","scores":{},"notes":""},{"id":"ruy4kwuc","name":"Edoardo Leonardi","grade":"9","num":"","scores":{},"notes":""},{"id":"lvegjuz8","name":"Parker Leugers","grade":"9","num":"","scores":{},"notes":""},{"id":"7cibd9c1","name":"Eli Lippert","grade":"8","num":"","scores":{},"notes":""},{"id":"4ivihnvo","name":"Eliott Lopez","grade":"9","num":"","scores":{},"notes":""},{"id":"wy1nl4tz","name":"Ted Lubin","grade":"10","num":"","scores":{},"notes":""},{"id":"ko1320e5","name":"Channing Ma","grade":"9","num":"","scores":{},"notes":""},{"id":"602874oc","name":"Didier Magallanes Chavez","grade":"9","num":"","scores":{},"notes":""},{"id":"5yl9ch4r","name":"Deborah Makonda","grade":"9","num":"","scores":{},"notes":""},{"id":"n2hv52c0","name":"Amando Martinez Bautista","grade":"10","num":"","scores":{},"notes":""},{"id":"4uh66wui","name":"Jesus Martinez Bautista","grade":"10","num":"","scores":{},"notes":""},{"id":"dn8lrzmm","name":"Rene Martinez Bautista","grade":"10","num":"","scores":{},"notes":""},{"id":"f29y39i8","name":"Eamon McCourt","grade":"7","num":"","scores":{},"notes":""},{"id":"pesowwfy","name":"Robbie Messer","grade":"8","num":"","scores":{},"notes":""},{"id":"epdonyba","name":"Kenas Mone","grade":"9","num":"","scores":{},"notes":""},{"id":"q2y8vzhu","name":"Yhakxel Monfort","grade":"10","num":"","scores":{},"notes":""},{"id":"wi5z8ozj","name":"Derek Montoyra Alvarado","grade":"10","num":"","scores":{},"notes":""},{"id":"mq3nscj3","name":"Jean Mwela","grade":"10","num":"","scores":{},"notes":""},{"id":"8ksp7p7w","name":"Elisha Ngumoya","grade":"10","num":"","scores":{},"notes":""},{"id":"tumm4u6f","name":"Jose Oropeza","grade":"9","num":"","scores":{},"notes":""},{"id":"aa5mrkz2","name":"Henry Pagan","grade":"7","num":"","scores":{},"notes":""},{"id":"82n1cqdo","name":"Breydon Parks","grade":"8","num":"","scores":{},"notes":""},{"id":"qb7sg0av","name":"Spencer Patton","grade":"10","num":"","scores":{},"notes":""},{"id":"t92l4nmc","name":"Kevin Perez","grade":"10","num":"","scores":{},"notes":""},{"id":"xra9qwnp","name":"Carter Peyton","grade":"10","num":"","scores":{},"notes":""},{"id":"f5tjunc8","name":"Arpan Pokhrel","grade":"10","num":"","scores":{},"notes":""},{"id":"jd8zt8r5","name":"Speed Price","grade":"10","num":"","scores":{},"notes":""},{"id":"ew11wvc8","name":"Oliver Pulito","grade":"10","num":"","scores":{},"notes":""},{"id":"1kawcsig","name":"Isaac Qualls","grade":"9","num":"","scores":{},"notes":""},{"id":"m1txsx7o","name":"Angel Ramirez","grade":"10","num":"","scores":{},"notes":""},{"id":"sevtoskt","name":"Andrew Roche","grade":"8","num":"","scores":{},"notes":""},{"id":"gygg3c4u","name":"Damon Rodriguez-Hernandez","grade":"9","num":"","scores":{},"notes":""},{"id":"kk0hdvjs","name":"Brandon Romero","grade":"9","num":"","scores":{},"notes":""},{"id":"hb5n6aow","name":"Johncarlo Santiago","grade":"10","num":"","scores":{},"notes":""},{"id":"2bwrqu1a","name":"Hugh Seo","grade":"10","num":"","scores":{},"notes":""},{"id":"nqih1iy6","name":"Joochan Shin","grade":"10","num":"","scores":{},"notes":""},{"id":"cnikubw7","name":"Nicolas Silva","grade":"10","num":"","scores":{},"notes":""},{"id":"x2wsjvmg","name":"Vidal Simo","grade":"10","num":"","scores":{},"notes":""},{"id":"qrtl36zx","name":"Austin Soriano","grade":"10","num":"","scores":{},"notes":""},{"id":"idjrcths","name":"Killian Sullivan","grade":"8","num":"","scores":{},"notes":""},{"id":"tr4e9l7p","name":"Liam Terry","grade":"8","num":"","scores":{},"notes":""},{"id":"fnduvni9","name":"Ulisses Torres Rodriguez","grade":"9","num":"","scores":{},"notes":""},{"id":"vxqsgndf","name":"Alex Wang","grade":"9","num":"","scores":{},"notes":""},{"id":"t2a3hds6","name":"Mark Wilson","grade":"10","num":"","scores":{},"notes":""},{"id":"akkg8xoe","name":"Augusten Zuliani","grade":"9","num":"","scores":{},"notes":""}];
 
-if (!localStorage.getItem(KEYS[1]) || state[1].length === 0) { state[1] = ROSTER_D1; saveDay(1); }
-if (!localStorage.getItem(KEYS[2]) || state[2].length === 0) { state[2] = ROSTER_D2; saveDay(2); }
-
+// State starts empty; players are added live as check-in numbers are assigned.
 
 initFirebase();
 loadCoachName();

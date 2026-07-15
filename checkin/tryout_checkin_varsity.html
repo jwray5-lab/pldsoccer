@@ -233,6 +233,21 @@
     .day-btn.absent  { background: var(--surface2); color: var(--muted); }
     .day-btn:hover   { filter: brightness(1.25); }
 
+    /* ── Editable name ── */
+    .name-display { cursor: text; }
+    .name-display:hover { text-decoration: underline dotted; text-underline-offset: 3px; }
+    .name-input {
+      background: var(--surface2); border: 1px solid var(--red); border-radius: 4px;
+      color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px;
+      padding: 2px 6px; width: 160px;
+    }
+    /* ── Export button ── */
+    .btn-export {
+      background: var(--surface2); border: 1px solid var(--border); border-radius: 6px;
+      padding: 7px 14px; color: var(--muted); font-size: 13px; font-weight: 600;
+      cursor: pointer; font-family: 'DM Sans', sans-serif; white-space: nowrap;
+    }
+    .btn-export:hover { border-color: var(--green); color: var(--green); }
 
     /* ── Modal ── */
     .modal-overlay {
@@ -303,6 +318,7 @@
     <button class="filter-btn"        data-filter="assigned"  onclick="setFilter(this)">Assigned</button>
     <button class="filter-btn"        data-filter="unassigned" onclick="setFilter(this)">Unassigned</button>
   </div>
+  <button class="btn-export" onclick="exportCSV()">Export CSV</button>
   <button class="btn-add-player" onclick="openModal()">+ Add Player</button>
 </div>
 
@@ -509,11 +525,13 @@ let email2Data   = {};   // {playerKey: email2}
 let physData     = {};   // {playerKey: physical expiration}
 let day1Data     = {};   // {playerKey: {name, grade, ts}}
 let day2Data     = {};   // {playerKey: {name, grade, ts}}
+let nameData     = {};   // {playerKey: display name override}
 let extraPlayers = [];    // walk-ons
 let currentFilter = 'all';
 let editingEmailKey  = null;
 let editingEmail2Key = null;
 let editingPhysKey   = null;
+let editingNameKey   = null;
 
 function playerKey(name) {
   return name.toLowerCase().replace(/[^a-z0-9]/g, '_');
@@ -565,9 +583,17 @@ function initFirebase() {
     renderTable();
   });
 
+  db.ref('tryouts2026/varsity/names').on('value', snap => {
+    nameData = snap.val() || {};
+    renderTable();
+  });
+
   db.ref('tryouts2026/varsity/extra_players').on('value', snap => {
     const data = snap.val() || {};
-    extraPlayers = Object.values(data).sort((a, b) => a.name.localeCompare(b.name));
+    extraPlayers = Object.values(data).sort((a, b) => {
+      const last = n => n.trim().split(/\s+/).slice(-1)[0].toLowerCase();
+      return last(a.name).localeCompare(last(b.name));
+    });
     renderTable();
   });
 }
@@ -575,6 +601,57 @@ function initFirebase() {
 function setSyncStatus(state, text) {
   document.getElementById('sync-dot').className = 'sync-dot ' + state;
   document.getElementById('sync-text').textContent = text;
+}
+
+// ── Save name override ────────────────────────────────────────────────────────
+function saveName(originalName, newName) {
+  if (!firebaseReady) return;
+  const key = playerKey(originalName);
+  const done = () => setSyncStatus('online', 'Connected — numbers sync live to evaluation forms');
+  setSyncStatus('syncing', 'Saving…');
+  const trimmed = newName.trim();
+  if (trimmed && trimmed !== originalName) {
+    db.ref('tryouts2026/varsity/names/' + key).set(trimmed).then(done);
+  } else {
+    db.ref('tryouts2026/varsity/names/' + key).remove().then(done);
+  }
+}
+function startEditName(key) {
+  editingNameKey = key; editingEmailKey = null; editingEmail2Key = null; editingPhysKey = null;
+  renderTable();
+  setTimeout(() => { const i = document.getElementById('name-inp-'+key); if(i){i.focus();i.select();} }, 30);
+}
+function commitName(originalName) {
+  const key = playerKey(originalName);
+  const inp = document.getElementById('name-inp-'+key);
+  if (!inp) return;
+  saveName(originalName, inp.value);
+  editingNameKey = null;
+}
+function cancelName() { editingNameKey = null; renderTable(); }
+
+// ── Export CSV ────────────────────────────────────────────────────────────────
+function exportCSV() {
+  const allPlayers = [...PLAYERS, ...extraPlayers.map(p => ({ ...p, walkon: true }))];
+  const rows = [['Name','Grade','Tryout #','Physical Exp','Email 1','Email 2','Day 1','Day 2']];
+  allPlayers.forEach(p => {
+    const key = playerKey(p.name);
+    const displayName = nameData[key] || p.name;
+    const rec   = checkinData[key];
+    const num   = rec ? rec.num : '';
+    const email = emailData[key]  || p.email1 || '';
+    const email2= email2Data[key] || p.email2 || '';
+    const phys  = physData[key]   || p.phys   || '';
+    const day1  = day1Data[key] ? 'Yes' : 'No';
+    const day2  = day2Data[key] ? 'Yes' : 'No';
+    rows.push([displayName, p.grade, num, phys, email, email2, day1, day2]);
+  });
+  const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a = Object.assign(document.createElement('a'), {
+    href: URL.createObjectURL(new Blob([csv], {type:'text/csv'})),
+    download: 'varsity-checkin.csv'
+  });
+  a.click(); URL.revokeObjectURL(a.href);
 }
 
 // ── Save day attendance ───────────────────────────────────────────────────────
@@ -712,25 +789,27 @@ function renderTable() {
   let html = '';
 
   allPlayers.forEach((p, i) => {
-    const key       = playerKey(p.name);
-    const rec       = checkinData[key];
-    const num       = rec ? rec.num : '';
-    const email     = emailData[key] || '';
-    const email2    = email2Data[key] || p.email2 || '';
-    const phys      = physData[key]   || p.phys   || '';
-    const day1      = !!day1Data[key];
-    const day2      = !!day2Data[key];
+    const key        = playerKey(p.name);
+    const displayName= nameData[key] || p.name;
+    const rec        = checkinData[key];
+    const num        = rec ? rec.num : '';
+    const email      = emailData[key] || '';
+    const email2     = email2Data[key] || p.email2 || '';
+    const phys       = physData[key]   || p.phys   || '';
+    const day1       = !!day1Data[key];
+    const day2       = !!day2Data[key];
     const isAssigned = !!num;
     if (isAssigned) assigned++;
     if (email) emailCount++;
     if (day1) day1Count++;
     if (day2) day2Count++;
 
-    if (query && !p.name.toLowerCase().includes(query) && !String(p.grade).includes(query) && !email.toLowerCase().includes(query) && !email2.toLowerCase().includes(query)) return;
+    if (query && !displayName.toLowerCase().includes(query) && !p.name.toLowerCase().includes(query) && !String(p.grade).includes(query) && !email.toLowerCase().includes(query) && !email2.toLowerCase().includes(query)) return;
     if (currentFilter === 'assigned'   && !isAssigned) return;
     if (currentFilter === 'unassigned' &&  isAssigned) return;
 
     visibleCount++;
+    const isEditingName  = (editingNameKey  === key);
     const isEditingEmail = (editingEmailKey === key);
 
     const isEditingPhys = (editingPhysKey === key);
@@ -782,7 +861,12 @@ function renderTable() {
     html += `
       <tr class="${isAssigned ? 'assigned' : 'unassigned'}${p.walkon ? ' walkon-row' : ''}">
         <td class="row-num">${i + 1}</td>
-        <td class="p-name">${p.name}</td>
+        <td class="p-name">${isEditingName
+          ? `<input id="name-inp-${key}" class="name-input" type="text" value="${displayName.replace(/"/g,'&quot;').replace(/'/g,'&#39;')}"
+               onblur="commitName('${p.name.replace(/'/g,"\\'")}')"
+               onkeydown="if(event.key==='Enter')commitName('${p.name.replace(/'/g,"\\'")}'); if(event.key==='Escape')cancelName();">`
+          : `<span class="name-display" ondblclick="startEditName('${key}')" title="Double-click to edit">${displayName}</span>`
+        }</td>
         <td class="p-grade">${p.grade}</td>
         <td class="p-num">
           <input
