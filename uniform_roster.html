@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Varsity Roster — PLD Boys Soccer 2026</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -330,8 +332,23 @@ const UNIFORMS = [
   { num: '29', size: 'L' },
 ];
 
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyCSWl0deRXE3ieLMM2TQy1h6rUmzTr0-W4",
+  authDomain: "pld-soccer-tryout-evaluations.firebaseapp.com",
+  databaseURL: "https://pld-soccer-tryout-evaluations-default-rtdb.firebaseio.com",
+  projectId: "pld-soccer-tryout-evaluations",
+  storageBucket: "pld-soccer-tryout-evaluations.firebasestorage.app",
+  messagingSenderId: "130088370427",
+  appId: "1:130088370427:web:e4f0d1f9f6b9f8e8c1b6f1"
+};
+
+firebase.initializeApp(FIREBASE_CONFIG);
+const db = firebase.database();
+const UNIFORMS_REF = db.ref('tryouts2026/varsity/uniforms');
+
 const SIZE_LABEL = { M: 'Medium', S: 'Small', L: 'Large' };
 const tbody = document.getElementById('rosterBody');
+let currentAssignments = {};
 
 function buildOptions(selectedValue) {
   const sorted = [...PLAYERS].sort();
@@ -343,30 +360,17 @@ function buildOptions(selectedValue) {
   return opts;
 }
 
-function getAssignments() {
-  try { return JSON.parse(localStorage.getItem('uniformRoster') || '{}'); }
-  catch { return {}; }
-}
-
-function saveAssignments(assignments) {
-  localStorage.setItem('uniformRoster', JSON.stringify(assignments));
-}
-
 function updateCount() {
-  const assignments = getAssignments();
-  const count = Object.values(assignments).filter(v => v).length;
+  const count = Object.values(currentAssignments).filter(v => v).length;
   document.getElementById('assignedNum').textContent = count;
 }
 
 function buildTable() {
-  const assignments = getAssignments();
   tbody.innerHTML = '';
-
   UNIFORMS.forEach(({ num, size }) => {
-    const assigned = assignments[num] || '';
+    const assigned = currentAssignments[num] || '';
     const tr = document.createElement('tr');
     if (assigned) tr.classList.add('assigned');
-
     tr.innerHTML = `
       <td><div class="num-badge">${num}</div></td>
       <td><span class="size-pill size-${size}">${size} — ${SIZE_LABEL[size]}</span></td>
@@ -376,20 +380,16 @@ function buildTable() {
         </select>
       </td>
       <td>
-        <button class="clear-btn" title="Clear" onclick="assign('${num}', '', document.querySelector('[data-num=\\'${num}\\']'))">✕</button>
+        <button class="clear-btn" title="Clear" onclick="assign('${num}', '', this.closest('tr').querySelector('select'))">✕</button>
       </td>
     `;
     tbody.appendChild(tr);
   });
-
   updateCount();
 }
 
 function assign(num, value, selectEl) {
-  const assignments = getAssignments();
-  assignments[num] = value;
-  saveAssignments(assignments);
-
+  UNIFORMS_REF.child(num).set(value || null);
   const tr = selectEl.closest('tr');
   if (value) {
     tr.classList.add('assigned');
@@ -399,17 +399,19 @@ function assign(num, value, selectEl) {
     selectEl.classList.remove('has-value');
     selectEl.value = '';
   }
-  updateCount();
 }
 
 function clearAll() {
   if (confirm('Clear all jersey assignments?')) {
-    localStorage.removeItem('uniformRoster');
-    buildTable();
+    UNIFORMS_REF.set(null);
   }
 }
 
-buildTable();
+// Listen for changes and rebuild table
+UNIFORMS_REF.on('value', snap => {
+  currentAssignments = snap.val() || {};
+  buildTable();
+});
 </script>
 </body>
 </html>

@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>JV Roster — PLD Boys Soccer 2026</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -287,7 +289,48 @@ select.has-value {
 
 <script>
 const PLAYERS = [
-  // Add player names here when ready
+  "Alejandro Castellanos",
+  "Alex Fidowicz",
+  "Angel Ramirez",
+  "Bentley Hardin",
+  "Brandon Cuellar",
+  "Carter Crovo",
+  "Carter Peyton",
+  "Cash Donoghue",
+  "Channing Ma",
+  "Christian Jones",
+  "Colton Brewer",
+  "Derek Montoya Alvarado",
+  "Didier Magallanes Chavez",
+  "Dylan Collins",
+  "Edoardo Leonardi",
+  "Elijah Kelly",
+  "Elijah Ngumoya",
+  "Fernando Arellano",
+  "Ismail Khan",
+  "Johncarlo Santiago",
+  "Joochan Shin",
+  "Jose Abad",
+  "Jose Quintos Gil",
+  "Juan Abad",
+  "Justin Chavez",
+  "Kellen Daugherty",
+  "Kieran Derbyshire",
+  "Killian Sullivan",
+  "Levi Hollen",
+  "Liam Terry",
+  "Mason Kelly",
+  "Oliver Pulito",
+  "Pablo Enriquez",
+  "Parker Leugers",
+  "Preston Brassine",
+  "Prikash Kharel",
+  "Ronan Fleming",
+  "Ryder Hays",
+  "Speed Price",
+  "Spencer Patton",
+  "Vidal Simo",
+  "Yaseen Agoub",
 ];
 
 const UNIFORMS = [
@@ -314,8 +357,23 @@ const UNIFORMS = [
   { num: '32', size: 'M' },
 ];
 
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyCSWl0deRXE3ieLMM2TQy1h6rUmzTr0-W4",
+  authDomain: "pld-soccer-tryout-evaluations.firebaseapp.com",
+  databaseURL: "https://pld-soccer-tryout-evaluations-default-rtdb.firebaseio.com",
+  projectId: "pld-soccer-tryout-evaluations",
+  storageBucket: "pld-soccer-tryout-evaluations.firebasestorage.app",
+  messagingSenderId: "130088370427",
+  appId: "1:130088370427:web:e4f0d1f9f6b9f8e8c1b6f1"
+};
+
+firebase.initializeApp(FIREBASE_CONFIG);
+const db = firebase.database();
+const UNIFORMS_REF = db.ref('tryouts2026/jv/uniforms');
+
 const SIZE_LABEL = { M: 'Medium', L: 'Large', X: 'XL' };
 const tbody = document.getElementById('rosterBody');
+let currentAssignments = {};
 
 function buildOptions(selectedValue) {
   const sorted = [...PLAYERS].sort();
@@ -327,30 +385,17 @@ function buildOptions(selectedValue) {
   return opts;
 }
 
-function getAssignments() {
-  try { return JSON.parse(localStorage.getItem('uniformRosterJV') || '{}'); }
-  catch { return {}; }
-}
-
-function saveAssignments(assignments) {
-  localStorage.setItem('uniformRosterJV', JSON.stringify(assignments));
-}
-
 function updateCount() {
-  const assignments = getAssignments();
-  const count = Object.values(assignments).filter(v => v).length;
+  const count = Object.values(currentAssignments).filter(v => v).length;
   document.getElementById('assignedNum').textContent = count;
 }
 
 function buildTable() {
-  const assignments = getAssignments();
   tbody.innerHTML = '';
-
   UNIFORMS.forEach(({ num, size }) => {
-    const assigned = assignments[num] || '';
+    const assigned = currentAssignments[num] || '';
     const tr = document.createElement('tr');
     if (assigned) tr.classList.add('assigned');
-
     tr.innerHTML = `
       <td><div class="num-badge">${num}</div></td>
       <td><span class="size-pill size-${size}">${size} — ${SIZE_LABEL[size]}</span></td>
@@ -365,15 +410,11 @@ function buildTable() {
     `;
     tbody.appendChild(tr);
   });
-
   updateCount();
 }
 
 function assign(num, value, selectEl) {
-  const assignments = getAssignments();
-  assignments[num] = value;
-  saveAssignments(assignments);
-
+  UNIFORMS_REF.child(num).set(value || null);
   const tr = selectEl.closest('tr');
   if (value) {
     tr.classList.add('assigned');
@@ -383,17 +424,18 @@ function assign(num, value, selectEl) {
     selectEl.classList.remove('has-value');
     selectEl.value = '';
   }
-  updateCount();
 }
 
 function clearAll() {
   if (confirm('Clear all jersey assignments?')) {
-    localStorage.removeItem('uniformRosterJV');
-    buildTable();
+    UNIFORMS_REF.set(null);
   }
 }
 
-buildTable();
+UNIFORMS_REF.on('value', snap => {
+  currentAssignments = snap.val() || {};
+  buildTable();
+});
 </script>
 </body>
 </html>
