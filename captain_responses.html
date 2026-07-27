@@ -339,11 +339,6 @@ function submitGate() {
   }
 }
 
-if (sessionStorage.getItem(SESSION_KEY) === '1') {
-  document.getElementById('pw-gate').classList.remove('visible');
-  initFirebase();
-}
-
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyCSWl0deRXE3ieLMM2TQy1h6rUmzTr0-W4",
   authDomain: "pld-soccer-tryout-evaluations.firebaseapp.com",
@@ -496,6 +491,12 @@ function initFirebase() {
 
     entries.forEach((sub, i) => list.appendChild(buildCard(sub, i)));
   });
+}
+
+// Run session check after all functions are defined
+if (sessionStorage.getItem(SESSION_KEY) === '1') {
+  document.getElementById('pw-gate').classList.remove('visible');
+  initFirebase();
 }
 </script>
 </body>
