@@ -486,6 +486,13 @@ input[type="text"]:focus { border-color: rgba(206,14,45,0.5); }
 
   </form>
 
+  <!-- CLOSED SCREEN -->
+  <div class="success-screen" id="closedScreen">
+    <div class="success-icon" style="border-color:rgba(255,255,255,0.15);background:rgba(255,255,255,0.05);">✕</div>
+    <div class="success-title">Submissions Closed</div>
+    <p class="success-sub">The captain questionnaire is no longer accepting responses. Please reach out to Coach Wray directly if you have questions.</p>
+  </div>
+
   <!-- SUCCESS SCREEN -->
   <div class="success-screen" id="successScreen">
     <div class="success-icon">✓</div>
@@ -496,6 +503,21 @@ input[type="text"]:focus { border-color: rgba(206,14,45,0.5); }
 </div>
 
 <script>
+// 11:59 PM EST July 28, 2026 = 04:59 AM UTC July 29, 2026
+const DEADLINE = new Date('2026-07-29T04:59:00Z');
+
+function checkDeadline() {
+  if (new Date() > DEADLINE) {
+    document.getElementById('captainForm').style.display = 'none';
+    document.getElementById('closedScreen').classList.add('visible');
+    return true;
+  }
+  return false;
+}
+
+// Check on load
+checkDeadline();
+
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyCSWl0deRXE3ieLMM2TQy1h6rUmzTr0-W4",
   authDomain: "pld-soccer-tryout-evaluations.firebaseapp.com",
@@ -512,6 +534,8 @@ const SUBMISSIONS_REF = db.ref('captain_questionnaire/submissions');
 
 document.getElementById('captainForm').addEventListener('submit', async function(e) {
   e.preventDefault();
+
+  if (checkDeadline()) return;
 
   const nameVal = this.elements['name'].value.trim();
   if (!nameVal) {
