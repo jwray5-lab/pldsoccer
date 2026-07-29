@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Captain Vote — PLD Boys Soccer 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --red: #ce0e2d;
+  --red-mid: #e8324f;
+  --dark: #0e0e0e;
+  --dark-2: #1a1a1a;
+  --dark-3: #252525;
+  --white: #ffffff;
+  --border: rgba(255,255,255,0.08);
+}
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--dark);
+  color: var(--white);
+  min-height: 100vh;
+  padding-bottom: 80px;
+}
+
+/* HERO */
+.hero {
+  text-align: center;
+  padding: 48px 32px 40px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 40px;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 60% 100% at 50% 0%, rgba(206,14,45,0.1) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero img {
+  width: 72px; height: 72px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 16px rgba(206,14,45,0.4));
+  margin-bottom: 16px;
+  position: relative;
+}
+.hero-eyebrow {
+  font-size: 11px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--red);
+  font-weight: 600;
+  margin-bottom: 12px;
+  position: relative;
+}
+.hero-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(44px, 8vw, 76px);
+  letter-spacing: 4px;
+  line-height: 1;
+  position: relative;
+}
+.hero-title .accent { color: var(--red); }
+.hero-sub {
+  font-size: 13px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.35);
+  margin-top: 14px;
+  position: relative;
+}
+.hero-note {
+  max-width: 520px;
+  margin: 16px auto 0;
+  font-size: 14px;
+  color: rgba(255,255,255,0.45);
+  line-height: 1.7;
+  position: relative;
+}
+
+/* LAYOUT */
+.wrap { max-width: 680px; margin: 0 auto; padding: 0 24px; }
+
+/* STEP LABELS */
+.step-label {
+  font-size: 10px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--red);
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+
+/* CANDIDATE CARDS */
+.candidates {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 32px;
+}
+.candidate-card {
+  background: var(--dark-2);
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 20px;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  user-select: none;
+  position: relative;
+}
+.candidate-card:hover { border-color: rgba(206,14,45,0.3); background: var(--dark-3); }
+.candidate-card.first {
+  border-color: var(--red);
+  background: rgba(206,14,45,0.06);
+}
+.candidate-card.second {
+  border-color: rgba(255,255,255,0.3);
+  background: rgba(255,255,255,0.03);
+}
+.candidate-card.disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.rank-badge {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 16px;
+  color: rgba(255,255,255,0.2);
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+.candidate-card.first .rank-badge {
+  background: var(--red);
+  border-color: var(--red);
+  color: var(--white);
+}
+.candidate-card.second .rank-badge {
+  background: rgba(255,255,255,0.1);
+  border-color: rgba(255,255,255,0.3);
+  color: var(--white);
+}
+
+.candidate-info { flex: 1; }
+.candidate-name {
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--white);
+}
+.candidate-pos {
+  font-size: 12px;
+  color: rgba(255,255,255,0.35);
+  margin-top: 2px;
+  letter-spacing: 0.5px;
+}
+
+.rank-label {
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: rgba(255,255,255,0.2);
+  flex-shrink: 0;
+  transition: color 0.15s;
+}
+.candidate-card.first .rank-label { color: var(--red); }
+.candidate-card.second .rank-label { color: rgba(255,255,255,0.5); }
+
+/* INSTRUCTIONS */
+.instructions {
+  background: rgba(206,14,45,0.06);
+  border: 1px solid rgba(206,14,45,0.2);
+  border-radius: 8px;
+  padding: 14px 18px;
+  font-size: 13px;
+  color: rgba(255,255,255,0.5);
+  line-height: 1.6;
+  margin-bottom: 28px;
+  text-align: center;
+}
+.instructions strong { color: rgba(255,255,255,0.8); }
+
+/* SELECTION STATUS */
+.selection-status {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+.status-pill {
+  flex: 1;
+  min-width: 140px;
+  background: var(--dark-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 16px;
+  text-align: center;
+}
+.status-pill.filled-first { border-color: var(--red); background: rgba(206,14,45,0.06); }
+.status-pill.filled-second { border-color: rgba(255,255,255,0.25); background: rgba(255,255,255,0.03); }
+.status-pill-label {
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.3);
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.status-pill.filled-first .status-pill-label { color: var(--red); }
+.status-pill.filled-second .status-pill-label { color: rgba(255,255,255,0.5); }
+.status-pill-name {
+  font-weight: 700;
+  font-size: 14px;
+  color: rgba(255,255,255,0.2);
+}
+.status-pill.filled-first .status-pill-name,
+.status-pill.filled-second .status-pill-name { color: var(--white); }
+
+/* SUBMIT */
+.submit-section { text-align: center; margin-top: 8px; }
+.btn-submit {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 48px;
+  background: var(--red);
+  color: var(--white);
+  border: none;
+  border-radius: 8px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s, opacity 0.2s;
+}
+.btn-submit:hover:not(:disabled) { background: var(--red-mid); }
+.btn-submit:disabled { opacity: 0.35; cursor: not-allowed; }
+.error-msg { margin-top: 12px; font-size: 13px; color: #e84545; display: none; }
+
+/* ALREADY VOTED */
+.voted-screen {
+  display: none;
+  text-align: center;
+  padding: 60px 24px;
+  max-width: 480px;
+  margin: 0 auto;
+}
+.voted-screen.visible { display: block; }
+.voted-icon {
+  width: 64px; height: 64px;
+  border-radius: 50%;
+  background: rgba(206,14,45,0.12);
+  border: 2px solid rgba(206,14,45,0.35);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px;
+  margin: 0 auto 24px;
+}
+.voted-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 38px;
+  letter-spacing: 4px;
+  margin-bottom: 10px;
+}
+.voted-sub {
+  font-size: 14px;
+  color: rgba(255,255,255,0.4);
+  line-height: 1.7;
+}
+
+/* SUCCESS */
+.success-screen {
+  display: none;
+  text-align: center;
+  padding: 60px 24px;
+  max-width: 480px;
+  margin: 0 auto;
+}
+.success-screen.visible { display: block; }
+.success-icon {
+  width: 64px; height: 64px;
+  border-radius: 50%;
+  background: rgba(206,14,45,0.12);
+  border: 2px solid rgba(206,14,45,0.35);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px;
+  margin: 0 auto 24px;
+}
+.success-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 38px;
+  letter-spacing: 4px;
+  margin-bottom: 10px;
+}
+.success-sub { font-size: 14px; color: rgba(255,255,255,0.4); line-height: 1.7; }
+.success-choices {
+  display: flex;
+  gap: 10px;
+  margin: 24px auto 0;
+  max-width: 360px;
+  flex-wrap: wrap;
+}
+.success-choice {
+  flex: 1;
+  min-width: 140px;
+  background: var(--dark-2);
+  border-radius: 8px;
+  padding: 12px 16px;
+  text-align: center;
+}
+.success-choice-label {
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.35);
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.success-choice-name { font-weight: 700; font-size: 15px; }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <img src="6 Star Dunbar Crest.png" alt="PLD Crest" onerror="this.style.display='none'">
+  <div class="hero-eyebrow">Paul Laurence Dunbar · Men's Soccer · 2026</div>
+  <h1 class="hero-title">Captain <span class="accent">Vote</span></h1>
+  <p class="hero-sub">2026 Season</p>
+  <p class="hero-note">Rank your top two choices. Your 1st choice carries more weight than your 2nd. You can only vote once.</p>
+</div>
+
+<div class="wrap">
+
+  <!-- ALREADY VOTED SCREEN -->
+  <div class="voted-screen" id="votedScreen">
+    <div class="voted-icon">✓</div>
+    <div class="voted-title">Already Voted</div>
+    <p class="voted-sub">You've already submitted your vote. Each player can only vote once. Thank you for participating.</p>
+  </div>
+
+  <!-- VOTING FORM -->
+  <div id="voteForm">
+    <div class="instructions">
+      <strong>Tap your 1st choice</strong>, then tap your <strong>2nd choice</strong>.<br>
+      Tap a selected player again to deselect them.
+    </div>
+
+    <div class="selection-status">
+      <div class="status-pill" id="pill1">
+        <div class="status-pill-label">1st Choice</div>
+        <div class="status-pill-name" id="pill1name">Not selected</div>
+      </div>
+      <div class="status-pill" id="pill2">
+        <div class="status-pill-label">2nd Choice</div>
+        <div class="status-pill-name" id="pill2name">Not selected</div>
+      </div>
+    </div>
+
+    <div class="candidates" id="candidateList"></div>
+
+    <div class="submit-section">
+      <button class="btn-submit" id="submitBtn" disabled onclick="submitVote()">Submit Vote →</button>
+      <p class="error-msg" id="errorMsg">Something went wrong. Please try again.</p>
+    </div>
+  </div>
+
+  <!-- SUCCESS SCREEN -->
+  <div class="success-screen" id="successScreen">
+    <div class="success-icon">✓</div>
+    <div class="success-title">Vote Submitted</div>
+    <p class="success-sub">Your vote has been recorded. Coaches will announce the captains soon.</p>
+    <div class="success-choices">
+      <div class="success-choice">
+        <div class="success-choice-label">1st Choice</div>
+        <div class="success-choice-name" id="confirm1">—</div>
+      </div>
+      <div class="success-choice">
+        <div class="success-choice-label">2nd Choice</div>
+        <div class="success-choice-name" id="confirm2">—</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const CANDIDATES = [
+  { name: 'Darwin Doodnauth',  pos: 'Center Back / Left Back' },
+  { name: 'Adam Fidowicz',     pos: 'Midfielder' },
+  { name: 'Joseph Feola',      pos: 'Left Wing / Right Wing' },
+  { name: 'Landon Fair',       pos: 'Center Midfielder' },
+  { name: 'Eyasu Getaneh',     pos: 'Center Back' },
+  { name: 'Harrison Pope',     pos: 'Left Wing / Center Mid' },
+  { name: 'Tristan Roentz',    pos: 'Goalkeeper' },
+];
+
+const VOTE_KEY = 'captainVote2026';
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyCSWl0deRXE3ieLMM2TQy1h6rUmzTr0-W4",
+  authDomain: "pld-soccer-tryout-evaluations.firebaseapp.com",
+  databaseURL: "https://pld-soccer-tryout-evaluations-default-rtdb.firebaseio.com",
+  projectId: "pld-soccer-tryout-evaluations",
+  storageBucket: "pld-soccer-tryout-evaluations.firebasestorage.app",
+  messagingSenderId: "130088370427",
+  appId: "1:130088370427:web:e4f0d1f9f6b9f8e8c1b6f1"
+};
+
+firebase.initializeApp(FIREBASE_CONFIG);
+const db = firebase.database();
+const VOTES_REF = db.ref('captain_questionnaire/votes');
+
+let first = null, second = null;
+
+// Check if already voted
+if (localStorage.getItem(VOTE_KEY)) {
+  document.getElementById('voteForm').style.display = 'none';
+  document.getElementById('votedScreen').classList.add('visible');
+}
+
+// Build candidate cards
+const list = document.getElementById('candidateList');
+CANDIDATES.forEach(({ name, pos }) => {
+  const card = document.createElement('div');
+  card.className = 'candidate-card';
+  card.dataset.name = name;
+  card.innerHTML = `
+    <div class="rank-badge" data-badge></div>
+    <div class="candidate-info">
+      <div class="candidate-name">${name}</div>
+      <div class="candidate-pos">${pos}</div>
+    </div>
+    <div class="rank-label" data-label></div>
+  `;
+  card.addEventListener('click', () => handleSelect(name));
+  list.appendChild(card);
+});
+
+function handleSelect(name) {
+  if (first === name) {
+    // Deselect first; promote second to first
+    first = second;
+    second = null;
+  } else if (second === name) {
+    // Deselect second
+    second = null;
+  } else if (!first) {
+    first = name;
+  } else if (!second) {
+    second = name;
+  } else {
+    // Both taken — replace second
+    second = name;
+  }
+  updateUI();
+}
+
+function updateUI() {
+  const cards = list.querySelectorAll('.candidate-card');
+  cards.forEach(card => {
+    const name = card.dataset.name;
+    const badge = card.querySelector('[data-badge]');
+    const label = card.querySelector('[data-label]');
+    card.classList.remove('first', 'second', 'disabled');
+    badge.textContent = '';
+    label.textContent = '';
+
+    if (name === first) {
+      card.classList.add('first');
+      badge.textContent = '1';
+      label.textContent = '1st';
+    } else if (name === second) {
+      card.classList.add('second');
+      badge.textContent = '2';
+      label.textContent = '2nd';
+    }
+  });
+
+  // Status pills
+  const pill1 = document.getElementById('pill1');
+  const pill2 = document.getElementById('pill2');
+  document.getElementById('pill1name').textContent = first || 'Not selected';
+  document.getElementById('pill2name').textContent = second || 'Not selected';
+  pill1.className = 'status-pill' + (first ? ' filled-first' : '');
+  pill2.className = 'status-pill' + (second ? ' filled-second' : '');
+
+  // Submit button
+  document.getElementById('submitBtn').disabled = !(first && second);
+}
+
+async function submitVote() {
+  if (!first || !second) return;
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Submitting…';
+  document.getElementById('errorMsg').style.display = 'none';
+
+  try {
+    await VOTES_REF.push({
+      first_choice: first,
+      second_choice: second,
+      submitted_at: new Date().toISOString()
+    });
+    localStorage.setItem(VOTE_KEY, '1');
+    document.getElementById('confirm1').textContent = first;
+    document.getElementById('confirm2').textContent = second;
+    document.getElementById('voteForm').style.display = 'none';
+    document.getElementById('successScreen').classList.add('visible');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } catch (err) {
+    console.error(err);
+    btn.disabled = false;
+    btn.textContent = 'Submit Vote →';
+    document.getElementById('errorMsg').style.display = 'block';
+  }
+}
+</script>
+</body>
+</html>
