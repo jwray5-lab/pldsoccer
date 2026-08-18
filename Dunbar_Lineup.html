@@ -221,6 +221,8 @@ body.edit-locked .player-remove { display: none; }
 }
 .pw-cancel:hover { color: #888; }
 </style>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 </head>
 <body class="edit-locked">
 
@@ -692,6 +694,37 @@ function lockEdit() {
 document.getElementById('pw-overlay').addEventListener('click', function(e) {
   if (e.target === this) closePwModal();
 });
+
+// ── LOAD VARSITY ROSTER FROM FIREBASE ──
+(function loadVarsityRoster() {
+  const FIREBASE_CONFIG = {
+    apiKey: "AIzaSyCSWl0deRXE3ieLMM2TQy1h6rUmzTr0-W4",
+    authDomain: "pld-soccer-tryout-evaluations.firebaseapp.com",
+    databaseURL: "https://pld-soccer-tryout-evaluations-default-rtdb.firebaseio.com",
+    projectId: "pld-soccer-tryout-evaluations",
+    storageBucket: "pld-soccer-tryout-evaluations.firebasestorage.app",
+    messagingSenderId: "130088370427",
+    appId: "1:130088370427:web:e4f0d1f9f6b9f8e8c1b6f1"
+  };
+  try { firebase.app(); } catch(e) { firebase.initializeApp(FIREBASE_CONFIG); }
+  const db = firebase.database();
+  db.ref('tryouts2026/varsity/uniforms').once('value', snap => {
+    const data = snap.val();
+    if (!data) return;
+    // Sort: treat "00" as -1, "0" as 0, others numerically
+    const entries = Object.entries(data).sort((a, b) => {
+      const na = a[0] === '00' ? -1 : parseInt(a[0]);
+      const nb = b[0] === '00' ? -1 : parseInt(b[0]);
+      return na - nb;
+    });
+    state.roster = [];
+    state.nextId = 1;
+    entries.forEach(([num, name]) => {
+      state.roster.push({ id: 'p' + (state.nextId++), name, number: num });
+    });
+    renderRoster();
+  });
+})();
 
 </script>
 </body>
