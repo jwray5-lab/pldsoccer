@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PLD Boys Soccer · 2027 Season</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --red: #ce0e2d;
+  --red-mid: #e8324f;
+  --red-dark: #a00b22;
+  --gold: #ffc930;
+  --dark: #0e0e0e;
+  --dark-2: #1a1a1a;
+  --dark-3: #252525;
+  --white: #ffffff;
+}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--dark);
+  color: var(--white);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.hero {
+  position: relative;
+  padding: 72px 40px 64px;
+  text-align: center;
+  overflow: hidden;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 60% 70% at 50% 0%, rgba(206,14,45,0.13) 0%, transparent 70%);
+  pointer-events: none;
+}
+.season-back {
+  position: absolute; top: 20px; left: 24px; z-index: 2;
+  font-size: 12px; letter-spacing: 2px; text-transform: uppercase; font-weight: 600;
+  color: rgba(255,255,255,0.5); text-decoration: none;
+}
+.season-back:hover { color: var(--white); }
+.hero-crest { width: 160px; height: 160px; margin: 0 auto 22px; position: relative; }
+.hero-crest img {
+  width: 100%; height: 100%; object-fit: contain;
+  filter: drop-shadow(0 6px 28px rgba(206,14,45,0.45));
+}
+.hero-eyebrow {
+  font-size: 11px; letter-spacing: 5px; text-transform: uppercase;
+  color: var(--red-mid); font-weight: 600; margin-bottom: 10px; position: relative;
+}
+.hero-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(56px, 9vw, 96px);
+  letter-spacing: 6px; line-height: 0.9; position: relative; margin-bottom: 14px;
+}
+.hero-title .accent { color: var(--red); }
+.hero-sub {
+  font-size: 15px; font-weight: 300; color: rgba(255,255,255,0.45);
+  letter-spacing: 1px; position: relative; margin-bottom: 40px;
+}
+
+/* Key dates */
+.dates {
+  width: 100%; max-width: 1000px; position: relative;
+  display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px;
+  border-radius: 10px; overflow: hidden; margin-bottom: 28px; text-align: left;
+}
+.date { padding: 14px 14px 12px; background: var(--dark-2); }
+.date b {
+  display: block; font-family: 'Bebas Neue', sans-serif; font-weight: 400;
+  font-size: 20px; letter-spacing: 1.5px; line-height: 1;
+}
+.date span { display: block; font-size: 12px; color: rgba(255,255,255,0.55); margin-top: 4px; }
+.date.pre { border-top: 3px solid #6a6361; }
+.date.reg { border-top: 3px solid var(--white); }
+.date.dist { border-top: 3px solid var(--red-dark); }
+.date.region { border-top: 3px solid var(--red); }
+.date.state { border-top: 3px solid var(--gold); }
+
+/* Section cards */
+.sections {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+  width: 100%; max-width: 1000px; position: relative; text-align: left;
+}
+.section-card {
+  text-decoration: none; color: var(--white);
+  border-radius: 14px; overflow: hidden;
+  display: flex; flex-direction: column;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+a.section-card:hover { transform: translateY(-4px); box-shadow: 0 16px 48px rgba(0,0,0,0.5); }
+a.section-card:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+.section-card.schedule { background: var(--red); grid-column: span 2; }
+.section-card.soon { background: var(--dark-2); border: 1px dashed rgba(255,255,255,0.14); }
+.section-card-body { padding: 30px 28px 28px; flex: 1; display: flex; flex-direction: column; }
+.section-card-label {
+  font-size: 10px; letter-spacing: 4px; text-transform: uppercase; font-weight: 600; margin-bottom: 6px;
+}
+.schedule .section-card-label { color: rgba(255,255,255,0.65); }
+.soon .section-card-label { color: rgba(255,255,255,0.4); }
+.section-card-title {
+  font-family: 'Bebas Neue', sans-serif; font-size: 30px; letter-spacing: 2px;
+  line-height: 1.1; margin-bottom: 10px;
+}
+.soon .section-card-title { color: rgba(255,255,255,0.7); }
+.section-card-desc { font-size: 13px; line-height: 1.55; flex: 1; margin-bottom: 20px; }
+.schedule .section-card-desc { color: rgba(255,255,255,0.8); max-width: 52ch; }
+.soon .section-card-desc { color: rgba(255,255,255,0.4); margin-bottom: 0; }
+.levels { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 20px; }
+.lv {
+  font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+  padding: 4px 9px; border-radius: 4px;
+}
+.lv.v { background: var(--gold); color: #1a1300; }
+.lv.r { background: var(--white); color: var(--red); }
+.lv.b { background: var(--dark); color: var(--white); }
+.section-card-cta {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 13px; font-weight: 700; letter-spacing: 0.5px;
+  padding: 10px 18px; border-radius: 7px; align-self: flex-start;
+  background: rgba(0,0,0,0.22); transition: background 0.2s;
+}
+.schedule:hover .section-card-cta { background: rgba(0,0,0,0.38); }
+
+footer {
+  background: var(--dark-2);
+  border-top: 1px solid rgba(255,255,255,0.06);
+  padding: 18px 40px;
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+}
+.footer-text { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.3); }
+.footer-dot { width: 5px; height: 5px; background: var(--red); border-radius: 50%; }
+
+@media (max-width: 820px) {
+  .dates { grid-template-columns: 1fr 1fr; }
+  .dates .state { grid-column: span 2; }
+  .sections { grid-template-columns: 1fr; max-width: 480px; }
+  .section-card.schedule { grid-column: auto; }
+}
+@media (max-width: 580px) {
+  .hero { padding: 60px 20px 48px; }
+  .hero-crest { width: 130px; height: 130px; }
+  footer { flex-direction: column; align-items: flex-start; padding: 18px 20px; }
+}
+@media (prefers-reduced-motion: reduce) { .section-card { transition: none; } a.section-card:hover { transform: none; } }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <a class="season-back" href="index.html">← All seasons</a>
+  <div class="hero-crest">
+    <img src="6 Star Dunbar Crest.png" alt="Paul Laurence Dunbar Bulldogs soccer crest" onerror="this.style.display='none'">
+  </div>
+  <div class="hero-eyebrow">Paul Laurence Dunbar Boys Soccer</div>
+  <div class="hero-title">2027 <span class="accent">SEASON</span></div>
+  <div class="hero-sub">Varsity · JV Red · JV Black</div>
+
+  <div class="dates" aria-label="2027 key dates">
+    <div class="date pre"><b>Preseason</b><span>Jul 15 to Aug 15</span></div>
+    <div class="date reg"><b>Regular Season</b><span>Aug 16 to Oct 9</span></div>
+    <div class="date dist"><b>District</b><span>Oct 11 to 16</span></div>
+    <div class="date region"><b>Region</b><span>Oct 18 to 23</span></div>
+    <div class="date state"><b>State</b><span>Oct 25 to Nov 6</span></div>
+  </div>
+
+  <div class="sections">
+    <a href="schedule-2027.html" class="section-card schedule">
+      <div class="section-card-body">
+        <div class="section-card-label">Schedule</div>
+        <div class="section-card-title">2027 Match Schedule</div>
+        <div class="section-card-desc">Every scrimmage and match, week by week, from preseason through the state tournament. Shows dates, times, opponents and whether each game is home or away.</div>
+        <div class="levels"><span class="lv v">Varsity</span><span class="lv r">JV Red</span><span class="lv b">JV Black</span></div>
+        <div class="section-card-cta">View Schedule →</div>
+      </div>
+    </a>
+
+    <div class="section-card soon">
+      <div class="section-card-body">
+        <div class="section-card-label">Coming soon</div>
+        <div class="section-card-title">More 2027 Resources</div>
+        <div class="section-card-desc">Coaching, player and staff pages for 2027 will be added here as the season gets closer.</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<footer>
+  <div class="footer-text">PLD Boys Soccer · 2027 Season</div>
+  <div class="footer-dot"></div>
+  <div class="footer-text">Paul Laurence Dunbar</div>
+</footer>
+
+</body>
+</html>

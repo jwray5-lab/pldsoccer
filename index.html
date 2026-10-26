@@ -2,78 +2,184 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Workouts</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PLD Boys Soccer</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Space+Mono:wght@400;700&display=swap');
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  :root{
-    --iron:#19191a;
-    --iron-2:#232324;
-    --plate:#eeece4;
-    --plate-dim:#a6a49c;
-    --steel:#5b7f9e;
-    --brass:#b3925c;
-    --line:#33332f;
-    --done:#7a9b6e;
-  }
-  *{box-sizing:border-box; -webkit-tap-highlight-color: transparent;}
-  html,body{margin:0;padding:0;background:var(--iron);color:var(--plate);font-family:'Space Mono',monospace;
-    min-height:100vh; display:flex; align-items:center; justify-content:center;}
+:root {
+  --red: #ce0e2d;
+  --red-mid: #e8324f;
+  --red-dark: #a00b22;
+  --gold: #ffc930;
+  --dark: #0e0e0e;
+  --dark-2: #1a1a1a;
+  --dark-3: #252525;
+  --white: #ffffff;
+}
 
-  main{width:100%; max-width:420px; padding:32px 20px;}
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--dark);
+  color: var(--white);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
 
-  .eyebrow{
-    font-family:'Oswald',sans-serif; font-size:11px; letter-spacing:3px; text-transform:uppercase;
-    color:var(--brass); margin:0 0 6px; text-align:center;
-  }
-  h1{
-    font-family:'Oswald',sans-serif; font-weight:700; font-size:32px; letter-spacing:0.5px;
-    margin:0 0 34px; text-transform:uppercase; text-align:center;
-  }
+.hero {
+  position: relative;
+  padding: 72px 40px 64px;
+  text-align: center;
+  overflow: hidden;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 60% 70% at 50% 0%, rgba(206,14,45,0.16) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 8px;
+  background: repeating-linear-gradient(90deg, var(--red) 0 14px, var(--white) 14px 20px);
+  opacity: 0.85;
+}
+.hero-crest { width: 200px; height: 200px; margin: 0 auto 24px; position: relative; }
+.hero-crest img {
+  width: 100%; height: 100%; object-fit: contain;
+  filter: drop-shadow(0 6px 28px rgba(206,14,45,0.45));
+}
+.hero-eyebrow {
+  font-size: 11px; letter-spacing: 5px; text-transform: uppercase;
+  color: var(--red-mid); font-weight: 600; margin-bottom: 10px; position: relative;
+}
+.hero-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(56px, 10vw, 104px);
+  letter-spacing: 6px; line-height: 0.9; position: relative; margin-bottom: 14px;
+}
+.hero-title .accent { color: var(--red); }
+.hero-sub {
+  font-size: 15px; font-weight: 300; color: rgba(255,255,255,0.45);
+  letter-spacing: 1px; position: relative; margin-bottom: 52px;
+}
 
-  .card{
-    display:block; background:var(--iron-2); border:1px solid var(--line); border-radius:6px;
-    padding:22px 20px; margin-bottom:14px; text-decoration:none; color:var(--plate);
-    position:relative; overflow:hidden;
-  }
-  .card:active{background:#2a2a2b;}
-  .card-name{
-    font-family:'Oswald',sans-serif; font-weight:700; font-size:22px; letter-spacing:0.3px;
-    text-transform:uppercase;
-  }
-  .card-sub{font-size:11px; color:var(--plate-dim); margin-top:4px; letter-spacing:0.3px;}
-  .card-arrow{
-    position:absolute; right:20px; top:50%; transform:translateY(-50%);
-    font-size:20px; color:var(--plate-dim);
-  }
-  .card.jay{border-left:3px solid var(--steel);}
-  .card.jayb{border-left:3px solid var(--done);}
-  .card.anne{border-left:3px solid var(--brass);}
+.seasons {
+  display: grid;
+  grid-template-columns: 1.25fr 1fr;
+  gap: 20px;
+  width: 100%;
+  max-width: 880px;
+  position: relative;
+  text-align: left;
+}
+.season-card {
+  text-decoration: none;
+  color: var(--white);
+  border-radius: 14px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+}
+.season-card:hover { transform: translateY(-4px); box-shadow: 0 16px 48px rgba(0,0,0,0.5); }
+.season-card:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+.season-card.current { background: var(--red); }
+.season-card.past { background: var(--dark-2); border: 1px solid rgba(255,255,255,0.1); }
+.season-card.past:hover { border-color: rgba(255,255,255,0.22); }
+.season-body { padding: 30px 28px 28px; display: flex; flex-direction: column; flex: 1; }
+.season-tag {
+  align-self: flex-start;
+  font-size: 10px; letter-spacing: 3px; text-transform: uppercase; font-weight: 700;
+  padding: 4px 9px; border-radius: 4px; margin-bottom: 14px;
+}
+.current .season-tag { background: var(--gold); color: #1a1300; }
+.past .season-tag { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.6); }
+.season-year {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 72px; letter-spacing: 3px; line-height: 0.9; margin-bottom: 6px;
+}
+.past .season-year { color: rgba(255,255,255,0.85); }
+.season-name { font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 2px; margin-bottom: 10px; }
+.season-desc { font-size: 13px; line-height: 1.55; margin-bottom: 20px; flex: 1; }
+.current .season-desc { color: rgba(255,255,255,0.8); }
+.past .season-desc { color: rgba(255,255,255,0.45); }
+.season-cta {
+  align-self: flex-start;
+  font-size: 13px; font-weight: 700; letter-spacing: 0.5px;
+  padding: 10px 18px; border-radius: 7px; transition: background 0.2s;
+}
+.current .season-cta { background: rgba(0,0,0,0.22); }
+.current:hover .season-cta { background: rgba(0,0,0,0.38); }
+.past .season-cta { background: rgba(206,14,45,0.15); color: var(--red-mid); }
+.past:hover .season-cta { background: rgba(206,14,45,0.25); }
+
+footer {
+  background: var(--dark-2);
+  border-top: 1px solid rgba(255,255,255,0.06);
+  padding: 18px 40px;
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;
+}
+.footer-text { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.3); }
+.footer-dot { width: 5px; height: 5px; background: var(--red); border-radius: 50%; }
+
+@media (max-width: 680px) {
+  .hero { padding: 56px 20px 52px; }
+  .hero-crest { width: 160px; height: 160px; }
+  .seasons { grid-template-columns: 1fr; max-width: 420px; }
+  footer { flex-direction: column; align-items: flex-start; padding: 18px 20px; }
+}
+@media (prefers-reduced-motion: reduce) { .season-card { transition: none; } .season-card:hover { transform: none; } }
 </style>
 </head>
 <body>
-<main>
-  <p class="eyebrow">Full Body · 3x/Week</p>
-  <h1>Workouts</h1>
 
-  <a class="card jay" href="./jay/">
-    <div class="card-name">Jay's Workouts</div>
-    <div class="card-sub">Iron Ledger — squat / hinge / power</div>
-    <span class="card-arrow">→</span>
-  </a>
+<header class="hero">
+  <div class="hero-crest">
+    <img src="6 Star Dunbar Crest.png" alt="Paul Laurence Dunbar Bulldogs soccer crest" onerror="this.style.display='none'">
+  </div>
+  <div class="hero-eyebrow">Paul Laurence Dunbar Boys Soccer</div>
+  <div class="hero-title">PLD <span class="accent">SOCCER</span></div>
+  <div class="hero-sub">Lexington, Kentucky · Choose a season</div>
 
-  <a class="card jayb" href="./jay-b/">
-    <div class="card-name">Jay's Mix</div>
-    <div class="card-sub">Iron Ledger B — hinge / pull / power</div>
-    <span class="card-arrow">→</span>
-  </a>
+  <nav class="seasons" aria-label="Seasons">
+    <a href="2027.html" class="season-card current">
+      <div class="season-body">
+        <span class="season-tag">Up next</span>
+        <div class="season-year">2027</div>
+        <div class="season-name">Season Hub</div>
+        <div class="season-desc">Match schedule for Varsity, JV Red and JV Black. Preseason opens July 15 and the regular season starts August 16.</div>
+        <div class="season-cta">Go to 2027 →</div>
+      </div>
+    </a>
 
-  <a class="card anne" href="./anne/">
-    <div class="card-name">Anne's Workouts</div>
-    <div class="card-sub">Foundations — beginner full body</div>
-    <span class="card-arrow">→</span>
-  </a>
-</main>
+    <a href="2026.html" class="season-card past">
+      <div class="season-body">
+        <span class="season-tag">Archive</span>
+        <div class="season-year">2026</div>
+        <div class="season-name">Season Hub</div>
+        <div class="season-desc">Coaching, player and staff resources from the 2026 season, including tryouts, rosters and training plans.</div>
+        <div class="season-cta">Go to 2026 →</div>
+      </div>
+    </a>
+  </nav>
+</header>
+
+<footer>
+  <div class="footer-text">PLD Boys Soccer · Bulldogs</div>
+  <div class="footer-dot"></div>
+  <div class="footer-text">Paul Laurence Dunbar</div>
+</footer>
+
 </body>
 </html>
