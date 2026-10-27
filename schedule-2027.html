@@ -84,8 +84,8 @@ form{display:grid;grid-template-columns:repeat(6,1fr);gap:12px 14px}
 input,select,textarea{font:inherit;color:var(--fg);background:var(--bg);border:1px solid var(--line);border-radius:5px;padding:9px 10px;min-width:0;width:100%}
 textarea{resize:vertical;min-height:40px}
 input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-visible{outline:2px solid var(--red);outline-offset:2px}
-.seg{display:flex;border:1px solid var(--line);border-radius:5px;overflow:hidden}
-.seg input{position:absolute;opacity:0;pointer-events:none}
+.seg{display:flex;border:1px solid var(--line);border-radius:5px;overflow:hidden;position:relative}
+.seg input{position:absolute;left:0;top:0;width:1px;height:1px;margin:0;opacity:0;pointer-events:none}
 .seg label{flex:1;text-align:center;padding:9px 6px;cursor:pointer;font-family:var(--label);font-weight:700;letter-spacing:.04em;text-transform:uppercase;font-size:14px;color:var(--fg);background:var(--bg);border-right:1px solid var(--line);white-space:nowrap}
 .seg label:last-of-type{border-right:0}
 .seg input:checked+label.lv-varsity{background:var(--gold);color:#1a1300}
@@ -116,6 +116,17 @@ button:disabled{opacity:.5;cursor:not-allowed}
 .ptag.district{background:var(--red-deep)}.ptag.region{background:var(--red)}.ptag.state{background:var(--gold);color:#1a1300}.ptag.other{background:var(--idle)}
 .games{display:grid;gap:6px;min-width:0}
 .open{color:var(--muted);font-size:14px;padding:8px 0;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.slot{display:grid;grid-template-columns:92px minmax(0,1fr) auto;gap:10px;align-items:center;border:1px dashed var(--line);border-radius:6px;padding:6px 10px;background:transparent}
+.slot .d{font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--muted)}
+.slot .olab{font-family:var(--label);font-weight:700;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ok)}
+.slot .fills{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}
+.slot .fills button{padding:4px 8px;font-size:12px;border-style:dashed}
+.slot .fills button:hover{border-style:solid}
+.slot .fills button.lv-v:hover{background:var(--gold);color:#1a1300;border-color:var(--gold)}
+.slot .fills button.lv-r:hover{background:var(--red);color:#fff;border-color:var(--red)}
+.slot .fills button.lv-b:hover{background:var(--black);color:#fff;border-color:var(--black)}
+.slot .fills span{font-family:var(--label);font-weight:600;font-size:12px;letter-spacing:.06em;text-transform:uppercase;border:1px dashed var(--line);border-radius:3px;padding:3px 8px;color:var(--muted)}
+@media (max-width:760px){.slot{grid-template-columns:auto 1fr}.slot .fills{grid-column:1/-1;justify-content:flex-start}}
 .open .gap{font-family:var(--label);font-weight:600;font-size:12px;letter-spacing:.06em;text-transform:uppercase;border:1px dashed var(--line);border-radius:3px;padding:2px 7px}
 .g{display:grid;grid-template-columns:92px 74px 82px minmax(0,1fr) auto auto;gap:10px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:8px 10px}
 .g .d{font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
@@ -217,6 +228,7 @@ footer{color:var(--muted);font-size:12.5px;padding-bottom:30px}
         <button class="chip" type="button" data-f="Varsity" aria-pressed="false">Varsity</button>
         <button class="chip" type="button" data-f="JV Red" aria-pressed="false">JV Red</button>
         <button class="chip" type="button" data-f="JV Black" aria-pressed="false">JV Black</button>
+        <button class="chip" type="button" id="slots-toggle" aria-pressed="true">Open slots: Tue · Thu · Sat</button>
         <button class="chip" type="button" id="copy">Copy list</button>
         <button class="chip" type="button" id="export">Export schedule.json</button>
         <label class="chip" for="import" style="cursor:pointer;border:1px solid var(--line);font-family:var(--label);font-weight:700;letter-spacing:.06em;text-transform:uppercase">Import</label>
@@ -227,7 +239,7 @@ footer{color:var(--muted);font-size:12.5px;padding-bottom:30px}
     <div id="weeks"></div>
   </section>
 
-  <footer>Weeks run Monday to Sunday. The first preseason week starts Thursday, Jul 15. Open regular season weeks show which levels still need a match.</footer>
+  <footer>Weeks run Monday to Sunday. The first preseason week starts Thursday, Jul 15. Dashed rows are open Tuesdays, Thursdays and Saturdays in preseason and the regular season. Tap a level on one to start a match on that date.</footer>
 </main>
 
 <script>
@@ -267,7 +279,8 @@ footer{color:var(--muted);font-size:12.5px;padding-bottom:30px}
   const weekOf=s=>WEEKS.find(w=>s>=w.s&&s<=w.e)||null;
   const weekNum=(s,k)=>{const w=weekOf(s);return w&&w.phase&&w.phase.k===k?w.i:null;};
 
-  let matches=[]; let filter="all"; let editing=null; let db=null; let canWrite=true; let loaded=false;
+  let matches=[]; let filter="all"; let showSlots=true;
+  try{showSlots=localStorage.getItem("pld-2027-slots")!=="off";}catch(e){} let editing=null; let db=null; let canWrite=true; let loaded=false;
 
   function describePhase(s){
     if(!s) return "";
@@ -292,7 +305,7 @@ footer{color:var(--muted);font-size:12.5px;padding-bottom:30px}
       const mine=reg.filter(m=>m.level===l);
       const conf=mine.filter(m=>m.status==="Confirmed").length;
       const scr=matches.filter(m=>m.level===l&&phaseOf(m.date)?.k==="preseason").length;
-      return `<div class="t"><span class="l">${l} · regular season</span><span class="n">${mine.length}</span><span class="s">${conf} confirmed · ${mine.length-conf} not yet · ${scr} scrimmage${scr===1?"":"s"}</span></div>`;
+      return `<div class="t"><span class="l">${l} · regular season</span><span class="n">${mine.length}</span><span class="s">${conf} confirmed · ${mine.length-conf} not yet · ${scr} scrimmage${scr===1?"":"s"}</span><span class="s">${openSlotCount(l)} open Tue/Thu/Sat dates left</span></div>`;
     }).join("");
     const pend=matches.filter(m=>m.status!=="Confirmed").length;
     $("#tally").innerHTML=html+`<div class="t"><span class="l">Awaiting coaches</span><span class="n">${pend}</span><span class="s">Pending or tentative, all levels</span></div>`;
@@ -330,9 +343,45 @@ footer{color:var(--muted);font-size:12.5px;padding-bottom:30px}
     $("#weeks").innerHTML=out;
   }
 
+  // Open Tue/Thu/Sat slots in preseason and regular season
+  const SLOT_DAYS=[2,4,6];
+  function slotDates(w){
+    if(!w||!w.phase||!["preseason","regular"].includes(w.phase.k)) return [];
+    const out=[];
+    for(let d=toD(w.s);iso(d)<=w.e;d=addDays(d,1)){
+      const s=iso(d);
+      if(SLOT_DAYS.includes(d.getUTCDay())&&s>=w.phase.s&&s<=w.phase.e) out.push(s);
+    }
+    return out;
+  }
+  function openLevels(date){
+    const lv=filter==="all"?LEVELS:[filter];
+    return lv.filter(l=>!matches.some(m=>m.date===date&&m.level===l));
+  }
+  function openSlotCount(level){
+    let n=0;
+    for(const w of WEEKS) for(const d of slotDates(w)) if(!matches.some(m=>m.date===d&&m.level===level)) n++;
+    return n;
+  }
+  const LVBTN={"Varsity":"lv-v","JV Red":"lv-r","JV Black":"lv-b"};
+  function slotRow(date){
+    const open=openLevels(date);
+    if(!open.length) return "";
+    const fills=canWrite
+      ? open.map(l=>`<button type="button" class="${LVBTN[l]}" data-fill="${date}|${esc(l)}" aria-label="Schedule ${esc(l)} on ${fmtDay(date)}">+ ${esc(l)}</button>`).join("")
+      : open.map(l=>`<span>${esc(l)}</span>`).join("");
+    return `<div class="slot"><span class="d">${fmtDay(date)}</span><span class="olab">Open</span><div class="fills">${fills}</div></div>`;
+  }
+
   function weekBlock(title,range,p,games,isReg,w){
     let body;
-    if(games.length){
+    const slots=showSlots?slotDates(w):[];
+    if(slots.length){
+      const items=games.map(m=>({k:m.date+"1"+(m.time||"99"),h:gameRow(m)}))
+        .concat(slots.map(d=>({k:d+"2",h:slotRow(d)})).filter(x=>x.h));
+      items.sort((a,b)=>a.k.localeCompare(b.k));
+      body=items.length?items.map(x=>x.h).join(""):`<div class="open">Every Tue, Thu and Sat this week is booked${filter==="all"?"":" for "+filter}.</div>`;
+    } else if(games.length){
       body=games.map(gameRow).join("");
       if(isReg&&filter==="all"){
         const missing=LEVELS.filter(l=>!games.some(m=>m.level===l));
@@ -351,6 +400,15 @@ footer{color:var(--muted);font-size:12.5px;padding-bottom:30px}
     document.querySelectorAll(".chip[data-f]").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));
     render();
   }));
+
+  // Open slot toggle
+  const slotBtn=$("#slots-toggle");
+  slotBtn.setAttribute("aria-pressed",String(showSlots));
+  slotBtn.addEventListener("click",()=>{
+    showSlots=!showSlots; slotBtn.setAttribute("aria-pressed",String(showSlots));
+    try{localStorage.setItem("pld-2027-slots",showSlots?"on":"off");}catch(e){}
+    render();
+  });
 
   // Copy list
   $("#copy").addEventListener("click",async()=>{
@@ -400,6 +458,17 @@ footer{color:var(--muted);font-size:12.5px;padding-bottom:30px}
   // Edit / delete
   let armed=null;
   $("#weeks").addEventListener("click",async e=>{
+    const fl=e.target.closest("[data-fill]");
+    if(fl&&canWrite){
+      const [d,l]=fl.dataset.fill.split("|");
+      if(editing) resetForm(false);
+      $("#f-date").value=d; form.level.value=l; $("#f-status").value="Pending";
+      $("#f-phase").textContent=describePhase(d);
+      msg.className="msg"; msg.textContent="Adding "+l+" on "+fmtDay(d)+". Enter the opponent and time.";
+      document.getElementById("add-h").scrollIntoView({behavior:"smooth",block:"start"});
+      $("#f-opp").focus({preventScroll:true});
+      return;
+    }
     const ed=e.target.closest("[data-edit]"), dl=e.target.closest("[data-del]");
     if(ed){
       const m=matches.find(x=>x.id===ed.dataset.edit); if(!m) return;
