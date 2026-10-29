@@ -125,6 +125,11 @@ button:disabled{opacity:.5;cursor:not-allowed}
 .slot .fills button.lv-v:hover{background:var(--gold);color:#1a1300;border-color:var(--gold)}
 .slot .fills button.lv-r:hover{background:var(--red);color:#fff;border-color:var(--red)}
 .slot .fills button.lv-b:hover{background:var(--black);color:#fff;border-color:var(--black)}
+.slot .fills span.blk{border-style:solid;border-color:var(--warn-bg);background:var(--warn-bg);color:var(--warn);text-decoration:line-through;text-decoration-thickness:1px}
+.slot .olab.blocked{color:var(--warn)}
+.opp small.conflict{color:var(--warn);font-weight:600}
+.rulehint{font-size:13.5px;border-radius:5px;padding:8px 12px;background:var(--warn-bg);color:var(--warn)}
+.rulehint.stop{background:var(--red);color:#fff}
 .slot .fills span{font-family:var(--label);font-weight:600;font-size:12px;letter-spacing:.06em;text-transform:uppercase;border:1px dashed var(--line);border-radius:3px;padding:3px 8px;color:var(--muted)}
 @media (max-width:760px){.slot{grid-template-columns:auto 1fr}.slot .fills{grid-column:1/-1;justify-content:flex-start}}
 .open .gap{font-family:var(--label);font-weight:600;font-size:12px;letter-spacing:.06em;text-transform:uppercase;border:1px dashed var(--line);border-radius:3px;padding:2px 7px}
@@ -211,6 +216,7 @@ footer{color:var(--muted);font-size:12.5px;padding-bottom:30px}
           <select id="f-status"><option>Pending</option><option>Confirmed</option><option>Tentative</option></select>
         </div>
         <div class="f c6"><label for="f-notes">Notes</label><textarea id="f-notes" rows="1" placeholder="Coach contact, bus time, showcase name (optional)" maxlength="300"></textarea></div>
+        <div class="c6 rulehint" id="f-rule" role="status" hidden></div>
         <div class="c6 actions">
           <button type="submit" class="primary" id="f-submit">Add match</button>
           <button type="button" id="f-cancel" hidden>Cancel edit</button>
@@ -239,7 +245,7 @@ footer{color:var(--muted);font-size:12.5px;padding-bottom:30px}
     <div id="weeks"></div>
   </section>
 
-  <footer>Weeks run Monday to Sunday. The first preseason week starts Thursday, Jul 15. Dashed rows are open Tuesdays, Thursdays and Saturdays in preseason and the regular season. Tap a level on one to start a match on that date.</footer>
+  <footer>Weeks run Monday to Sunday. The first preseason week starts Thursday, Jul 15. Dashed rows are open Tuesdays, Thursdays and Saturdays in preseason and the regular season. Tap a level on one to start a match on that date. A Saturday match blocks the Thursday before it for that level.</footer>
 </main>
 
 <script>
@@ -291,7 +297,8 @@ footer{color:var(--muted);font-size:12.5px;padding-bottom:30px}
     if(s<"2027-07-15") return "Before preseason";
     return "Outside the season dates";
   }
-  $("#f-date").addEventListener("input",e=>{$("#f-phase").textContent=describePhase(e.target.value);});
+  $("#f-date").addEventListener("input",e=>{$("#f-phase").textContent=describePhase(e.target.value);updateRule();});
+  document.querySelectorAll('input[name="level"]').forEach(r=>r.addEventListener("change",()=>updateRule()));
 
   function countdown(){
     const now=new Date(); const start=new Date(2027,7,16);
@@ -318,12 +325,14 @@ footer{color:var(--muted);font-size:12.5px;padding-bottom:30px}
     const vs=m.site==="Away"?"at ":(m.site==="Neutral"?"vs ":"vs ");
     const sub=[m.site, m.location, m.notes].filter(Boolean).map(esc).join(" · ");
     const st=(m.status||"Pending").toLowerCase();
+    const cf=satBlock(m.date,m.level,m.id);
+    const flag=cf?`<small class="conflict">Conflict: ${esc(m.level)} also plays Sat ${fmtShort(toD(cf.date))} ${esc(vsText(cf))}</small>`:"";
     const btns=canWrite?`<div class="rowbtns"><button type="button" data-edit="${esc(m.id)}" aria-label="Edit ${esc(m.opponent)}">Edit</button><button type="button" class="danger" data-del="${esc(m.id)}" aria-label="Delete ${esc(m.opponent)}">Delete</button></div>`:`<div class="rowbtns"></div>`;
-    return `<div class="g"><span class="d">${fmtDay(m.date)}</span><span class="tm">${fmtTime(m.time)}</span><span class="lv ${LVCLASS[m.level]||""}">${esc(m.level)}</span><div class="opp"><strong>${vs}${esc(m.opponent)}</strong><small>${sub}</small></div><span class="st ${st}">${esc(m.status||"Pending")}</span>${btns}</div>`;
+    return `<div class="g"><span class="d">${fmtDay(m.date)}</span><span class="tm">${fmtTime(m.time)}</span><span class="lv ${LVCLASS[m.level]||""}">${esc(m.level)}</span><div class="opp"><strong>${vs}${esc(m.opponent)}</strong><small>${sub}</small>${flag}</div><span class="st ${st}">${esc(m.status||"Pending")}</span>${btns}</div>`;
   }
 
   function render(){
-    renderTally();
+    renderTally(); updateRule();
     const shown=matches.filter(m=>filter==="all"||m.level===filter).sort(sortM);
     const empty=$("#empty");
     if(!loaded){empty.hidden=false;}
@@ -360,17 +369,47 @@ footer{color:var(--muted);font-size:12.5px;padding-bottom:30px}
   }
   function openSlotCount(level){
     let n=0;
-    for(const w of WEEKS) for(const d of slotDates(w)) if(!matches.some(m=>m.date===d&&m.level===level)) n++;
+    for(const w of WEEKS) for(const d of slotDates(w)) if(!matches.some(m=>m.date===d&&m.level===level)&&!satBlock(d,level)) n++;
     return n;
   }
   const LVBTN={"Varsity":"lv-v","JV Red":"lv-r","JV Black":"lv-b"};
+  // Rule: a Saturday match blocks the Thursday before it, for the same level
+  const plusDays=(s,n)=>iso(addDays(toD(s),n));
+  const dowOf=s=>toD(s).getUTCDay();
+  function satBlock(date,level,exceptId){
+    if(!date||dowOf(date)!==4) return null;
+    const sat=plusDays(date,2);
+    return matches.find(m=>m.id!==exceptId&&m.level===level&&m.date===sat)||null;
+  }
+  function thuClash(date,level,exceptId){
+    if(!date||dowOf(date)!==6) return null;
+    const thu=plusDays(date,-2);
+    return matches.find(m=>m.id!==exceptId&&m.level===level&&m.date===thu)||null;
+  }
+  const vsText=m=>(m.site==="Away"?"at ":"vs ")+m.opponent;
+
   function slotRow(date){
     const open=openLevels(date);
     if(!open.length) return "";
-    const fills=canWrite
-      ? open.map(l=>`<button type="button" class="${LVBTN[l]}" data-fill="${date}|${esc(l)}" aria-label="Schedule ${esc(l)} on ${fmtDay(date)}">+ ${esc(l)}</button>`).join("")
-      : open.map(l=>`<span>${esc(l)}</span>`).join("");
-    return `<div class="slot"><span class="d">${fmtDay(date)}</span><span class="olab">Open</span><div class="fills">${fills}</div></div>`;
+    const blocked=open.filter(l=>satBlock(date,l));
+    const free=open.filter(l=>!blocked.includes(l));
+    const fills=(canWrite
+      ? free.map(l=>`<button type="button" class="${LVBTN[l]}" data-fill="${date}|${esc(l)}" aria-label="Schedule ${esc(l)} on ${fmtDay(date)}">+ ${esc(l)}</button>`)
+      : free.map(l=>`<span>${esc(l)}</span>`)).join("")
+      + blocked.map(l=>`<span class="blk" title="${esc(l)} plays ${fmtDay(plusDays(date,2))}">${esc(l)} · Sat match</span>`).join("");
+    const lab=free.length?`<span class="olab">Open</span>`:`<span class="olab blocked">Blocked</span>`;
+    return `<div class="slot"><span class="d">${fmtDay(date)}</span>${lab}<div class="fills">${fills}</div></div>`;
+  }
+
+  let satOk=null;
+  function updateRule(){
+    const box=$("#f-rule"); if(!box) return;
+    const d=$("#f-date").value, l=form.level.value;
+    const blk=satBlock(d,l,editing), clash=thuClash(d,l,editing);
+    satOk=null; $("#f-submit").textContent=editing?"Save changes":"Add match";
+    if(blk){box.hidden=false;box.className="c6 rulehint stop";box.textContent=`${l} can't play ${fmtDay(d)}: it plays ${fmtDay(blk.date)} ${vsText(blk)}. Pick another date or move the Saturday match.`;}
+    else if(clash){box.hidden=false;box.className="c6 rulehint";box.textContent=`${l} already plays ${fmtDay(clash.date)} ${vsText(clash)}. Adding this Saturday match will flag that Thursday as a conflict.`;}
+    else {box.hidden=true;box.textContent="";}
   }
 
   function weekBlock(title,range,p,games,isReg,w){
@@ -427,6 +466,7 @@ footer{color:var(--muted);font-size:12.5px;padding-bottom:30px}
     form.reset(); if(keepDate) $("#f-date").value=d;
     $("#f-phase").textContent=describePhase($("#f-date").value);
     editing=null; $("#f-submit").textContent="Add match"; $("#f-cancel").hidden=true;
+    updateRule();
   }
   $("#f-cancel").addEventListener("click",()=>{resetForm(false);msg.textContent="";});
 
@@ -441,6 +481,11 @@ footer{color:var(--muted);font-size:12.5px;padding-bottom:30px}
       updatedAt:new Date().toISOString()
     };
     if(!rec.date||!rec.opponent){msg.className="msg err";msg.textContent="Add a date and an opponent.";return;}
+    const blk=satBlock(rec.date,rec.level,editing);
+    if(blk){msg.className="msg err";msg.textContent=`Not saved. ${rec.level} plays ${fmtDay(blk.date)}, so ${fmtDay(rec.date)} is blocked.`;return;}
+    const clash=thuClash(rec.date,rec.level,editing), key=rec.date+"|"+rec.level;
+    if(clash&&satOk!==key){satOk=key;$("#f-submit").textContent="Save anyway";msg.className="msg err";msg.textContent=`${rec.level} already plays ${fmtDay(clash.date)}. Click Save anyway to keep both, or change the date.`;return;}
+    satOk=null;
     const btn=$("#f-submit"); btn.disabled=true;
     try{
       const ref=editing?db.collection("matches").doc(editing):db.collection("matches").doc();
@@ -463,7 +508,7 @@ footer{color:var(--muted);font-size:12.5px;padding-bottom:30px}
       const [d,l]=fl.dataset.fill.split("|");
       if(editing) resetForm(false);
       $("#f-date").value=d; form.level.value=l; $("#f-status").value="Pending";
-      $("#f-phase").textContent=describePhase(d);
+      $("#f-phase").textContent=describePhase(d); updateRule();
       msg.className="msg"; msg.textContent="Adding "+l+" on "+fmtDay(d)+". Enter the opponent and time.";
       document.getElementById("add-h").scrollIntoView({behavior:"smooth",block:"start"});
       $("#f-opp").focus({preventScroll:true});
@@ -476,7 +521,7 @@ footer{color:var(--muted);font-size:12.5px;padding-bottom:30px}
       $("#f-date").value=m.date; $("#f-time").value=m.time||""; $("#f-opp").value=m.opponent;
       form.level.value=m.level; form.site.value=m.site||"Home"; $("#f-loc").value=m.location||"";
       $("#f-status").value=m.status||"Pending"; $("#f-notes").value=m.notes||"";
-      $("#f-phase").textContent=describePhase(m.date);
+      $("#f-phase").textContent=describePhase(m.date); updateRule();
       $("#f-submit").textContent="Save changes"; $("#f-cancel").hidden=false;
       msg.className="msg"; msg.textContent="Editing "+m.level+" vs "+m.opponent+".";
       document.getElementById("add-h").scrollIntoView({behavior:"smooth",block:"start"});
