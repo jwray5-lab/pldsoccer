@@ -158,7 +158,18 @@ button:disabled{opacity:.5;cursor:not-allowed}
 .notice{background:var(--warn-bg);color:var(--warn);border-radius:6px;padding:10px 14px;font-size:14px}
 footer{color:var(--muted);font-size:12.5px;padding-bottom:30px}
 @media (prefers-reduced-motion:no-preference){.g{transition:border-color .15s}.g:hover{border-color:var(--muted)}}
+.authbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;background:var(--surface-2);border:1px solid var(--line);border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:14px}
+.authbar .who{color:var(--muted)}
+.authbar .who b{color:var(--fg)}
+.authbar form{display:flex;flex-wrap:wrap;gap:8px;align-items:center;flex:1 1 420px}
+.authbar input{width:auto;flex:1 1 160px;padding:7px 9px}
+.authbar button{padding:7px 12px;font-size:13px}
+.linkbtn{background:none;border:none;padding:0;color:var(--muted);text-decoration:underline;text-transform:none;letter-spacing:0;font-family:var(--body);font-weight:400;font-size:13px}
+.notice button{margin-left:8px;padding:5px 10px;font-size:12.5px}
 </style>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 </head>
 <body>
 <header class="mast">
@@ -188,6 +199,17 @@ footer{color:var(--muted);font-size:12.5px;padding-bottom:30px}
 
   <section aria-labelledby="add-h">
     <div class="sec-head"><h2 id="add-h">Add a Match</h2><p class="hint">Log it as Pending while you wait on the other coach, then mark it Confirmed.</p></div>
+    <div id="authbar" class="authbar">
+      <span class="who" id="auth-who">Checking sign-in…</span>
+      <form id="auth-form" hidden autocomplete="on">
+        <input type="email" id="auth-email" placeholder="Coach email" autocomplete="username" required aria-label="Coach email">
+        <input type="password" id="auth-pass" placeholder="Password" autocomplete="current-password" required aria-label="Password">
+        <button type="submit" class="primary" id="auth-go">Sign in</button>
+        <button type="button" class="linkbtn" id="auth-forgot">Forgot password?</button>
+        <span class="msg" id="auth-msg" role="status" aria-live="polite"></span>
+      </form>
+      <button type="button" id="auth-out" hidden>Sign out</button>
+    </div>
     <div id="notice" class="notice" hidden></div>
     <div class="card">
       <form id="form" autocomplete="off">
@@ -237,7 +259,7 @@ footer{color:var(--muted);font-size:12.5px;padding-bottom:30px}
         <button class="chip" type="button" id="slots-toggle" aria-pressed="true">Open slots: Tue · Thu · Sat</button>
         <button class="chip" type="button" id="copy">Copy list</button>
         <button class="chip" type="button" id="export">Export schedule.json</button>
-        <label class="chip" for="import" style="cursor:pointer;border:1px solid var(--line);font-family:var(--label);font-weight:700;letter-spacing:.06em;text-transform:uppercase">Import</label>
+        <label class="chip" id="import-lab" for="import" style="cursor:pointer;border:1px solid var(--line);font-family:var(--label);font-weight:700;letter-spacing:.06em;text-transform:uppercase">Import</label>
         <input type="file" id="import" accept=".json,application/json" hidden>
       </div>
     </div>
@@ -286,7 +308,7 @@ footer{color:var(--muted);font-size:12.5px;padding-bottom:30px}
   const weekNum=(s,k)=>{const w=weekOf(s);return w&&w.phase&&w.phase.k===k?w.i:null;};
 
   let matches=[]; let filter="all"; let showSlots=true;
-  try{showSlots=localStorage.getItem("pld-2027-slots")!=="off";}catch(e){} let editing=null; let db=null; let canWrite=true; let loaded=false;
+  try{showSlots=localStorage.getItem("pld-2027-slots")!=="off";}catch(e){} let editing=null; let db=null; let canWrite=false; let loaded=false;
 
   function describePhase(s){
     if(!s) return "";
@@ -494,7 +516,7 @@ footer{color:var(--muted);font-size:12.5px;padding-bottom:30px}
       resetForm(true);
     }catch(err){
       msg.className="msg err";
-      if(err&&err.code==="invalid_argument"){canWrite=false;applyWriteState();msg.textContent="You can view this schedule but not change it.";}
+      if(err&&(err.code==="invalid_argument"||/PERMISSION_DENIED/i.test(err.code||err.message||""))){canWrite=false;applyWriteState();msg.textContent="Your account can't edit this schedule. Check the database rules.";}
       else if(err&&err.code==="quota_exceeded") msg.textContent="The schedule is full. Delete some old entries and try again.";
       else msg.textContent="That didn't save. Check your connection and try again.";
     }finally{btn.disabled=false;}
@@ -542,56 +564,128 @@ footer{color:var(--muted);font-size:12.5px;padding-bottom:30px}
 
   function applyWriteState(){
     form.querySelectorAll("input,select,textarea,button").forEach(el=>el.disabled=!canWrite);
-    if(!canWrite){$("#notice").hidden=false;$("#notice").textContent="This is a view-only copy of the schedule.";}
+    $("#import-lab").style.display=canWrite?"":"none";
     render();
   }
 
-  // Boot (GitHub Pages version: saves in this browser, seeds from schedule.json)
-  const KEY="pld-2027-matches";
-  function localDb(){
-    let data={}; const subs=[];
-    try{data=JSON.parse(localStorage.getItem(KEY)||"{}")||{};}catch(e){data={};}
-    const snap=()=>({docs:Object.entries(data).map(([id,v])=>({id,data:()=>v}))});
-    const emit=()=>subs.forEach(f=>f(snap()));
-    const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(data));}catch(e){} emit();};
+  // Boot: shared online schedule (Firebase). Anyone can view; signed-in coaches can edit.
+  const FB={apiKey:"AIzaSyChTjsKRkpfAmB_4dVkeUELnLNx1QRKac0",authDomain:"pld-soccer-2027-schedule.firebaseapp.com",databaseURL:"https://pld-soccer-2027-schedule-default-rtdb.firebaseio.com",projectId:"pld-soccer-2027-schedule",storageBucket:"pld-soccer-2027-schedule.firebasestorage.app",messagingSenderId:"700435213660",appId:"1:700435213660:web:098e66fc05e3785b7a2599"};
+  const PATH="schedule2027/matches";
+  const OLD_KEY="pld-2027-matches"; // where earlier versions saved matches in this browser
+  const notice=(html)=>{const n=$("#notice"); if(!html){n.hidden=true;n.innerHTML="";return;} n.hidden=false; n.innerHTML=html;};
+  const safeKey=k=>String(k).replace(/[.#$\[\]\/]/g,"_");
+  const toMap=arr=>{const o={};(Array.isArray(arr)?arr:[]).forEach((m,i)=>{if(m&&m.date&&m.opponent){const {id,...rest}=m;o[safeKey(id||("m"+i))]=rest;}});return o;};
+  const oldLocal=()=>{try{const d=JSON.parse(localStorage.getItem(OLD_KEY)||"{}")||{};return Object.keys(d).length?d:null;}catch(e){return null;}};
+
+  function cloudDb(){
+    const ref=firebase.database().ref(PATH); let data={}; let ready=false;
     return {
       collection:()=>({
-        doc:(id)=>{id=id||("m"+Date.now().toString(36)+Math.random().toString(36).slice(2,7));
-          return {set:async v=>{data[id]=v;save();},delete:async()=>{delete data[id];save();}};},
-        onSnapshot:(f)=>{subs.push(f);setTimeout(()=>f(snap()),0);return()=>{};}
+        doc:(id)=>{const r=id?ref.child(safeKey(id)):ref.push(); return {set:v=>r.set(v),delete:()=>r.remove()};},
+        onSnapshot:(f,onErr)=>{ref.on("value",snap=>{data=snap.val()||{};ready=true;f({docs:Object.entries(data).map(([id,v])=>({id,data:()=>v}))});},e=>{if(onErr)onErr(e);});}
       }),
       isEmpty:()=>Object.keys(data).length===0,
-      replaceAll:(obj)=>{data=obj||{};save();},
+      isReady:()=>ready,
+      replaceAll:(obj)=>ref.set(obj||{}),
       all:()=>data
     };
   }
-  const toMap=arr=>{const o={};(Array.isArray(arr)?arr:[]).forEach((m,i)=>{if(m&&m.date&&m.opponent){const {id,...rest}=m;o[id||("m"+i)]=rest;}});return o;};
+  function staticDb(obj){ // read-only fallback if Firebase can't load
+    const data=obj||{};
+    return {collection:()=>({doc:()=>({set:async()=>{throw {code:"PERMISSION_DENIED"};},delete:async()=>{throw {code:"PERMISSION_DENIED"};}}),
+      onSnapshot:(f)=>setTimeout(()=>f({docs:Object.entries(data).map(([id,v])=>({id,data:()=>v}))}),0)}),
+      isEmpty:()=>Object.keys(data).length===0,isReady:()=>true,replaceAll:async()=>{throw {code:"PERMISSION_DENIED"};},all:()=>data};
+  }
+
+  // Offer to move matches saved in this browser (older version) up to the shared schedule
+  function checkMigrate(){
+    if(!canWrite||!db||!db.isReady()) return;
+    const local=oldLocal();
+    if(db.isEmpty()&&local){
+      notice(`The shared schedule is empty, but this browser has ${Object.keys(local).length} matches saved from the old version. <button type="button" id="mig-go">Upload them</button>`);
+      $("#mig-go").onclick=async()=>{
+        $("#mig-go").disabled=true;
+        try{await db.replaceAll(local); notice(""); msg.className="msg"; msg.textContent="Uploaded "+Object.keys(local).length+" matches to the shared schedule.";}
+        catch(e){notice("Upload failed. Your account may not have permission to edit. Check the database rules.");}
+      };
+    }else if(db.isEmpty()){
+      notice("The shared schedule is empty. Click Import to load a schedule.json you exported earlier.");
+    }else if($("#mig-go")||/schedule is empty/.test($("#notice").textContent)){ notice(""); }
+  }
 
   $("#export").addEventListener("click",()=>{
-    const list=Object.entries(db.all()).map(([id,v])=>({id,...v})).sort(sortM);
+    const list=Object.entries(db?db.all():{}).map(([id,v])=>({id,...v})).sort(sortM);
     const blob=new Blob([JSON.stringify(list,null,2)],{type:"application/json"});
     const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="schedule.json";
     document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),1000);
   });
   $("#import").addEventListener("change",async e=>{
     const f=e.target.files[0]; if(!f) return;
-    try{db.replaceAll(toMap(JSON.parse(await f.text()))); msg.className="msg"; msg.textContent="Imported "+f.name+".";}
-    catch(err){msg.className="msg err"; msg.textContent="That file isn't a schedule export.";}
+    try{
+      if(!canWrite) throw {code:"PERMISSION_DENIED"};
+      const obj=toMap(JSON.parse(await f.text())), n=Object.keys(obj).length;
+      if(!n) throw new Error("empty");
+      if(!db.isEmpty()&&!confirm("Replace the shared schedule with the "+n+" matches in "+f.name+"? Everyone will see the change.")){e.target.value="";return;}
+      await db.replaceAll(obj); notice(""); msg.className="msg"; msg.textContent="Imported "+n+" matches from "+f.name+".";
+    }catch(err){
+      msg.className="msg err";
+      msg.textContent=(err&&/PERMISSION_DENIED/i.test(err.code||err.message||""))?"Sign in with a coach account to import.":"That file isn't a schedule export.";
+    }
     e.target.value="";
   });
 
+  // Sign-in
+  const who=$("#auth-who"), aform=$("#auth-form"), amsg=$("#auth-msg");
+  function showAuth(user){
+    canWrite=!!user;
+    aform.hidden=!!user; $("#auth-out").hidden=!user;
+    who.innerHTML=user?`Signed in as <b>${esc(user.email||"coach")}</b>. Changes save for everyone instantly.`:"Viewing the schedule. Coaches, sign in to edit:";
+    applyWriteState(); checkMigrate();
+  }
+  function authErr(e){
+    const c=(e&&e.code)||"";
+    if(/invalid-credential|wrong-password|user-not-found|invalid-email|invalid-login/.test(c)) return "That email and password didn't match.";
+    if(/too-many-requests/.test(c)) return "Too many tries. Wait a few minutes and try again.";
+    if(/network/.test(c)) return "No connection. Check your internet and try again.";
+    if(/operation-not-allowed|configuration-not-found/.test(c)) return "Email sign-in isn't turned on in Firebase yet.";
+    return "Sign-in didn't work ("+c+").";
+  }
+
   countdown(); render();
-  db=localDb();
-  (async()=>{
-    if(db.isEmpty()){
-      try{const r=await fetch("schedule.json",{cache:"no-store"}); if(r.ok) db.replaceAll(toMap(await r.json()));}catch(e){}
-    }
+  if(typeof firebase==="undefined"){
+    // Firebase blocked or offline: show the last published schedule.json, view only
+    aform.hidden=true; who.textContent="The live schedule couldn't load. Showing the last published copy.";
+    applyWriteState();
+    (async()=>{let obj={};try{const r=await fetch("schedule.json",{cache:"no-store"}); if(r.ok) obj=toMap(await r.json());}catch(e){}
+      db=staticDb(obj); db.collection("matches").onSnapshot(snap=>{loaded=true;matches=snap.docs.map(s=>({id:s.id,...s.data()}));render();});})();
+  }else{
+    if(!firebase.apps.length) firebase.initializeApp(FB);
+    db=cloudDb();
+    applyWriteState();
     db.collection("matches").onSnapshot(snap=>{
       loaded=true;
       matches=snap.docs.map(s=>({id:s.id,...s.data()}));
+      render(); checkMigrate();
+    },err=>{
+      loaded=true;
+      notice("The schedule couldn't load from the database. Reload the page to try again.");
       render();
     });
-  })();
+    firebase.auth().onAuthStateChanged(showAuth);
+    aform.addEventListener("submit",async e=>{
+      e.preventDefault(); amsg.className="msg"; amsg.textContent="Signing in…"; $("#auth-go").disabled=true;
+      try{await firebase.auth().signInWithEmailAndPassword($("#auth-email").value.trim(),$("#auth-pass").value); amsg.textContent=""; $("#auth-pass").value="";}
+      catch(err){amsg.className="msg err"; amsg.textContent=authErr(err);}
+      finally{$("#auth-go").disabled=false;}
+    });
+    $("#auth-forgot").addEventListener("click",async()=>{
+      const em=$("#auth-email").value.trim();
+      if(!em){amsg.className="msg err";amsg.textContent="Enter your email first, then click Forgot password.";return;}
+      try{await firebase.auth().sendPasswordResetEmail(em); amsg.className="msg"; amsg.textContent="Reset link sent to "+em+".";}
+      catch(err){amsg.className="msg err"; amsg.textContent=authErr(err);}
+    });
+    $("#auth-out").addEventListener("click",()=>firebase.auth().signOut());
+  }
 })();
 </script>
 </body>
